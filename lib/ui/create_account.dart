@@ -50,7 +50,7 @@ class _CreateAccountState extends State<CreateAccount> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey,
         title: const Text(
           'Create Account',
           style: TextStyle(

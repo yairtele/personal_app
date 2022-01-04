@@ -52,11 +52,11 @@ class _LoginState extends State<Login> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey,
         title: const Text(
-          'Login',
+          'NEWSAN',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+              fontSize: 30, fontWeight: FontWeight.w500, color: Colors.white),
         ),
       ),
       body: SafeArea(

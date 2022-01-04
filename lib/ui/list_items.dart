@@ -38,27 +38,28 @@ class ListItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    final items = List<String>.generate(10000, (i) => 'Item $i');
+    final items = List<String>.generate(10000, (i) => 'Lote $i');
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey,
         title: const Text(
-          'Items for sale',
+          'Lotes en Auditoria',
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
           IconButton(
+            icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+            onPressed: () => appState.currentAction =
+                PageAction(state: PageState.addPage, page: CheckoutPageConfig),
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => appState.currentAction =
                 PageAction(state: PageState.addPage, page: SettingsPageConfig),
           ),
-          IconButton(
-            icon: const Icon(Icons.add_shopping_cart_sharp),
-            onPressed: () => appState.currentAction =
-                PageAction(state: PageState.addPage, page: CheckoutPageConfig),
-          )
+
         ],
       ),
       body: SafeArea(

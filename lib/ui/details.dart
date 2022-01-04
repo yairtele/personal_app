@@ -43,7 +43,7 @@ class Details extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey,
         title: Text(
           'Item $id',
           style: const TextStyle(
