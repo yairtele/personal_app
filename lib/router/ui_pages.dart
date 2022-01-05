@@ -40,7 +40,8 @@ const String DetailsPath = '/details';
 const String CartPath = '/cart';
 const String CheckoutPath = '/checkout';
 const String SettingsPath = '/settings';
-
+const String NewBatchPath = '/newbatch';
+const String UploadBatchPath = '/uploadbatch';
 enum Pages {
   Splash,
   Login,
@@ -49,7 +50,9 @@ enum Pages {
   Details,
   Cart,
   Checkout,
-  Settings
+  Settings,
+  NewBatch,
+  UploadBatch
 }
 
 class PageConfiguration {
@@ -78,3 +81,7 @@ PageConfiguration CheckoutPageConfig = PageConfiguration(
     key: 'Checkout', path: CheckoutPath, uiPage: Pages.Checkout, currentPageAction: null);
 PageConfiguration SettingsPageConfig = PageConfiguration(
     key: 'Settings', path: SettingsPath, uiPage: Pages.Settings, currentPageAction: null);
+PageConfiguration NewBatchPageConfig = PageConfiguration(
+    key: 'NewBatch', path: NewBatchPath, uiPage: Pages.NewBatch, currentPageAction: null);
+PageConfiguration UploadBatchPageConfig = PageConfiguration(
+    key: 'UploadBatch', path: UploadBatchPath, uiPage: Pages.UploadBatch, currentPageAction: null);

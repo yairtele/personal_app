@@ -31,6 +31,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:navigation_app/ui/newbatch.dart';
+import '../ui/newbatch.dart';
+import '../ui/uploadbatch.dart';
 import '../app_state.dart';
 import '../ui/details.dart';
 import '../ui/cart.dart';
@@ -180,6 +183,13 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case Pages.Settings:
           _addPageData(Settings(), SettingsPageConfig);
           break;
+        case Pages.NewBatch:
+          _addPageData(NewBatch(), NewBatchPageConfig);
+          break;
+        case Pages.UploadBatch:
+          _addPageData(UploadBatch(), UploadBatchPageConfig);
+          break;
+
         case Pages.Details:
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction.widget, pageConfig);
@@ -260,6 +270,13 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
       case Pages.Details:
         DetailsPageConfig.currentPageAction = action;
         break;
+      case Pages.NewBatch:
+        NewBatchPageConfig.currentPageAction = action;
+        break;
+      case Pages.UploadBatch:
+        UploadBatchPageConfig.currentPageAction = action;
+        break;
+
       default:
         break;
     }
@@ -348,6 +365,20 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
             _createPage(Settings(), SettingsPageConfig)
           ]);
           break;
+        case 'newbatch':
+          setPath([
+            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(NewBatch(), NewBatchPageConfig)
+          ]);
+          break;
+        case 'uploadbatch':
+          setPath([
+            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(UploadBatch(), NewBatchPageConfig)
+          ]);
+
+          break;
+
       }
     }
   }

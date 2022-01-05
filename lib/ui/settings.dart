@@ -39,7 +39,7 @@ class Settings extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.grey,
         title: const Text(
           'Settings',
           style: TextStyle(

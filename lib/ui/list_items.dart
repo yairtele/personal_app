@@ -59,15 +59,20 @@ class ListItems extends StatelessWidget {
             onPressed: () => appState.currentAction =
                 PageAction(state: PageState.addPage, page: SettingsPageConfig),
           ),
-
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => appState.currentAction =
+                PageAction(state: PageState.addPage, page: NewBatchPageConfig),
+          ),
         ],
       ),
       body: SafeArea(
-        child: ListView.builder(
+          child: ListView.builder(
           itemCount: items.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text('${items[index]}'),
+              title: Text('${items[index]}'
+              ),
               onTap: () {
                 appState.currentAction = PageAction(
                     state: PageState.addWidget,
