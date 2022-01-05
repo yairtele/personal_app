@@ -5,7 +5,8 @@ import 'package:navigation_app/router/ui_pages.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
-
+bool EAN = false;
+bool MOD = false;
 class UploadBatch extends StatefulWidget {
   const UploadBatch({Key key}) : super(key: key);
 
@@ -32,6 +33,28 @@ class _UploadBatch extends State<UploadBatch> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             //Text('ID Lote Retail: '),
+            CheckboxListTile(
+              title: Text('EAN'),
+              value: EAN,
+              onChanged: (newValue) {
+                setState(() {
+                  EAN = newValue;
+                  MOD = false;
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+            ),
+            CheckboxListTile(
+              title: Text('MOD'),
+              value: MOD,
+              onChanged: (newValue2) {
+                setState(() {
+                  MOD = newValue2;
+                  EAN = false;
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+            ),
             Container(
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
@@ -41,23 +64,18 @@ class _UploadBatch extends State<UploadBatch> {
                 textInputAction: TextInputAction.send,
                 maxLength: 30,
                 decoration: InputDecoration(
-                    hintText: 'ID Lote Retail',
+                    hintText: 'EAN/MOD',
                     helperText: 'Ej: 939482'
                 ),
               ),
             ),
+
             Container(
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
-              child: const TextField(
-                autofocus: true,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.send,
-                maxLength: 50,
-                decoration: InputDecoration(
-                    hintText: 'Descripcion',
-                    helperText: 'Ej: Lote Fravega 4'
-                ),
+              child: ElevatedButton(
+                onPressed: () {  },
+                child: const Text('Buscar'),
               ),
             ),
             Container(
@@ -66,7 +84,7 @@ class _UploadBatch extends State<UploadBatch> {
               child: ElevatedButton(
                 onPressed: () => appState.currentAction =
                     PageAction(state: PageState.replaceAll, page: ListItemsPageConfig),
-                child: const Text('Crear'),
+                child: const Text('Confirmar'),
               ),
             ),
           ],
