@@ -30,6 +30,7 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/details.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app_state.dart';
 import '../router/ui_pages.dart';
@@ -49,10 +50,12 @@ class ListItems extends StatelessWidget {
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
-          IconButton(
-            icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
-            onPressed: () => appState.currentAction =
-                PageAction(state: PageState.addPage, page: CheckoutPageConfig),
+          RaisedButton.icon(onPressed:(){
+            launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
+              }
+              ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+               label: Text(''),
+               color: Colors.grey,
           ),
           IconButton(
             icon: const Icon(Icons.settings),
