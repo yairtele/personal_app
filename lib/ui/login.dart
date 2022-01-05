@@ -53,11 +53,12 @@ class _LoginState extends State<Login> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.grey,
-        title: const Text(
-          'NEWSAN',
-          style: TextStyle(
-              fontSize: 30, fontWeight: FontWeight.w500, color: Colors.white),
-        ),
+        title: Image.asset('assets/images/logo_blanco.png',height:120 ,width:160,),
+        //title: const Text(
+          //'NEWSAN',
+          //style: TextStyle(
+            //  fontSize: 30, fontWeight: FontWeight.w500, color: Colors.white),
+        //),
       ),
       body: SafeArea(
         child: Center(
