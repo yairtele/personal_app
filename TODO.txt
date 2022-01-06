@@ -14,3 +14,12 @@ Temas técnicos
 [] 5. Habilitar/deshabilitar campos, botones, captura de fotos, etc, de acuerdo al estado de la entidad que se está viendo
 [] 6. Hacer que sea responsive
 [] 7. Persistir datos entre páginas para no consultar cada vez (cuando sepamos como refrescar ante cambios externos)
+
+Modificaciones DER:
+Solicitud:
+Agregar campo referencia interna.
+
+Devolución de productos no auditables:
+¿Se desea cargar por unidad o por cantidad? (Combo tipo de carga)
+    - Si es por cantidad le doy la posibilidad de cargar una foto opcional.
+Si ya existe una solicitud con el mismo EAN
