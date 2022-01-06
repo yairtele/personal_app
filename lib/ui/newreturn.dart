@@ -7,14 +7,14 @@ import 'package:provider/provider.dart';
 import '../app_state.dart';
 bool EAN = false;
 bool MOD = false;
-class UploadBatch extends StatefulWidget {
-  const UploadBatch({Key key}) : super(key: key);
+class NewReturn extends StatefulWidget {
+  const NewReturn({Key key}) : super(key: key);
 
   @override
-  State<UploadBatch> createState() => _UploadBatch();
+  State<NewReturn> createState() => _NewReturn();
 }
 
-class _UploadBatch extends State<UploadBatch> {
+class _NewReturn extends State<NewReturn> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);

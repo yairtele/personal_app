@@ -65,7 +65,7 @@ class _NewBatchState extends State<NewBatch> {
                 padding: EdgeInsets.all(15),
                 child: ElevatedButton(
                   onPressed: () => appState.currentAction =
-                      PageAction(state: PageState.addPage, page: UploadBatchPageConfig),
+                      PageAction(state: PageState.addPage, page: NewReturnPageConfig),
                     child: const Text('Crear'),
                   ),
               ),

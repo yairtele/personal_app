@@ -33,7 +33,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/newbatch.dart';
 import '../ui/newbatch.dart';
-import '../ui/uploadbatch.dart';
+import '../ui/newreturn.dart';
 import '../app_state.dart';
 import '../ui/details.dart';
 import '../ui/cart.dart';
@@ -186,8 +186,8 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case Pages.NewBatch:
           _addPageData(NewBatch(), NewBatchPageConfig);
           break;
-        case Pages.UploadBatch:
-          _addPageData(UploadBatch(), UploadBatchPageConfig);
+        case Pages.NewReturn:
+          _addPageData(NewReturn(), NewReturnPageConfig);
           break;
 
         case Pages.Details:
@@ -273,8 +273,8 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
       case Pages.NewBatch:
         NewBatchPageConfig.currentPageAction = action;
         break;
-      case Pages.UploadBatch:
-        UploadBatchPageConfig.currentPageAction = action;
+      case Pages.NewReturn:
+        NewReturnPageConfig.currentPageAction = action;
         break;
 
       default:
@@ -371,10 +371,10 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
             _createPage(NewBatch(), NewBatchPageConfig)
           ]);
           break;
-        case 'uploadbatch':
+        case 'newreturn':
           setPath([
             _createPage(ListItems(), ListItemsPageConfig),
-            _createPage(UploadBatch(), NewBatchPageConfig)
+            _createPage(NewReturn(), NewBatchPageConfig)
           ]);
 
           break;

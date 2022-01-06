@@ -59,8 +59,8 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
         return SettingsPageConfig;
       case NewBatchPath:
         return NewBatchPageConfig;
-      case UploadBatchPath:
-        return UploadBatchPageConfig;
+      case NewReturnPath:
+        return NewReturnPageConfig;
       default:
         return SplashPageConfig;
     }
@@ -87,8 +87,8 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
         return const RouteInformation(location: SettingsPath);
       case Pages.NewBatch:
         return const RouteInformation(location: NewBatchPath);
-      case Pages.UploadBatch:
-        return const RouteInformation(location: UploadBatchPath);
+      case Pages.NewReturn:
+        return const RouteInformation(location: NewReturnPath);
       default: return const RouteInformation(location: SplashPath);
 
     }

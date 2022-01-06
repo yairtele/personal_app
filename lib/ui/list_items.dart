@@ -39,7 +39,7 @@ class ListItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    final items = List<String>.generate(10000, (i) => 'Lote $i');
+    final items = List<String>.generate(10, (i) => 'Lote $i');
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
