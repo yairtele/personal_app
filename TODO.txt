@@ -1,0 +1,16 @@
+Armar dummy
+[v] 1. Cambiar framework de navegación de MaterialApp.routes a MaterialApp.router (navigator 2.0)
+[] 2. Crear todas las páginas con un texto que diga el nombre de la página (o en AppBar)
+[] 3. Aprender layouts básicos (container, rows, columns)
+[] 4. Mostrar textos en duro
+[] 5. Mostrar datos en forma de lista  o de grid
+[] 6. Mostrar formularios (campos de texto, botones, etc)
+
+Temas técnicos
+[] 1. Invocar servicios
+[] 2. Autenticación con Athento
+[] 3. Leer códigos de barra
+[] 4. Capturar fotos para subir a Athento (ABM, manejar tamaño y resolución ANTES de subir a Athento)
+[] 5. Habilitar/deshabilitar campos, botones, captura de fotos, etc, de acuerdo al estado de la entidad que se está viendo
+[] 6. Hacer que sea responsive
+[] 7. Persistir datos entre páginas para no consultar cada vez (cuando sepamos como refrescar ante cambios externos)
