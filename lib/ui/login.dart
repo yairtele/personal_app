@@ -33,6 +33,7 @@ import 'package:provider/provider.dart';
 
 import '../app_state.dart';
 import '../router/ui_pages.dart';
+import 'package:email_validator/email_validator.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -54,11 +55,6 @@ class _LoginState extends State<Login> {
         elevation: 0,
         backgroundColor: Colors.grey,
         title: Image.asset('assets/images/logo_blanco.png',height:120 ,width:160,),
-        //title: const Text(
-          //'NEWSAN',
-          //style: TextStyle(
-            //  fontSize: 30, fontWeight: FontWeight.w500, color: Colors.white),
-        //),
       ),
       body: SafeArea(
         child: Center(
@@ -110,29 +106,7 @@ class _LoginState extends State<Login> {
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          side: BorderSide(
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {
-                          appState.currentAction = PageAction(state: PageState.addPage, page: CreateAccountPageConfig);
-                        },
-                        child: const Text(
-                          'Create Account',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
+                          primary: Colors.grey,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4.0),
                           ),

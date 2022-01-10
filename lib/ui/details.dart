@@ -31,10 +31,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
+final returns = List<String>.generate(10, (i) => 'Solicitud $i');
 
 class Details extends StatelessWidget {
   final int id;
-
   const Details(this.id);
 
   @override
@@ -45,31 +45,26 @@ class Details extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.grey,
         title: Text(
-          'Item $id',
+          'Lote $id',
           style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
       ),
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  appState.addToCart('Item $id');
-                  //appState.currentAction = PageAction(state: PageState.pop);
-                  appState.currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
-                },
-                child: const Text('Add to Cart'),
+        child: ListView.builder(
+          itemCount: returns.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text('${returns[index]}'
               ),
-              const SizedBox(height: 16,),
-              ElevatedButton(
-                onPressed: () => appState.currentAction = PageAction(state: PageState.addPage, page: CartPageConfig),
-                child: const Text('Cart'),
-              ),
-            ],
-          ),
+              onTap: () {
+                appState.currentAction = PageAction(
+                    state: PageState.addWidget,
+                    widget: Details(index),
+                    page: DetailsPageConfig);
+              },
+            );
+          },
         ),
       ),
     );
