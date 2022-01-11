@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider<AppState>(
       create: (_) => appState,
       child: MaterialApp.router(
-        title: 'Navigation App',
+        title: 'Newsan App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

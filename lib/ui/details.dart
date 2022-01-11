@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
+import 'details_return.dart';
 final returns = List<String>.generate(10, (i) => 'Solicitud $i');
 
 class Details extends StatelessWidget {
@@ -60,8 +61,8 @@ class Details extends StatelessWidget {
               onTap: () {
                 appState.currentAction = PageAction(
                     state: PageState.addWidget,
-                    widget: Details(index),
-                    page: DetailsPageConfig);
+                    widget: DetailsReturn(index),
+                    page: DetailsReturnPageConfig);
               },
             );
           },

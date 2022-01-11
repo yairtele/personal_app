@@ -89,6 +89,8 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
         return const RouteInformation(location: NewBatchPath);
       case Pages.NewReturn:
         return const RouteInformation(location: NewReturnPath);
+      case Pages.DetailsReturn:
+        return const RouteInformation(location: DetailsReturnPath);
       default: return const RouteInformation(location: SplashPath);
 
     }
