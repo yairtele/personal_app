@@ -29,10 +29,11 @@
  */
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
 import 'details_return.dart';
-final returns = List<String>.generate(10, (i) => 'Solicitud $i');
+final returns = List<String>.generate(5, (i) => 'Solicitud $i');
 
 class Details extends StatelessWidget {
   final int id;
@@ -50,6 +51,20 @@ class Details extends StatelessWidget {
           style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
+        actions: [
+          RaisedButton.icon(onPressed:(){
+            launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
+          }
+            ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+            label: Text(''),
+            color: Colors.grey,
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => appState.currentAction =
+                PageAction(state: PageState.addPage, page: SettingsPageConfig),
+          ),
+        ],
       ),
       body: SafeArea(
         child: ListView.builder(

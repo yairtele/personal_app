@@ -43,6 +43,7 @@ const String SettingsPath = '/settings';
 const String NewBatchPath = '/newbatch';
 const String NewReturnPath = '/newreturn';
 const String DetailsReturnPath = '/detailsreturn';
+const String DetailProductPath = '/detailproduct';
 enum Pages {
   Splash,
   Login,
@@ -54,7 +55,8 @@ enum Pages {
   Settings,
   NewBatch,
   NewReturn,
-  DetailsReturn
+  DetailsReturn,
+  DetailProduct
 }
 
 class PageConfiguration {
@@ -89,3 +91,6 @@ PageConfiguration NewReturnPageConfig = PageConfiguration(
     key: 'NewReturn', path: NewReturnPath, uiPage: Pages.NewReturn, currentPageAction: null);
 PageConfiguration DetailsReturnPageConfig = PageConfiguration(
     key: 'DetailsReturn', path: DetailsReturnPath, uiPage: Pages.DetailsReturn, currentPageAction: null);
+PageConfiguration DetailProductPageConfig = PageConfiguration(
+    key: 'DetailProduct', path: DetailProductPath, uiPage: Pages.DetailProduct, currentPageAction: null);
+

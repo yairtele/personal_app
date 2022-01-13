@@ -3,10 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_app/router/ui_pages.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'dart:async';
 
 import '../app_state.dart';
 bool EAN = false;
 bool MOD = false;
+PickedFile imageFile;
+String _ruta ;
+var type;
 class NewReturn extends StatefulWidget {
   const NewReturn({Key key}) : super(key: key);
 
@@ -87,6 +95,28 @@ class _NewReturn extends State<NewReturn> {
                 child: const Text('Confirmar'),
               ),
             ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: imageFile == null
+                            ? AssetImage('assets/images/logo_blanco.png')
+                            : FileImage(File(imageFile.path)),
+                        fit: BoxFit.cover)),
+              ),
+
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library,
+              ),
+            onTap: () async {
+              final tmpFile = await getImage(1);
+              setState(() {
+                imageFile = tmpFile;
+                print('Path: ' + imageFile.path.toString());
+              });
+            }),
           ],
         ),
       ),
@@ -94,3 +124,9 @@ class _NewReturn extends State<NewReturn> {
   }
 }
 
+Future getImage(int type) async {
+  final pickedImage = await ImagePicker().getImage(
+      source: type == 1 ? ImageSource.camera : ImageSource.gallery,
+      imageQuality: 50);
+  return pickedImage;
+}

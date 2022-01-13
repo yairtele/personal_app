@@ -34,7 +34,6 @@ import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/newbatch.dart';
 import '../ui/newbatch.dart';
 import '../ui/newreturn.dart';
-import '../ui/details_return.dart';
 import '../app_state.dart';
 import '../ui/details.dart';
 import '../ui/cart.dart';
@@ -195,6 +194,11 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
             _addPageData(pageConfig.currentPageAction.widget, pageConfig);
           }
           break;
+        case Pages.DetailProduct:
+          if (pageConfig.currentPageAction != null) {
+            _addPageData(pageConfig.currentPageAction.widget, pageConfig);
+          }
+          break;
         case Pages.Details:
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction.widget, pageConfig);
@@ -283,6 +287,9 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         break;
       case Pages.DetailsReturn:
         DetailsReturnPageConfig.currentPageAction = action;
+        break;
+      case Pages.DetailProduct:
+        DetailProductPageConfig.currentPageAction = action;
         break;
 
       default:

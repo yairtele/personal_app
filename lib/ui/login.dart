@@ -29,11 +29,14 @@
  */
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app_state.dart';
 import '../router/ui_pages.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:keycloak_flutter/keycloak_flutter.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -131,3 +134,38 @@ class _LoginState extends State<Login> {
     );
   }
 }
+/*
+Future authenticate() async {
+
+  // parameters here just for the sake of the question
+  var uri = Uri.parse('https://keycloak-url/auth/realms/myrealm');
+  var clientId = 'my_client_id';
+  var scopes = List<String>.of(['openid', 'profile']);
+  var port = 4200;
+  var redirectUri = Uri.parse('http://localhost:4200');
+
+  var issuer = await Issuer.discover(uri);
+  var client = new Client(issuer, clientId);
+
+  urlLauncher(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceWebView: true);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  var authenticator = new Authenticator(client,
+      scopes: scopes,
+      port: port,
+      urlLancher: urlLauncher,
+      redirectUri: redirectUri);
+
+  var c = await authenticator.authorize();
+  closeWebView();
+
+  var token= await c.getTokenResponse();
+  print(token);
+  return token;
+}
+*/

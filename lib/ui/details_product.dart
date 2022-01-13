@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
-final products = List<String>.generate(3, (i) => 'Producto $i');
+final photos = List<String>.generate(4, (i) => 'Foto $i');
 
-class DetailsReturn extends StatelessWidget {
+class DetailProduct extends StatelessWidget {
   final int id;
-  const DetailsReturn(this.id);
+  const DetailProduct(this.id);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class DetailsReturn extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.grey,
         title: Text(
-          'Solicitud $id',
+          'Producto $id',
           style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
@@ -38,16 +38,16 @@ class DetailsReturn extends StatelessWidget {
       ),
       body: SafeArea(
         child: ListView.builder(
-          itemCount: products.length,
+          itemCount: photos.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text('${products[index]}'
+              title: Text('${photos[index]}'
               ),
               onTap: () {
-                appState.currentAction = PageAction(
-                    state: PageState.addWidget,
-                    widget: DetailsReturn(index),
-                    page: DetailsReturnPageConfig);
+                //appState.currentAction = PageAction(
+                  //  state: PageState.addWidget,
+                    //widget: DetailProduct(index),
+                    //page: DetailProductPageConfig);
               },
             );
           },
