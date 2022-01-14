@@ -88,8 +88,8 @@ class _NewBatchState extends State<NewBatch> {
 
 void _makePostRequest() async {
 // set up Post request arguments
-  String username = 'luiz';
-  String password = '123';
+  String username = 'diego.daiuto@socialpath.com.ar';
+  String password = 'pass cambiar';
   String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
   // Uri url = 'https://newsan.athento.com/athento/site/automation/Athento.DocumentCreate/';
   var queryParameters;
