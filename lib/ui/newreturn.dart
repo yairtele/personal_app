@@ -1,19 +1,29 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
 import 'package:navigation_app/router/ui_pages.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
+//import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:async';
+import 'package:universal_html/html.dart' as html;
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart';
 
 import '../app_state.dart';
 bool EAN = false;
 bool MOD = false;
-PickedFile imageFile;
+//PickedFile imageFile;
+FilePickerResult imageFile;
 String _ruta ;
+var _controller = TextEditingController();
+//final ImagePicker _picker = ImagePicker();
+var _barcodeReader = FlutterBarcodeSdk();
+
 var type;
 class NewReturn extends StatefulWidget {
   const NewReturn({Key key}) : super(key: key);
@@ -66,8 +76,9 @@ class _NewReturn extends State<NewReturn> {
             Container(
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
-              child: const TextField(
+              child: TextField(
                 autofocus: true,
+                controller: _controller,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.send,
                 maxLength: 30,
@@ -101,7 +112,7 @@ class _NewReturn extends State<NewReturn> {
                     image: DecorationImage(
                         image: imageFile == null
                             ? AssetImage('assets/images/logo_blanco.png')
-                            : FileImage(File(imageFile.path)),
+                            : FileImage(File(imageFile.files.single.path)),
                         fit: BoxFit.cover)),
               ),
 
@@ -111,22 +122,37 @@ class _NewReturn extends State<NewReturn> {
                 Icons.photo_library,
               ),
             onTap: () async {
-              final tmpFile = await getImage(1);
-              setState(() {
-                imageFile = tmpFile;
-                print('Path: ' + imageFile.path.toString());
-              });
-            }),
+              final userAgent = html.window.navigator.userAgent.toString().toLowerCase();
+              RegExp regExp = new RegExp(r'Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini');
+              if (regExp.hasMatch(userAgent)) {
+                final tmpFile = await FilePicker.platform.pickFiles(); //await getImage(1);
+                setState(() async {
+                  imageFile = tmpFile;
+                  var fileBytes = imageFile.files.first.bytes;
+                  //print('Path: ' + imageFile.files.single.path);
+                  await _barcodeReader.init();
+                  //metodo no soportado en Flutter web, buscar otra libreria
+                  List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                  print('Barcode: ' + results[0].toString());
+                  _controller.text = results[0].toString();
+                });
+              } else {
+                final barcode = await BarcodeScanner.scan();
+                _controller.text = barcode.rawContent;
+              }
+            }
+            ),
           ],
         ),
       ),
     );
   }
 }
-
+/*
 Future getImage(int type) async {
   final pickedImage = await ImagePicker().getImage(
       source: type == 1 ? ImageSource.camera : ImageSource.gallery,
       imageQuality: 50);
   return pickedImage;
 }
+*/
