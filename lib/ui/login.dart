@@ -53,6 +53,9 @@ class _LoginState extends State<Login> {
     final appState = Provider.of<AppState>(context, listen: false);
     passwordTextController.text = appState.password;
     emailTextController.text = appState.emailAddress;
+    final myController = TextEditingController();
+    var email= Text(myController.text);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -76,7 +79,7 @@ class _LoginState extends State<Login> {
                                 border: UnderlineInputBorder(),
                                 hintText: 'Email'),
                             onChanged: (email) => appState.emailAddress = email,
-                            controller: emailTextController),
+                            controller: myController),
                       ),
                     ],
                   ),
@@ -134,6 +137,8 @@ class _LoginState extends State<Login> {
     );
   }
 }
+
+
 /*
 Future authenticate() async {
 

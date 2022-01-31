@@ -47,17 +47,15 @@ class ListItems extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.grey,
         title: const Text(
-          'Lotes en Auditoria',
+          'Lotes',
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
-          RaisedButton.icon(onPressed:(){
-            launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
-              }
-              ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
-               label: Text(''),
-               color: Colors.grey,
+          const Text(
+            '\nBienvenido: Juan Perez\nCUIT: 39-558978954-0',
+            style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
           ),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -69,6 +67,13 @@ class ListItems extends StatelessWidget {
             onPressed: () => appState.currentAction =
                 PageAction(state: PageState.addPage, page: NewBatchPageConfig),
           ),
+          RaisedButton.icon(onPressed:(){
+            launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
+              }
+              ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+               label: Text(''),
+               color: Colors.grey,
+          ),
         ],
       ),
       body: SafeArea(
@@ -78,7 +83,7 @@ class ListItems extends StatelessWidget {
             return ListTile(
               isThreeLine: true,
               leading: Icon(Icons.article),
-              title: Text('${items[index]}',style: TextStyle(fontSize: 16.0 ,fontWeight:FontWeight.bold,color: Colors.black)
+              title: Text('\n${items[index]}',style: TextStyle(fontSize: 14.0 ,fontWeight:FontWeight.bold,color: Colors.black)
               ),
               subtitle: Text('Referencia Interna de Lote: 0005889$index\nDescripcion: FRAV${items[index]}\n'),
               onTap: () {
