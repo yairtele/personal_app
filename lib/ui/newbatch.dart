@@ -42,7 +42,7 @@ class _NewBatchState extends State<NewBatch> {
                   textInputAction: TextInputAction.send,
                   maxLength: 30,
                   decoration: InputDecoration(
-                    hintText: 'ID Lote Retail',
+                    hintText: 'Referencia Interna Lote',
                     helperText: 'Ej: 939482'
                   ),
                 ),
