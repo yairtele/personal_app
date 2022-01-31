@@ -52,6 +52,11 @@ class Details extends StatelessWidget {
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
+          const Text(
+            '\nBienvenido: Juan Perez\nCUIT: 39-558978954-0',
+            style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => appState.currentAction =
