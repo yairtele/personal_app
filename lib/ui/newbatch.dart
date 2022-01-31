@@ -89,14 +89,17 @@ class _NewBatchState extends State<NewBatch> {
 void _makePostRequest() async {
 // set up Post request arguments
   String username = 'diego.daiuto@socialpath.com.ar';
-  String password = 'pass cambiar';
+  String password = 'hkjhg33j4kh5l2345kjh23lkj5h432l45kjh234lkjh543';
   String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
-  // Uri url = 'https://newsan.athento.com/athento/site/automation/Athento.DocumentCreate/';
-  var queryParameters;
-  Uri url = Uri.https('newsan.athento.com','/athento/site/automation/Athento.DocumentCreate');
-  var headers= <String, String>{'authorization': basicAuth};
+  print('BasicAuth:' + basicAuth);
+  String content = 'application/json';
+  //String connection = 'keep-alive';
+  //String encod = 'gzip, deflate, br';
+  // Uri url = 'https://newsan.athento.com/athento/site/automation/Athento.DocumentCreate/'
+  Uri url = Uri.https('newsan.athento.com','/athento/site/automation/Athento.DocumentCreate/');
+  var headers= <String, String>{'Authorization': basicAuth,'Content-Type':content};
  //uuid de AVON estático
-  var json = '{"input": "2ddd5db0-b28b-4fc9-b1e5-357a5d0b43e2","params": {"type": "lote_lif","audit": "Creado desde la aplicacion x","properties": {"dc:title":"Title example","lote_lif_descripcion_lote" : "Massa morbi magnis pede suspendisse in platea fames.","lote_lif_referencia_interna_lote" : "Morbi class cum praesent a.","lote_lif_ndeg_lote" : "000000000001","lote_lif_cuit_cliente" : "Porta lorem amet sed consectetuer.","lote_lif_razon_social" : "Curae felis massa egestas velit risus ligula accumsan porta potenti lacus dolor nullam porta parturient.","lote_lif_auditor" : "","lote_lif_backoffice" : ""}}}';
+  var json = '{"input": "5366d23d-07bb-4eb3-b34a-5943b0f5cccf","params": {"type": "lote_lif","audit": "Creado desde la aplicacion x","properties": {"dc:title":"Example3","lote_lif_descripcion_lote" : "Prueba","lote_lif_referencia_interna_lote" : "pr","lote_lif_ndeg_lote" : "000000000002","lote_lif_cuit_cliente" : "99-99999999-9","lote_lif_razon_social" : "Empresa SA","lote_lif_auditor" : "","lote_lif_backoffice" : "","lote_lif_generar_csv" : ""}}}';
 // make PUT request
   Response response = await post(url, headers: headers, body: json);
 // check the status code for the result

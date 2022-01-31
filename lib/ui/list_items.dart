@@ -27,6 +27,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/details.dart';
 import 'package:provider/provider.dart';
@@ -74,8 +76,11 @@ class ListItems extends StatelessWidget {
           itemCount: items.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text('${items[index]}'
+              isThreeLine: true,
+              leading: Icon(Icons.article),
+              title: Text('${items[index]}',style: TextStyle(fontSize: 16.0 ,fontWeight:FontWeight.bold,color: Colors.black)
               ),
+              subtitle: Text('Referencia Interna de Lote: 0005889$index\nDescripcion: FRAV${items[index]}\n'),
               onTap: () {
                 appState.currentAction = PageAction(
                     state: PageState.addWidget,

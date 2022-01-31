@@ -1,19 +1,31 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
 import 'package:navigation_app/router/ui_pages.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+//import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:async';
-
+import 'package:universal_html/html.dart' as html;
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
+
 bool EAN = false;
 bool MOD = false;
 PickedFile imageFile;
+//FilePickerResult imageFile;
 String _ruta ;
+var _controller = TextEditingController();
+final ImagePicker _picker = ImagePicker();
+var _barcodeReader = FlutterBarcodeSdk();
+
 var type;
 class NewReturn extends StatefulWidget {
   const NewReturn({Key key}) : super(key: key);
@@ -66,8 +78,9 @@ class _NewReturn extends State<NewReturn> {
             Container(
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
-              child: const TextField(
+              child: TextField(
                 autofocus: true,
+                controller: _controller,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.send,
                 maxLength: 30,
@@ -111,12 +124,37 @@ class _NewReturn extends State<NewReturn> {
                 Icons.photo_library,
               ),
             onTap: () async {
-              final tmpFile = await getImage(1);
-              setState(() {
-                imageFile = tmpFile;
-                print('Path: ' + imageFile.path.toString());
-              });
-            }),
+              //final userAgent = html.window.navigator.userAgent.toString().toLowerCase();
+              //print('Pre regexp');
+              //RegExp regExp = new RegExp(r'Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini');
+              //print('Post regexp');
+              if(kIsWeb){
+                //if (!regExp.hasMatch(userAgent)) {
+                print('Camino desktop');
+                final tmpFile = await getImage(1);
+                setState(() async {
+                  imageFile = tmpFile;
+                  var fileBytes = await imageFile.readAsBytes();
+                  //print('Path: ' + imageFile.files.single.path);
+                  //metodo no soportado en Flutter web, buscar otra libreria
+                  List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                  print('Barcode: ' + results[0].toString());
+                  _controller.text = results[0].toString();
+                });
+              } else {
+                if (Platform.isAndroid || Platform.isIOS) {
+                  print('Camino mobile');
+                  final barcode = await BarcodeScanner.scan();
+                  _controller.text = barcode.rawContent;
+                }
+              }
+              /*try{
+
+              }catch(e){
+
+              }*/
+            }
+            ),
           ],
         ),
       ),
