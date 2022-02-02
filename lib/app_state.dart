@@ -1,8 +1,7 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:navigation_app/services/sp_athento_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'services/user_services.dart';
 import 'router/ui_pages.dart';
 
 const String LoggedInKey = 'LoggedIn';
@@ -27,14 +26,21 @@ class PageAction {
 }
 class AppState extends ChangeNotifier {
   bool _loggedIn = false;
-  bool get loggedIn  => _loggedIn;
   bool _splashFinished = false;
+
+  String companyName;
+
+  bool get loggedIn  => _loggedIn;
   bool get splashFinished => _splashFinished;
+
   final cartItems = [];
   String emailAddress;
   String password;
   PageAction _currentAction = PageAction();
   PageAction get currentAction => _currentAction;
+
+  UserInfo userInfo = null;
+
   set currentAction(PageAction action) {
     _currentAction = action;
     notifyListeners();
@@ -73,11 +79,17 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void login() {
+  bool login() {
+    UserServices.login(emailAddress, password);
     _loggedIn = true;
     saveLoginState(loggedIn);
-    _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
-    notifyListeners();
+    if(_loggedIn){
+      _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
+      notifyListeners();
+    }
+
+    return _loggedIn;
+
   }
 
   void logout() {

@@ -27,9 +27,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:navigation_app/services/business_services.dart';
+import 'package:navigation_app/services/sp_athento_services.dart';
 import 'package:navigation_app/ui/details.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -38,27 +39,45 @@ import '../app_state.dart';
 import '../router/ui_pages.dart';
 
 class ListItems extends StatelessWidget {
+  const ListItems({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    final items = List<String>.generate(10, (i) => 'Lote $i');
+
+    // Obtener CUIT del usuario (del perfil de Athento)
+    UserInfo user_cuit;
+    if(appState.userInfo == null){
+      user_cuit = BusinessServices.getUserInfo(appState.emailAddress);
+      appState.userInfo = user_cuit;
+    }
+
+    // Obtener Razon social con el servicio de Newsan
+    String company_name;
+    if(appState.companyName == ''){
+      company_name = BusinessServices.getCompanyName(appState.userInfo.idNumber);
+      appState.companyName = company_name;
+    }
+
+    // Obtener lista de lotes Draft (en principio) desde Athento
+    var batches = BusinessServices.getBatches();
+    appState.companyName = company_name;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.grey,
         title: const Text(
-          'Lotes en Auditoria',
+          'Lotes',
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
-          RaisedButton.icon(onPressed:(){
-            launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
-              }
-              ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
-               label: Text(''),
-               color: Colors.grey,
-          ),
+          Center(
+              child: Text(
+            'Bienvenido, ${appState.userInfo.firstName}!\nCUIT: ${appState.userInfo.idNumber}',
+            style: const TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+          )),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => appState.currentAction =
@@ -69,18 +88,25 @@ class ListItems extends StatelessWidget {
             onPressed: () => appState.currentAction =
                 PageAction(state: PageState.addPage, page: NewBatchPageConfig),
           ),
+          RaisedButton.icon(onPressed:(){
+            launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
+              }
+              ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+               label: const Text(''),
+               color: Colors.grey,
+          ),
         ],
       ),
       body: SafeArea(
           child: ListView.builder(
-          itemCount: items.length,
+          itemCount: batches.length,
           itemBuilder: (context, index) {
             return ListTile(
               isThreeLine: true,
-              leading: Icon(Icons.article),
-              title: Text('${items[index]}',style: TextStyle(fontSize: 16.0 ,fontWeight:FontWeight.bold,color: Colors.black)
+              leading: const Icon(Icons.article),
+              title: Text('${_getBatchTitle(batches[index])}',style: const TextStyle(fontSize: 14.0 ,fontWeight:FontWeight.bold,color: Colors.black)
               ),
-              subtitle: Text('Referencia Interna de Lote: 0005889$index\nDescripcion: FRAV${items[index]}\n'),
+              subtitle: Text('${_getBatchSubTitle(batches[index])}\n'),
               onTap: () {
                 appState.currentAction = PageAction(
                     state: PageState.addWidget,
@@ -92,5 +118,12 @@ class ListItems extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getBatchTitle(Batch batch) {
+    return batch.retailReference != '' ? batch.retailReference : batch.description;
+  }
+  String _getBatchSubTitle(Batch batch) {
+    return batch.description != '' ? (batch.retailReference == '' ? '(sin referencia)' : batch.description) : '(Sin descripción)';
   }
 }

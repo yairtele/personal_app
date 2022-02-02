@@ -52,6 +52,21 @@ class Details extends StatelessWidget {
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
+          const Text(
+            '\nBienvenido: Juan Perez\nCUIT: 39-558978954-0',
+            style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => appState.currentAction =
+                PageAction(state: PageState.addPage, page: SettingsPageConfig),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => appState.currentAction =
+                PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+          ),
           RaisedButton.icon(onPressed:(){
             launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
           }
@@ -59,29 +74,70 @@ class Details extends StatelessWidget {
             label: Text(''),
             color: Colors.grey,
           ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => appState.currentAction =
-                PageAction(state: PageState.addPage, page: SettingsPageConfig),
-          ),
         ],
       ),
       body: SafeArea(
-        child: ListView.builder(
-          itemCount: returns.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text('${returns[index]}'
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 8),
+              padding: EdgeInsets.all(15),
+              child: const TextField(
+                autofocus: true,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.send,
+                maxLength: 30,
+                decoration: InputDecoration(
+                    hintText: 'Referencia Interna Lote',
+                    helperText: 'Ej: 939482'
+                ),
               ),
-              onTap: () {
-                appState.currentAction = PageAction(
-                    state: PageState.addWidget,
-                    widget: DetailsReturn(index),
-                    page: DetailsReturnPageConfig);
-              },
-            );
-          },
-        ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 8),
+              padding: EdgeInsets.all(15),
+              child: const TextField(
+                autofocus: true,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.send,
+                maxLength: 50,
+                decoration: InputDecoration(
+                    hintText: 'Descripcion',
+                    helperText: 'Ej: Lote Fravega 4'
+                ),
+              ),
+            ),
+
+            Container(
+              child: ElevatedButton(
+                onPressed: () => appState.currentAction =
+                    PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                child: const Text('Guardar'),
+              ),
+            ),
+
+            Container(
+              height: 500.0, // Change as you wish
+              width: 500.0, // Change as you wish
+              child: ListView.builder(
+              itemCount: returns.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text('${returns[index]}'
+                  ),
+                  onTap: () {
+                    appState.currentAction = PageAction(
+                        state: PageState.addWidget,
+                        widget: DetailsReturn(index),
+                        page: DetailsReturnPageConfig);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        )
       ),
     );
   }

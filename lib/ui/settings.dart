@@ -52,7 +52,10 @@ class Settings extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () async {
+                  style: ElevatedButton.styleFrom(
+                  primary: Colors.grey, // background
+              ),
+               onPressed: () async {
                   appState.logout();
                 },
                 child: const Text('Log Out'),

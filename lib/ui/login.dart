@@ -27,9 +27,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:navigation_app/services/user_services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -53,6 +53,7 @@ class _LoginState extends State<Login> {
     final appState = Provider.of<AppState>(context, listen: false);
     passwordTextController.text = appState.password;
     emailTextController.text = appState.emailAddress;
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -60,77 +61,97 @@ class _LoginState extends State<Login> {
         title: Image.asset('assets/images/logo_blanco.png',height:120 ,width:160,),
       ),
       body: SafeArea(
-        child: Center(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                            decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                                hintText: 'Email'),
-                            onChanged: (email) => appState.emailAddress = email,
-                            controller: emailTextController),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                                hintText: 'Password'),
-                            onChanged: (password) => appState.password = password,
-                            controller: passwordTextController),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
+        child:  LayoutBuilder(builder: (context, constraints){
+          return Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [ // Children
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                                decoration: const InputDecoration(
+                                    border: UnderlineInputBorder(),
+                                    hintText: 'Email'),
+                                onChanged: (email) => appState.emailAddress = email,
+                                controller: emailTextController),
                           ),
-                          side: const BorderSide(color: Colors.black),
-                        ),
-                        onPressed: () {
-                          appState.login();
-                        },
-                        child: const Text('Login', style: TextStyle(color: Colors.black),),
+                        ],
                       ),
                     ),
-                    const SizedBox(
-                      width: 16,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                                enableSuggestions: false,
+                                autocorrect: false,
+                                obscureText: true,
+                                decoration: const InputDecoration(
+                                    border: UnderlineInputBorder(),
+                                    hintText: 'Password'),
+                                onChanged: (password) => appState.password = password,
+                                controller: passwordTextController),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const SizedBox(
+                          width: 16,
+                        ),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.grey,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              side: const BorderSide(color: Colors.black),
+                            ),
+                            onPressed: () {
+                              try{
+                                appState.login();
+                              }
+                              on InvalidLoginException catch(e){
+                                _showSnackBar(e.message);
+
+                              }
+                              on Exception {
+                                _showSnackBar('Ha ocurrido un error inesperado autenticando al usuario.');
+                              }
+                            },
+                            child: const Text('Login', style: TextStyle(color: Colors.black),),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 16,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
+            )
+          );
+        })
       ),
+    );
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Usuario o clave inválida' )),
     );
   }
 }
