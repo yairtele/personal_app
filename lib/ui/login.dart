@@ -29,6 +29,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:navigation_app/services/user_services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -68,7 +69,7 @@ class _LoginState extends State<Login> {
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: [ // Children
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
@@ -119,7 +120,16 @@ class _LoginState extends State<Login> {
                               side: const BorderSide(color: Colors.black),
                             ),
                             onPressed: () {
-                              appState.login();
+                              try{
+                                appState.login();
+                              }
+                              on InvalidLoginException catch(e){
+                                _showSnackBar(e.message);
+
+                              }
+                              on Exception {
+                                _showSnackBar('Ha ocurrido un error inesperado autenticando al usuario.');
+                              }
                             },
                             child: const Text('Login', style: TextStyle(color: Colors.black),),
                           ),
@@ -136,6 +146,12 @@ class _LoginState extends State<Login> {
           );
         })
       ),
+    );
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Usuario o clave inválida' )),
     );
   }
 }

@@ -1,8 +1,6 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'services/user_services.dart';
 import 'router/ui_pages.dart';
 
 const String LoggedInKey = 'LoggedIn';
@@ -27,9 +25,11 @@ class PageAction {
 }
 class AppState extends ChangeNotifier {
   bool _loggedIn = false;
-  bool get loggedIn  => _loggedIn;
   bool _splashFinished = false;
+
+  bool get loggedIn  => _loggedIn;
   bool get splashFinished => _splashFinished;
+
   final cartItems = [];
   String emailAddress;
   String password;
@@ -73,11 +73,17 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void login() {
+  bool login() {
+    UserServices.login(emailAddress, password);
     _loggedIn = true;
     saveLoginState(loggedIn);
-    _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
-    notifyListeners();
+    if(_loggedIn){
+      _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
+      notifyListeners();
+    }
+
+    return _loggedIn;
+
   }
 
   void logout() {

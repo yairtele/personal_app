@@ -27,7 +27,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/details.dart';
@@ -38,6 +37,8 @@ import '../app_state.dart';
 import '../router/ui_pages.dart';
 
 class ListItems extends StatelessWidget {
+  const ListItems({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
@@ -71,7 +72,7 @@ class ListItems extends StatelessWidget {
             launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
               }
               ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
-               label: Text(''),
+               label: const Text(''),
                color: Colors.grey,
           ),
         ],
@@ -82,7 +83,7 @@ class ListItems extends StatelessWidget {
           itemBuilder: (context, index) {
             return ListTile(
               isThreeLine: true,
-              leading: Icon(Icons.article),
+              leading: const Icon(Icons.article),
               title: Text('\n${items[index]}',style: TextStyle(fontSize: 14.0 ,fontWeight:FontWeight.bold,color: Colors.black)
               ),
               subtitle: Text('Referencia Interna de Lote: 0005889$index\nDescripcion: FRAV${items[index]}\n'),
