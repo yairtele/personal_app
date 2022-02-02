@@ -25,6 +25,7 @@ String _ruta ;
 var _controller = TextEditingController();
 final ImagePicker _picker = ImagePicker();
 var _barcodeReader = FlutterBarcodeSdk();
+bool perUnity;
 
 var type;
 class NewReturn extends StatefulWidget {
@@ -79,6 +80,13 @@ class _NewReturn extends State<NewReturn> {
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
               child: TextField(
+                onChanged: (value) {
+                  if(int.parse(value).isEven){
+                    perUnity = true;
+                  } else {
+                    perUnity = false;
+                  }
+                },
                 autofocus: true,
                 controller: _controller,
                 keyboardType: TextInputType.text,
@@ -104,11 +112,14 @@ class _NewReturn extends State<NewReturn> {
               padding: EdgeInsets.all(15),
               child: ElevatedButton(
                 onPressed: () => appState.currentAction =
-                    PageAction(state: PageState.replaceAll, page: ListItemsPageConfig),
+                    PageAction(state: PageState.replaceAll, page: ListItemsPageConfig),//devolver a new batch anterior
                 child: const Text('Confirmar'),
               ),
             ),
-            Expanded(
+            perUnity? null: Container(
+
+            ),
+/*            Expanded(
               child: Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
@@ -117,21 +128,14 @@ class _NewReturn extends State<NewReturn> {
                             : FileImage(File(imageFile.path)),
                         fit: BoxFit.cover)),
               ),
-
-            ),
+            ),*/
             ListTile(
               leading: const Icon(
                 Icons.photo_library,
               ),
             onTap: () async {
-              //final userAgent = html.window.navigator.userAgent.toString().toLowerCase();
-              //print('Pre regexp');
-              //RegExp regExp = new RegExp(r'Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini');
-              //print('Post regexp');
               if(kIsWeb){
-                //if (!regExp.hasMatch(userAgent)) {
-                print('Camino desktop');
-                final tmpFile = await getImage(1);
+                /*final tmpFile = await getImage(1);
                 setState(() async {
                   imageFile = tmpFile;
                   var fileBytes = await imageFile.readAsBytes();
@@ -140,19 +144,13 @@ class _NewReturn extends State<NewReturn> {
                   List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
                   print('Barcode: ' + results[0].toString());
                   _controller.text = results[0].toString();
-                });
+                });*/
               } else {
                 if (Platform.isAndroid || Platform.isIOS) {
-                  print('Camino mobile');
                   final barcode = await BarcodeScanner.scan();
                   _controller.text = barcode.rawContent;
                 }
               }
-              /*try{
-
-              }catch(e){
-
-              }*/
             }
             ),
           ],
