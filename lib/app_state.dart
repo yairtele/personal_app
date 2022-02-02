@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:navigation_app/services/sp_athento_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/user_services.dart';
 import 'router/ui_pages.dart';
@@ -27,6 +28,8 @@ class AppState extends ChangeNotifier {
   bool _loggedIn = false;
   bool _splashFinished = false;
 
+  String companyName;
+
   bool get loggedIn  => _loggedIn;
   bool get splashFinished => _splashFinished;
 
@@ -35,6 +38,9 @@ class AppState extends ChangeNotifier {
   String password;
   PageAction _currentAction = PageAction();
   PageAction get currentAction => _currentAction;
+
+  UserInfo userInfo = null;
+
   set currentAction(PageAction action) {
     _currentAction = action;
     notifyListeners();
