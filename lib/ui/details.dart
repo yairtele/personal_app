@@ -36,8 +36,8 @@ import 'details_return.dart';
 final returns = List<String>.generate(5, (i) => 'Solicitud $i');
 
 class Details extends StatelessWidget {
-  final int id;
-  const Details(this.id);
+  final String title;
+  const Details(this.title);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class Details extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.grey,
         title: Text(
-          'Lote $id',
+          '$title',
           style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
