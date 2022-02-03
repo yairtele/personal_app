@@ -110,7 +110,7 @@ class ListItems extends StatelessWidget {
               onTap: () {
                 appState.currentAction = PageAction(
                     state: PageState.addWidget,
-                    widget: Details(_getBatchTitle(batches[index])),
+                    widget: Details(_getBatchTitle(batches[index]),_getBatchSubTitle(batches[index])),
                     page: DetailsPageConfig);
               },
             );

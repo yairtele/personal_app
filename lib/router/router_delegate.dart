@@ -342,7 +342,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     // Handle navapp://deeplinks/details/#
     if (uri.pathSegments.length == 2) {
       if (uri.pathSegments[0] == 'details') {
-        pushWidget(Details(''), DetailsPageConfig);
+        pushWidget(Details('',''), DetailsPageConfig);
       }
     } else if (uri.pathSegments.length == 1) {
       final path = uri.pathSegments[0];
