@@ -36,6 +36,8 @@ class AppState extends ChangeNotifier {
   final cartItems = [];
   String emailAddress;
   String password;
+  String description;
+  String reference;
   PageAction _currentAction = PageAction();
   PageAction get currentAction => _currentAction;
 
