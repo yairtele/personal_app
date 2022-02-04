@@ -128,6 +128,11 @@ class Details extends StatelessWidget {
                         PageAction(state: PageState.addPage, page: DetailsPageConfig),
                     child: const Text('Enviar Lote'),
                   ),
+                  ElevatedButton(
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                    child: const Text('Borrar Lote'),
+                  ),
                 ],
               ),
             ),
@@ -138,6 +143,7 @@ class Details extends StatelessWidget {
               itemCount: returns.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  leading: const Icon(Icons.art_track),
                   title: Text('${returns[index]}'
                   ),
                   onTap: () {
