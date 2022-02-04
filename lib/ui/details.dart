@@ -80,9 +80,9 @@ class Details extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+      child: ListView(
           children: [
             Container(
               margin: EdgeInsets.only(top: 8),
@@ -114,15 +114,23 @@ class Details extends StatelessWidget {
                 ),
               ),
             ),
-
-            Container(
-              child: ElevatedButton(
-                onPressed: () => appState.currentAction =
+            Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [  ElevatedButton(
+                    onPressed: () => appState.currentAction =
                     PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                child: const Text('Guardar'),
+                    child: const Text('Guardar'),
+                  ),
+                            ElevatedButton(
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                    child: const Text('Enviar Lote'),
+                  ),
+                ],
               ),
             ),
-
             Container(
               height: 500.0, // Change as you wish
               width: 500.0, // Change as you wish
@@ -145,6 +153,7 @@ class Details extends StatelessWidget {
           ],
         )
       ),
+
     );
   }
 }
