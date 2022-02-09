@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:navigation_app/services/sp_athento_services.dart';
+import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'config/cache.dart';
 import 'services/user_services.dart';
 import 'router/ui_pages.dart';
 
-const String LoggedInKey = 'LoggedIn';
+
 
 enum PageState {
   none,
@@ -39,8 +40,6 @@ class AppState extends ChangeNotifier {
   PageAction _currentAction = PageAction();
   PageAction get currentAction => _currentAction;
 
-  UserInfo userInfo = null;
-
   set currentAction(PageAction action) {
     _currentAction = action;
     notifyListeners();
@@ -71,7 +70,8 @@ class AppState extends ChangeNotifier {
 
   void setSplashFinished() {
     _splashFinished = true;
-    if (_loggedIn) {
+    logout();
+    if (_loggedIn || false) {
       _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
     } else {
       _currentAction = PageAction(state: PageState.replaceAll, page: LoginPageConfig);
@@ -79,34 +79,35 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool login() {
-    UserServices.login(emailAddress, password);
+  Future<bool> login() async{
+    final tokenInfo = await UserServices.login(emailAddress, password);
+
+
+    await Cache.saveUserName(emailAddress); //TODO: usar o no await?
+    await Cache.saveTokenInfo(tokenInfo); //TODO: usar o no await?
+
     _loggedIn = true;
-    saveLoginState(loggedIn);
+    Cache.saveLoginState(loggedIn);//TODO: usar o no await? En el código original no lo usaba
     if(_loggedIn){
       _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
       notifyListeners();
     }
 
     return _loggedIn;
-
   }
 
   void logout() {
     _loggedIn = false;
-    saveLoginState(loggedIn);
+    Cache.saveLoginState(loggedIn); //TODO: usar o no await? En el código original no lo usaba
     _currentAction = PageAction(state: PageState.replaceAll, page: LoginPageConfig);
     notifyListeners();
   }
 
-  void saveLoginState(bool loggedIn) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(LoggedInKey, loggedIn);
-  }
+
 
   void getLoggedInState() async {
-    final prefs = await SharedPreferences.getInstance();
-    _loggedIn = prefs.getBool(LoggedInKey);
+
+    _loggedIn = await Cache.getLoggedInState();
     if (_loggedIn == null) {
       _loggedIn = false;
     }

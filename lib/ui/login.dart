@@ -51,8 +51,11 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    passwordTextController.text = appState.password;
+    passwordTextController.text =  appState.password;
     emailTextController.text = appState.emailAddress;
+
+    emailTextController.text = 'adrian.scotto.newsan';
+    passwordTextController.text =  r'N$ju7ilo9#4791AS';
 
     return Scaffold(
       appBar: AppBar(
@@ -119,9 +122,11 @@ class _LoginState extends State<Login> {
                               ),
                               side: const BorderSide(color: Colors.black),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               try{
-                                appState.login();
+                                appState.emailAddress = emailTextController.text;
+                                appState.password = passwordTextController.text;
+                                await appState.login();
                               }
                               on InvalidLoginException catch(e){
                                 _showSnackBar(e.message);

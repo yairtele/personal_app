@@ -40,6 +40,7 @@ dependencies:
   barcode_scan2: ^4.2.0
   flutter_barcode_sdk: ^1.2.2
   universal_html: ^2.0.8
+
 #  keycloak_flutter: ^0.0.3
 
 dev_dependencies:
@@ -53,3 +54,4 @@ flutter:
 
   assets:
    - assets/images/
+#   - assets/cfg/

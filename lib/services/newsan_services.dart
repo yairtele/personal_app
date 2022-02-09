@@ -1,5 +1,5 @@
 class NewsanServices {
-  static String getCompanyInfo(String cuit) {
+  static Future<String> getCompanyInfo(String cuit) async{
     return 'La Empresa SRL';
   }
 }
