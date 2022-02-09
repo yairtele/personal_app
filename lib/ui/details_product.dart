@@ -22,9 +22,9 @@ class DetailProduct extends StatelessWidget {
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
-          const Text(
-            '\nBienvenido: Juan Perez\nCUIT: 39-558978954-0',
-            style: TextStyle(
+          Text(
+            '\nBienvenido, ${appState.userInfo.firstName}!\nCUIT: ${appState.userInfo.idNumber}',
+            style: const TextStyle(
                 fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
           ),
           IconButton(

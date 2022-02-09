@@ -36,25 +36,29 @@ import 'details_return.dart';
 final returns = List<String>.generate(5, (i) => 'Solicitud $i');
 
 class Details extends StatelessWidget {
-  final int id;
-  const Details(this.id);
+  final String title;
+  final String subtitle;
+  const Details(this.title,this.subtitle);
+
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
+    final _reference = TextEditingController(text: '$title');
+    final _description = TextEditingController(text: '$subtitle');
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.grey,
         title: Text(
-          'Lote $id',
+          '$title',
           style: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
         ),
         actions: [
-          const Text(
-            '\nBienvenido: Juan Perez\nCUIT: 39-558978954-0',
-            style: TextStyle(
+           Text(
+            '\nBienvenido, ${appState.userInfo.firstName}!\nCUIT: ${appState.userInfo.idNumber}',
+            style: const TextStyle(
                 fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
           ),
           IconButton(
@@ -76,19 +80,20 @@ class Details extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+      child: ListView(
           children: [
             Container(
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
-              child: const TextField(
+              child: TextField(
                 autofocus: true,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.send,
                 maxLength: 30,
-                decoration: InputDecoration(
+                controller: _reference,
+                decoration: const InputDecoration(
                     hintText: 'Referencia Interna Lote',
                     helperText: 'Ej: 939482'
                 ),
@@ -97,26 +102,40 @@ class Details extends StatelessWidget {
             Container(
               margin: EdgeInsets.only(top: 8),
               padding: EdgeInsets.all(15),
-              child: const TextField(
+              child: TextField(
                 autofocus: true,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.send,
                 maxLength: 50,
-                decoration: InputDecoration(
+                controller: _description,
+                decoration: const InputDecoration(
                     hintText: 'Descripcion',
                     helperText: 'Ej: Lote Fravega 4'
                 ),
               ),
             ),
-
-            Container(
-              child: ElevatedButton(
-                onPressed: () => appState.currentAction =
+            Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [  ElevatedButton(
+                    onPressed: () => appState.currentAction =
                     PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                child: const Text('Guardar'),
+                    child: const Text('Guardar'),
+                  ),
+                            ElevatedButton(
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                    child: const Text('Enviar Lote'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                    child: const Text('Borrar Lote'),
+                  ),
+                ],
               ),
             ),
-
             Container(
               height: 500.0, // Change as you wish
               width: 500.0, // Change as you wish
@@ -124,6 +143,7 @@ class Details extends StatelessWidget {
               itemCount: returns.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  leading: const Icon(Icons.art_track),
                   title: Text('${returns[index]}'
                   ),
                   onTap: () {
@@ -139,6 +159,7 @@ class Details extends StatelessWidget {
           ],
         )
       ),
+
     );
   }
 }

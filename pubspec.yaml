@@ -42,6 +42,7 @@ dependencies:
   universal_html: ^2.0.8
 
 #  keycloak_flutter: ^0.0.3
+  thumbnailer: ^2.0.1
 
 dev_dependencies:
   flutter_test:
