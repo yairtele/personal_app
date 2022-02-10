@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/router/ui_pages.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart';
@@ -78,8 +79,9 @@ class _NewBatchState extends State<NewBatch> {
                 padding: EdgeInsets.all(15),
                 child: ElevatedButton(
                     child: const Text('Enviar a Athento'),
-                    onPressed: () {
-                    _makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,appState.userInfo.idNumber,appState.companyName);
+                    onPressed: () async {
+                    var userInfo = await Cache.getUserInfo();
+                    _makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
                   }
                 ),
               ),

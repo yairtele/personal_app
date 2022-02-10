@@ -3,7 +3,7 @@ import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
-import 'newsan_services.dart';
+import '../newsan_services.dart';
 
 
 class BusinessServices {

@@ -30,9 +30,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:navigation_app/config/cache.dart';
-import 'package:navigation_app/services/business_services.dart';
+import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
-import 'package:navigation_app/ui/details.dart';
+import 'package:navigation_app/ui/batch_details.dart';
+import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -49,21 +50,21 @@ class ListItems extends StatefulWidget{
 
 class _ListItemsState extends State<ListItems> {
 
-  Future<_LocalData> _localData;
+  Future<ScreenData<dynamic, List<Batch>>> _localData;
 
   @override
   void initState(){
     super.initState();
-    _localData = _getUserAndBatchData();
+    _localData =   ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData(dataGetterParam: null);
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    return FutureBuilder<_LocalData>(
+    return FutureBuilder<ScreenData<dynamic, List<Batch>>>(
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<_LocalData> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
           final data = snapshot.data;
 
           Widget widget;
@@ -117,22 +118,21 @@ class _ListItemsState extends State<ListItems> {
               ),
               body: SafeArea(
                 child: ListView.builder(
-                  itemCount: data.batches.length,
+                  itemCount: data.data.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       isThreeLine: true,
                       leading: const Icon(Icons.article),
-                      title: Text('${_getBatchTitle(data.batches[index])}',
+                      title: Text('${_getBatchTitle(data.data[index])}',
                           style: const TextStyle(fontSize: 14.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.black)
                       ),
-                      subtitle: Text('${_getBatchSubTitle(data
-                          .batches[index])}\n'),
+                      subtitle: Text('${_getBatchSubTitle(data.data[index])}\n'),
                       onTap: () {
                         appState.currentAction = PageAction(
                             state: PageState.addWidget,
-                            widget: Details(index),
+                            widget: BatchDetails(batch: data.data[index]),
                             page: DetailsPageConfig);
                       },
                     );
@@ -238,28 +238,10 @@ class _ListItemsState extends State<ListItems> {
     */
   }
 
-  Future<_LocalData> _getUserAndBatchData() async{
-
-    // Obtener CUIT del usuario (del perfil de Athento)
-    var userInfo = await Cache.getUserInfo();
-
-    if(userInfo == null) {
-      final userName = await Cache.getUserName();
-      userInfo = await BusinessServices.getUserInfo(userName);
-      Cache.saveUserInfo(userInfo);
-    }
-
-    // Obtener Razon social con el servicio de Newsan
-    var companyName = await Cache.getCompanyName();
-    if(companyName ==  null) {
-      companyName = await BusinessServices.getCompanyName(userInfo.idNumber); // En el idNumber del perfil de athento se guarda l CUIT retail
-      Cache.saveCompanyName(companyName);
-    }
-
+  Future<List<Batch>> _getBatchData(something) async{
     // Obtener lista de lotes Draft (en principio) desde Athento
     final batches = await BusinessServices.getBatches();
-
-    return _LocalData(userInfo: userInfo, companyName: companyName, batches: batches);
+    return batches;
   }
 
   String _getBatchTitle(Batch batch) {
@@ -270,10 +252,3 @@ class _ListItemsState extends State<ListItems> {
   }
 }
 
-class _LocalData{
-  List<Batch> batches;
-  UserInfo userInfo;
-  String companyName;
-
-  _LocalData({@required UserInfo this.userInfo, @required this.companyName, @required this.batches});
-}

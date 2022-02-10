@@ -35,7 +35,7 @@ import 'package:navigation_app/ui/newbatch.dart';
 import '../ui/newbatch.dart';
 import '../ui/newreturn.dart';
 import '../app_state.dart';
-import '../ui/details.dart';
+import '../ui/batch_details.dart';
 import '../ui/cart.dart';
 import '../ui/checkout.dart';
 import '../ui/create_account.dart';
@@ -342,7 +342,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     // Handle navapp://deeplinks/details/#
     if (uri.pathSegments.length == 2) {
       if (uri.pathSegments[0] == 'details') {
-        pushWidget(Details('',''), DetailsPageConfig);
+        pushWidget(const BatchDetails(batch: null), DetailsPageConfig);
       }
     } else if (uri.pathSegments.length == 1) {
       final path = uri.pathSegments[0];
