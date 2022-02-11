@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/router/ui_pages.dart';
+import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/business_services.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart';
 
@@ -80,8 +82,9 @@ class _NewBatchState extends State<NewBatch> {
                 child: ElevatedButton(
                     child: const Text('Enviar a Athento'),
                     onPressed: () async {
-                    var userInfo = await Cache.getUserInfo();
-                    _makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
+                    final userInfo = await Cache.getUserInfo();
+                    _createBatch(referenceTextController.text, descriptionTextController.text);
+                    //_makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
                   }
                 ),
               ),
@@ -100,6 +103,14 @@ class _NewBatchState extends State<NewBatch> {
        ),
       ),
     );
+  }
+
+  void _createBatch(String retailReference, String description) async {
+
+    String cuitRetail;
+    const razonSocialRetail = 'Dummy S.R.L.';
+    BusinessServices.createBatch(Batch(retailReference: retailReference, description: description, cuitRetail: cuitRetail, retailCompanyName: razonSocialRetail));
+
   }
 }
 

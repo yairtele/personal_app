@@ -3,6 +3,7 @@ import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
+import 'package:navigation_app/services/business/batch.dart';
 import '../newsan_services.dart';
 
 
@@ -60,7 +61,7 @@ class BusinessServices {
       BatchAthentoFieldName.retailReference,
       BatchAthentoFieldName.description,
       BatchAthentoFieldName.cuitRetail,
-      BatchAthentoFieldName.razonSocialRetail,
+      BatchAthentoFieldName.retailCompanyName,
     ];
 
     const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
@@ -72,35 +73,3 @@ class BusinessServices {
 
 }
 
-class Batch {
-  String retailReference;
-  String description;
-  String cuitRetail;
-  String razonSocialRetail;
-
-  //TODO: validar uno de this.retailReference o this.description no sean vacíos ni nulos
-  Batch({this.retailReference, this.description, @required this.cuitRetail, @required this.razonSocialRetail});
-
-  Map<String, dynamic> toJSON() {
-    return {
-      BatchAthentoFieldName.retailReference: retailReference,
-      BatchAthentoFieldName.description: description,
-      BatchAthentoFieldName.cuitRetail: cuitRetail,
-      BatchAthentoFieldName.razonSocialRetail: razonSocialRetail
-    };
-  }
-
-  Batch.fromJSON(Map<String, dynamic> json){
-    retailReference = json[BatchAthentoFieldName.retailReference];
-    description = json[BatchAthentoFieldName.description];
-    cuitRetail = json[BatchAthentoFieldName.cuitRetail];
-    razonSocialRetail = json[BatchAthentoFieldName.razonSocialRetail];
-  }
-}
-
-class BatchAthentoFieldName{
-  static const String retailReference = 'referencia_interna_lote';
-  static const String description = 'descripcion_lote';
-  static const String cuitRetail = 'cuit_cliente';
-  static const String razonSocialRetail = 'razon_social';
-}

@@ -39,7 +39,7 @@ import '../ui/batch_details.dart';
 import '../ui/cart.dart';
 import '../ui/checkout.dart';
 import '../ui/create_account.dart';
-import '../ui/list_items.dart';
+import '../ui/batches.dart';
 import '../ui/login.dart';
 import '../ui/settings.dart';
 import '../ui/splash.dart';
@@ -172,7 +172,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           _addPageData(CreateAccount(), CreateAccountPageConfig);
           break;
         case Pages.List:
-          _addPageData(ListItems(), ListItemsPageConfig);
+          _addPageData(Batches(), ListItemsPageConfig);
           break;
         case Pages.Cart:
           _addPageData(Cart(), CartPageConfig);
@@ -364,31 +364,31 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           break;
         case 'cart':
           setPath([
-            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(Batches(), ListItemsPageConfig),
             _createPage(Cart(), CartPageConfig)
           ]);
           break;
         case 'checkout':
           setPath([
-            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(Batches(), ListItemsPageConfig),
             _createPage(Checkout(), CheckoutPageConfig)
           ]);
           break;
         case 'settings':
           setPath([
-            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(Batches(), ListItemsPageConfig),
             _createPage(Settings(), SettingsPageConfig)
           ]);
           break;
         case 'newbatch':
           setPath([
-            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(Batches(), ListItemsPageConfig),
             _createPage(NewBatch(), NewBatchPageConfig)
           ]);
           break;
         case 'newreturn':
           setPath([
-            _createPage(ListItems(), ListItemsPageConfig),
+            _createPage(Batches(), ListItemsPageConfig),
             _createPage(NewReturn(), NewBatchPageConfig)
           ]);
           break;

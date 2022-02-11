@@ -30,6 +30,7 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
+import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/screen_data.dart';
@@ -54,7 +55,7 @@ class _BatchDetailsState extends State<BatchDetails> {
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData(dataGetter: _getReturnRequests).getScreenData(dataGetterParam: widget.batch);
+    _localData = ScreenData<Batch, List<ReturnRequest>>(dataGetter: _getReturnRequests).getScreenData(dataGetterParam: widget.batch);
   }
 
 
@@ -74,6 +75,7 @@ class _BatchDetailsState extends State<BatchDetails> {
           Widget widget;
           if (snapshot.hasData) {
             final data = snapshot.data;
+
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,

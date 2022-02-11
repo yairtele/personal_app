@@ -29,9 +29,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:navigation_app/config/cache.dart';
+import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_services.dart';
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/ui/batch_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
@@ -40,35 +39,39 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
 
-class ListItems extends StatefulWidget{
-  const ListItems({Key key}) : super(key: key);
+class Batches extends StatefulWidget{
+  const Batches({Key key}) : super(key: key);
 
   @override
-  _ListItemsState createState() => _ListItemsState();
+  _BatchesState createState() => _BatchesState();
 }
 
 
-class _ListItemsState extends State<ListItems> {
+
+class _BatchesState extends State<Batches> {
 
   Future<ScreenData<dynamic, List<Batch>>> _localData;
 
   @override
   void initState(){
     super.initState();
-    _localData =   ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData(dataGetterParam: null);
+    _localData =   ScreenData<void, List<Batch>>(dataGetter: _getBatchData).getScreenData();
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    return FutureBuilder<ScreenData<dynamic, List<Batch>>>(
+    return FutureBuilder<ScreenData<void, List<Batch>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
-          final data = snapshot.data;
 
           Widget widget;
           if (snapshot.hasData) {
+            final data = snapshot.data;
+            final userInfo = data.userInfo;
+            final batches = data.data;
+
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -83,7 +86,7 @@ class _ListItemsState extends State<ListItems> {
                 actions: [
                   Center(
                       child: Text(
-                        'Bienvenido, ${data.userInfo.firstName}!\nCUIT: ${data
+                        'Bienvenido, ${userInfo.firstName}!\nCUIT: ${data
                             .userInfo.idNumber}',
                         style: const TextStyle(
                             fontSize: 12,
@@ -118,21 +121,21 @@ class _ListItemsState extends State<ListItems> {
               ),
               body: SafeArea(
                 child: ListView.builder(
-                  itemCount: data.data.length,
+                  itemCount: batches.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       isThreeLine: true,
                       leading: const Icon(Icons.article),
-                      title: Text('${_getBatchTitle(data.data[index])}',
+                      title: Text('${_getBatchTitle(batches[index])}',
                           style: const TextStyle(fontSize: 14.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.black)
                       ),
-                      subtitle: Text('${_getBatchSubTitle(data.data[index])}\n'),
+                      subtitle: Text('${_getBatchSubTitle(batches[index])}\n'),
                       onTap: () {
                         appState.currentAction = PageAction(
                             state: PageState.addWidget,
-                            widget: BatchDetails(batch: data.data[index]),
+                            widget: BatchDetails(batch: batches[index]),
                             page: DetailsPageConfig);
                       },
                     );
