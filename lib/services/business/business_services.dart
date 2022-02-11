@@ -25,7 +25,8 @@ class BusinessServices {
 
     final configProvider = await _getBearerConfigProvider(fieldNameInferenceConfig);
 
-    //TODO: ver cómo obtener el id del espacio
+    //TODO: ver cómo obtener el id del espacio.
+    //TODO: DIRECTAMENTE CONSUKLTAR SIN containerUUID (nosotros deberíamos tener un usuario retail para saber buscar nuestras pruebas).
     const containerUUID = '5366d23d-07bb-4eb3-b34a-5943b0f5cccf';
 
     final title = batch.retailReference + ' - ' + batch.description; // Se supone que Athento asigna nombre automáticamente, pero por las dudas...

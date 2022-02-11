@@ -67,11 +67,12 @@ class SpAthentoServices {
       ConfigProvider configProvider,
       String containerUUID, String docType, String title,
       Map<String, dynamic> fieldValues, [String auditMessage = '']) async {
+
     final renamedFieldValues = configProvider.getFieldValues(
         title, fieldValues);
 
     final jsonRequestBody = {
-      'input': containerUUID,
+      if (containerUUID != null) 'input': containerUUID,
       'params': {
         'type': docType,
         'audit': auditMessage,
@@ -83,8 +84,7 @@ class SpAthentoServices {
 
     //console.log("endpoint: " + configProvider.getServiceUrl() + "Athento.DocumentCreate/");
     //console.log(JSON.stringify(jsonRequestBody));
-    final response = await SpWS.post(configProvider.serviceBaseUrl +
-        configProvider.getEndpointUrl('createDocument'), parameters: {},
+    final response = await SpWS.post(configProvider.getEndpointUrl('createDocument'), parameters: {},
         headers: headers,
         body: jsonRequestBody);
 

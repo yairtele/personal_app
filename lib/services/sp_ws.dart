@@ -1,6 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/http.dart';
+
 class SpWS {
   static Future<http.Response> post(String uri,
       {Map<String, String> headers, Map<String, String> parameters,
@@ -48,7 +50,7 @@ class SpWS {
       //console.log("body: " + body);
       //console.log("timeout: " + timeout);
 
-      var response;
+      Response response;
       switch (method) {
         case RequestMethod.post:
           response = await http.post(Uri.parse(fullUri), headers: headers,
@@ -62,13 +64,12 @@ class SpWS {
           throw Exception('Method "$method" not supported.');
       }
 
-
-
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;
       }
       else {
-        throw Exception('Error al postear el request a la uri "$uri"');
+
+        throw Exception('Error al postear el request a la uri "$uri". Status Code: ${response.statusCode}. Error message: ${response.reasonPhrase}');
       }
     }
     on Exception catch (e) {

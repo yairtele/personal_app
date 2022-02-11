@@ -108,8 +108,11 @@ class _NewBatchState extends State<NewBatch> {
   void _createBatch(String retailReference, String description) async {
 
     String cuitRetail;
-    const razonSocialRetail = 'Dummy S.R.L.';
-    BusinessServices.createBatch(Batch(retailReference: retailReference, description: description, cuitRetail: cuitRetail, retailCompanyName: razonSocialRetail));
+    final retailCompanyName = await Cache.getCompanyName();
+    BusinessServices.createBatch(Batch(
+        retailReference: retailReference,
+        description: description, cuitRetail: cuitRetail,
+        retailCompanyName: retailCompanyName));
 
   }
 }
