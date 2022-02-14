@@ -20,12 +20,14 @@ class NewBatch extends StatefulWidget {
 class _NewBatchState extends State<NewBatch> {
   TextEditingController referenceTextController = TextEditingController();
   TextEditingController descriptionTextController = TextEditingController();
+  TextEditingController observationTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     referenceTextController.text= appState.reference;
     descriptionTextController.text = appState.description;
+    observationTextController.text = appState.observation;
 
     return Scaffold(
       appBar: AppBar(
@@ -79,11 +81,27 @@ class _NewBatchState extends State<NewBatch> {
               Container(
                 margin: EdgeInsets.only(top: 8),
                 padding: EdgeInsets.all(15),
+                child: TextField(
+                  autofocus: true,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.send,
+                  maxLength: 250,
+                  decoration: const InputDecoration(
+                      hintText: 'Observacion',
+                      helperText: 'Ej: Contiene fallas'
+                  ),
+                  onChanged: (observation) => appState.observation = observation,
+                  controller: observationTextController,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 8),
+                padding: EdgeInsets.all(15),
                 child: ElevatedButton(
                     child: const Text('Enviar a Athento'),
                     onPressed: () async {
                     final userInfo = await Cache.getUserInfo();
-                    _createBatch(referenceTextController.text, descriptionTextController.text);
+                    _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
                     //_makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
                   }
                 ),
@@ -105,14 +123,14 @@ class _NewBatchState extends State<NewBatch> {
     );
   }
 
-  void _createBatch(String retailReference, String description) async {
+  void _createBatch(String retailReference, String description, String observation) async {
 
     String cuitRetail;
     final retailCompanyName = await Cache.getCompanyName();
     BusinessServices.createBatch(Batch(
         retailReference: retailReference,
         description: description, cuitRetail: cuitRetail,
-        retailCompanyName: retailCompanyName));
+        retailCompanyName: retailCompanyName,observation:observation));
 
   }
 }

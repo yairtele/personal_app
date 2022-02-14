@@ -64,9 +64,11 @@ class _BatchDetailsState extends State<BatchDetails> {
     final batch = widget.batch;
     final title = _getBatchTitle(batch);
     final subTitle = _getBatchSubTitle(batch);
+    final observation = batch.observation;
     final appState = Provider.of<AppState>(context, listen: false);
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
+    final _observation = TextEditingController(text:observation);
 
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
@@ -141,6 +143,21 @@ class _BatchDetailsState extends State<BatchDetails> {
                           decoration: const InputDecoration(
                               hintText: 'Descripcion',
                               helperText: 'Ej: Lote Fravega 4'
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 250,
+                          controller: _observation,
+                          decoration: const InputDecoration(
+                              hintText: 'Observacion',
+                              helperText: 'Ej: Con Fallas'
                           ),
                         ),
                       ),
