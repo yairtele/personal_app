@@ -186,24 +186,30 @@ class _BatchDetailsState extends State<BatchDetails> {
                       Container(
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
-                        child: ListView.builder(
-                          itemCount: data.data.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              leading: const Icon(Icons.art_track),
-                              title: Text(data.data[index].retailReference),
-                              onTap: () {
-                                appState.currentAction = PageAction(
-                                    state: PageState.addWidget,
-                                    widget: ReturnRequestDetails(returnRequest: data.data[index]),
-                                    page: DetailsReturnPageConfig);
-                              },
-                            );
-                          },
+                        child: DataTable(
+                               columns: [
+                                 DataColumn(label: Text('Referencia: ')),
+                                 DataColumn(label: Text('Descripcion: ')),
+                               ],
+                               rows: [
+                                 DataRow(
+                                 cells: [
+                                   DataCell(Text(data.data[0].retailReference),showEditIcon: true,onTap:() { appState.currentAction = PageAction(
+                                            state: PageState.addWidget,
+                                            widget: ReturnRequestDetails(returnRequest: data.data[0]),
+                                            page: DetailsReturnPageConfig);
+                                   },),
+
+                                   DataCell(Text('Descripcion Dummy'),showEditIcon: true),
+                                  ],
+                                ),
+                               ],
+                              //onTap: () {
+
+                          ),
                         ),
-                      ),
                     ],
-                  )
+                  ),
               ),
             );
           } else if (snapshot.hasError) {
