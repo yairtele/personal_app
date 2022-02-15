@@ -69,19 +69,34 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ],
               ),
               body: SafeArea(
-                child: ListView.builder(
-                  itemCount: photos.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(photos[index].label),
-                      onTap: () {
-                        //appState.currentAction = PageAction(
-                        //  state: PageState.addWidget,
-                        //widget: DetailProduct(index),
-                        //page: DetailProductPageConfig);
-                      },
-                    );
-                  },
+                child: GridView.count(
+                  primary: false,
+                  padding: const EdgeInsets.all(20),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 2,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(photos[0].label),
+                      color: Colors.teal[100],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(photos[1].label),
+                      color: Colors.teal[200],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(photos[2].label),
+                      color: Colors.teal[300],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(photos[3].label),
+                      color: Colors.teal[400],
+                    ),
+                  ],
                 ),
               ),
             );

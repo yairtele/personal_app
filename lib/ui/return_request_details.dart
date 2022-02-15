@@ -31,7 +31,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
-
+    const int numItems = 10;
+    List<bool> selected = List<bool>.generate(numItems, (int index) => false);
     return FutureBuilder<ScreenData<ReturnRequest, List<Product>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<ReturnRequest, List<Product>>> snapshot) {
@@ -69,20 +70,26 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   ),
                 ],
               ),
+
               body: SafeArea(
-                child: ListView.builder(
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(products[index].retailReference ),
-                      onTap: () {
+                child: DataTable(
+                  columns: const <DataColumn>[
+                    DataColumn(
+                      label: Text('Productos:'),
+                    ),
+                  ],
+                  rows: List<DataRow>.generate(
+                    numItems,
+                        (int index) => DataRow(
+                      cells: <DataCell>[DataCell(Text('Producto $index'),onTap: () {
                         appState.currentAction = PageAction(
                             state: PageState.addWidget,
                             widget: ProductDetails(product: products[index]),
-                            page: DetailProductPageConfig);
-                      },
-                    );
-                  },
+                            page: DetailProductPageConfig);})],
+                      selected: selected[index],
+                    ),
+                  ),
+                  //onTap: () {
                 ),
               ),
             );
