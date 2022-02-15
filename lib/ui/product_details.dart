@@ -79,22 +79,22 @@ class _ProductDetailsState extends State<ProductDetails> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: Text(photos[0].label),
-                      color: Colors.teal[100],
+                      color: Colors.grey[500],
                     ),
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: Text(photos[1].label),
-                      color: Colors.teal[200],
+                      color: Colors.grey[600],
                     ),
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: Text(photos[2].label),
-                      color: Colors.teal[300],
+                      color: Colors.grey[700],
                     ),
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: Text(photos[3].label),
-                      color: Colors.teal[400],
+                      color: Colors.grey[800],
                     ),
                   ],
                 ),
