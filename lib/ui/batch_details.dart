@@ -69,10 +69,14 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
+    const int numItems = 10;
+    List<bool> selected = List<bool>.generate(numItems, (int index) => false);
 
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
+          final data = snapshot.data;
+          final batches = data.data;
 
           Widget widget;
           if (snapshot.hasData) {
@@ -187,23 +191,22 @@ class _BatchDetailsState extends State<BatchDetails> {
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
                         child: DataTable(
-                               columns: [
-                                 DataColumn(label: Text('Referencia: ')),
-                                 DataColumn(label: Text('Descripcion: ')),
-                               ],
-                               rows: [
-                                 DataRow(
-                                 cells: [
-                                   DataCell(Text(data.data[0].retailReference),showEditIcon: true,onTap:() { appState.currentAction = PageAction(
-                                            state: PageState.addWidget,
-                                            widget: ReturnRequestDetails(returnRequest: data.data[0]),
-                                            page: DetailsReturnPageConfig);
-                                   },),
-
-                                   DataCell(Text('Descripcion Dummy'),showEditIcon: true),
-                                  ],
+                            columns: const <DataColumn>[
+                              DataColumn(
+                                label: Text('Solicitudes'),
+                              ),
+                            ],
+                               rows: List<DataRow>.generate(
+                                 numItems,
+                                     (int index) => DataRow(
+                                       cells: <DataCell>[DataCell(Text('Solicitud $index'),onTap: () {
+                                         appState.currentAction = PageAction(
+                                             state: PageState.addWidget,
+                                             widget: ReturnRequestDetails(returnRequest: batches[index]),
+                                             page: DetailsReturnPageConfig);})],
+                                       selected: selected[index],
                                 ),
-                               ],
+                               ),
                               //onTap: () {
 
                           ),
