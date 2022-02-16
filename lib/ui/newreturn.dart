@@ -3,6 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
 import 'package:navigation_app/router/ui_pages.dart';
+import 'package:navigation_app/services/business/business_service_exception.dart';
+import 'package:navigation_app/services/business/business_services.dart';
+import 'package:navigation_app/services/business/product.dart';
+import 'package:navigation_app/services/business/return_request.dart';
+import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 //import 'package:file_picker/file_picker.dart';
@@ -18,191 +23,254 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
 import 'package:thumbnailer/thumbnailer.dart';
 
-bool EAN = false;
-bool MOD = false;
+
 PickedFile imageFile;
 //FilePickerResult imageFile;
-String _ruta ;
-var _controller = TextEditingController();
+String _ruta;
+var _searchParamTextController = TextEditingController();
 final ImagePicker _picker = ImagePicker();
 var _barcodeReader = FlutterBarcodeSdk();
-bool perUnity = true;
+
 var _loadReturn;
 var _quantity;
 XFile _quantityImage;
 
 var type;
+
 class NewReturn extends StatefulWidget {
-  const NewReturn({Key key}) : super(key: key);
+  final ReturnRequest returnRequest;
+  const NewReturn({Key key, this.returnRequest}) : super(key: key);
 
   @override
   State<NewReturn> createState() => _NewReturn();
 }
 
 class _NewReturn extends State<NewReturn> {
+  bool isAuditableProduct = true;
+  var _productSearchBy = ProductSearchBy.EAN;
+  Product _product = null;
+  Future<ScreenData<void, void>> _localData;
+
+  String _currentProductSearchParam = null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _localData = ScreenData<void, void>().getScreenData();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.grey,
-          title: const Text(
-            'Nuevo Ingreso',
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
-          ),
-        ),
-        body: LayoutBuilder(
-            builder: (BuildContext context,
-                BoxConstraints viewportConstraints) {
-              return SingleChildScrollView( //SafeArea(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: viewportConstraints.maxHeight,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      //Text('ID Lote Retail: '),
-                      CheckboxListTile(
-                        title: Text('EAN'),
-                        value: EAN,
-                        onChanged: (newValue) {
-                          setState(() {
-                            EAN = newValue;
-                            MOD = false;
-                          });
-                        },
-                        controlAffinity: ListTileControlAffinity
-                            .leading, //  <-- leading Checkbox
-                      ),
-                      CheckboxListTile(
-                        title: Text('MOD'),
-                        value: MOD,
-                        onChanged: (newValue2) {
-                          setState(() {
-                            MOD = newValue2;
-                            EAN = false;
-                          });
-                        },
-                        controlAffinity: ListTileControlAffinity
-                            .leading, //  <-- leading Checkbox
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: TextField(
-                          autofocus: true,
-                          controller: _controller,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.send,
-                          maxLength: 30,
-                          decoration: InputDecoration(
-                              hintText: 'EAN/MOD',
-                              helperText: 'Ej: 939482'
-                          ),
-                          onChanged: (value) {
-                            if (int
-                                .parse(value)
-                                .isEven) {
-                              setState(() {
-                                perUnity = true;
-                              });
-                            } else {
-                              setState(() {
-                                perUnity = false;
-                              });
-                            }
-                          },
-                        ),
-                      ),
 
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          child: const Text('Buscar'),
-                        ),
+    return FutureBuilder<ScreenData<void, void>>(
+        future: _localData,
+        builder: (BuildContext context,
+            AsyncSnapshot<ScreenData<void, void>> snapshot) {
+          Widget widget;
+          if (snapshot.hasData) {
+            final data = snapshot.data;
+            widget = Scaffold(
+                appBar: AppBar(
+                  elevation: 0,
+                  backgroundColor: Colors.grey,
+                  title: const Text(
+                    'Nuevo Ingreso',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+                body: LayoutBuilder(builder:
+                    (BuildContext context, BoxConstraints viewportConstraints) {
+                  return SingleChildScrollView(
+                    //SafeArea(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: viewportConstraints.maxHeight,
                       ),
-                      Container(
-                          margin: EdgeInsets.only(top: 8),
-                          padding: EdgeInsets.all(15),
-                          //child: Scaffold(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: RadioListTile<ProductSearchBy>(
+                                title: const Text('EAN'),
+                                groupValue: _productSearchBy,
+                                value: ProductSearchBy.EAN,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _productSearchBy = value;
+                                  });
+                                },
+                              )),
+                              Expanded(
+                                  child: RadioListTile<ProductSearchBy>(
+                                title: const Text('Cod. comercial'),
+                                groupValue: _productSearchBy,
+                                value: ProductSearchBy.CommercialCode,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _productSearchBy = value;
+                                  });
+                                },
+                              )),
+                            ],
+                          ),
+                          //Text('ID Lote Retail: '),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.all(15),
+                                child: TextField(
+                                  autofocus: true,
+                                  controller: _searchParamTextController,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.send,
+                                  maxLength: 30,
+                                  decoration: const InputDecoration(
+                                      hintText: 'EAN/MOD',
+                                      helperText: 'Ej: 939482'),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _currentProductSearchParam =
+                                          _searchParamTextController.text;
+                                    });
+                                  },
+                                ),
+                              )),
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.all(15),
+                                child: ElevatedButton(
+                                  child: const Text('Buscar'),
+                                  onPressed: () async {
+                                    try{
+                                      // Buscar info del producto y actualizar el Future del FutureBuilder.
+                                      Product product = null;
+                                      if (_productSearchBy ==
+                                          ProductSearchBy.EAN) {
+                                        product = await _getProductByEAN(_currentProductSearchParam);
+
+                                      } else {
+                                        product = await _getProductByCommercialCode(_currentProductSearchParam);
+                                      }
+                                      setState(() {
+                                        isAuditableProduct = product.photos.length > 0;
+                                        _product = product;
+                                      });
+                                    }
+                                    on BusinessServiceException catch(e){
+                                      _showSnackBar('Error recuperando información del producto: ${e.message}');
+                                    }
+                                    on Exception catch (e) {
+                                      _showSnackBar('Ha ocurrido un error inesperado: $e');
+                                    }
+
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          if (_product != null) ...[
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.all(15),
+                              //child: Scaffold(
                               //body: SafeArea(
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .start,
-                                      children: [
-                                        Text(
-                                          'Descripcion: Producto X!\nModelo: ABC123 Juridica: Ejemplo',
-                                          style: const TextStyle(fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.grey),
-                                        ),
-                                        perUnity ?
-                                        Container(
-                                          margin: EdgeInsets.only(top: 8),
-                                          padding: EdgeInsets.all(30),
-                                          child: TextField(
-                                              autofocus: true,
-                                              keyboardType: TextInputType.text,
-                                              textInputAction: TextInputAction.send,
-                                              maxLength: 30,
-                                              decoration: InputDecoration(
-                                                  labelText: 'Código Interno de Producto',
-                                                  helperText: 'Ej: AEF54216CV'
-                                              ),
-                                              onChanged: (value) {
-                                                //_quantity = value;
-                                              }
-                                            //},
-                                          ),
-                                        ) :
-                                        Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Descripcion: ${_product.description}',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                    isAuditableProduct
+                                        ? Container(
+                                            margin:
+                                                const EdgeInsets.only(top: 8),
+                                            padding: const EdgeInsets.all(30),
+                                            child: TextField(
+                                                autofocus: true,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                textInputAction:
+                                                    TextInputAction.send,
+                                                maxLength: 30,
+                                                decoration: const InputDecoration(
+                                                    labelText:
+                                                        'Código Interno de Producto',
+                                                    helperText:
+                                                        'Ej: AEF54216CV'),
+                                                onChanged: (value) {
+                                                  //_quantity = value;
+                                                }
+                                                //},
+                                                ),
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
                                             children: [
-                                              Container(
-                                                margin: EdgeInsets.only(top: 8),
-                                                padding: EdgeInsets.all(30),
-                                                child: TextField(
-                                                  autofocus: true,
-                                                  keyboardType: TextInputType.text,
-                                                  textInputAction: TextInputAction.send,
-                                                  maxLength: 10,
-                                                  decoration: InputDecoration(
-                                                      labelText: 'Cantidad',
-                                                      helperText: 'Ej: 12'
-                                                  ),
-                                                  onChanged: (value) {
-                                                    _quantity = value;
-                                                  }
-                                                  //},
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      top: 8),
+                                                  padding:
+                                                      const EdgeInsets.all(30),
+                                                  child: TextField(
+                                                      autofocus: true,
+                                                      keyboardType:
+                                                          TextInputType.text,
+                                                      textInputAction:
+                                                          TextInputAction.send,
+                                                      maxLength: 10,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                              labelText:
+                                                                  'Cantidad devuelta',
+                                                              helperText:
+                                                                  'Ej: 12'),
+                                                      onChanged: (value) {
+                                                        _quantity = value;
+                                                      }
+                                                      //},
+                                                      ),
                                                 ),
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.only(top: 8),
-                                                padding: EdgeInsets.all(15),
-                                                child: ElevatedButton(
-                                                  onPressed: () async {
-                                                    var temp_quant_image = await _picker.pickImage(source: ImageSource.gallery);
-                                                    setState(() =>
-                                                        _quantityImage = temp_quant_image
-                                                    );
-                                                  },
-                                                  child: const Text('Cargar foto\n(opcional)'),
-                                                  style: ElevatedButton.styleFrom(
-                                                        primary: Colors.grey,
-                                                        textStyle: TextStyle(
-                                                            fontSize: 14,
-                                                            //fontWeight: FontWeight.bold,
-                                                            color: Colors.white
-                                                        )
-                                                  )
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      top: 8),
+                                                  padding:
+                                                      const EdgeInsets.all(15),
+                                                  child: ElevatedButton(
+                                                      onPressed: () async {
+                                                        final temp_quant_image =
+                                                            await _picker.pickImage(
+                                                                source:
+                                                                    ImageSource
+                                                                        .gallery);
+                                                        setState(() =>
+                                                            _quantityImage =
+                                                                temp_quant_image);
+                                                      },
+                                                      child: const Text(
+                                                          'Cargar foto\n(opcional)'),
+                                                      style: ElevatedButton.styleFrom(
+                                                          primary: Colors.grey,
+                                                          textStyle: const TextStyle(
+                                                              fontSize: 14,
+                                                              //fontWeight: FontWeight.bold,
+                                                              color: Colors.white))),
                                                 ),
-                                              ),
-                                              /*const Padding(
+                                                /*const Padding(
                                                 padding: EdgeInsets.symmetric(horizontal: 7),
                                                 child: Text(
                                                   '(opcional)',
@@ -210,34 +278,40 @@ class _NewReturn extends State<NewReturn> {
                                                   textAlign: TextAlign.center,
                                                 ),
                                               ),*/
-                                              Thumbnail(
-                                                dataResolver: () async {
-                                                  return (await DefaultAssetBundle.of(context)
-                                                      .load(_quantityImage.path.replaceAll('blob:', '')))
-                                                      .buffer
-                                                      .asUint8List();
+                                                Thumbnail(
+                                                  dataResolver: () async {
+                                                    return (await DefaultAssetBundle
+                                                                .of(context)
+                                                            .load(_quantityImage
+                                                                .path
+                                                                .replaceAll(
+                                                                    'blob:',
+                                                                    '')))
+                                                        .buffer
+                                                        .asUint8List();
                                                   },
-                                                mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                                widgetSize: 100,
-                                              ),
-                                            ]
-                                          ),
-                              ]),
+                                                  mimeType:
+                                                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                                  widgetSize: 100,
+                                                ),
+                                              ]),
+                                  ]),
                               //)
-                          //)
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: ElevatedButton(
-                          onPressed: () =>
-                          appState.currentAction =
-                              PageAction(state: PageState.pop,
-                                  page: NewBatchPageConfig),
-                          //devolver a new batch anterior
-                          child: const Text('Confirmar'),
-                        ),
-                      ),
+                              //)
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.all(15),
+                              child: ElevatedButton(
+                                onPressed: () => appState.currentAction =
+                                    PageAction(
+                                        state: PageState.pop,
+                                        page: NewBatchPageConfig),
+                                //devolver a new batch anterior
+                                child: const Text('Confirmar'),
+                              ),
+                            ),
+                          ],
 /*            Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -248,13 +322,13 @@ class _NewReturn extends State<NewReturn> {
                         fit: BoxFit.cover)),
               ),
             ),*/
-                      ListTile(
-                          leading: const Icon(
-                            Icons.photo_library,
-                          ),
-                          onTap: () async {
-                            if (kIsWeb) {
-                              /*final tmpFile = await getImage(1);
+                          ListTile(
+                              leading: const Icon(
+                                Icons.photo_library,
+                              ),
+                              onTap: () async {
+                                if (kIsWeb) {
+                                  /*final tmpFile = await getImage(1);
                 setState(() async {
                   imageFile = tmpFile;
                   var fileBytes = await imageFile.readAsBytes();
@@ -264,27 +338,80 @@ class _NewReturn extends State<NewReturn> {
                   print('Barcode: ' + results[0].toString());
                   _controller.text = results[0].toString();
                 });*/
-                            } else {
-                              if (Platform.isAndroid || Platform.isIOS) {
-                                setState(() async {
-                                  final barcode = await BarcodeScanner.scan();
-                                  _controller.text = barcode.rawContent;
-                                });
-                              }
-                            }
-                          }
+                                } else {
+                                  if (Platform.isAndroid || Platform.isIOS) {
+                                    setState(() async {
+                                      final barcode =
+                                          await BarcodeScanner.scan();
+                                      _searchParamTextController.text =
+                                          barcode.rawContent;
+                                    });
+                                  }
+                                }
+                              }),
+                        ],
                       ),
-                    ],
+                    ),
+                  );
+                }));
+          } else if (snapshot.hasError) {
+
+            widget = Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
                   ),
-                ),
-              );
-            }
-        ));
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Text('Error: ${snapshot.error}'),
+                  )
+                ],
+              ),
+            );
+          } else {
+            widget = Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const <Widget>[
+                  SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Text('Aguarde un momento por favor...'),
+                  )
+                ]));
+          }
+          return widget;
+        });
+  }
+
+  Future<Product> _getProductByEAN(String eanCode) {
+    return BusinessServices.getProductByEAN(eanCode);
+  }
+
+  Future<Product> _getProductByCommercialCode(String commercialCode) {
+    return BusinessServices.getProductByCommercialCode(commercialCode);
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
+
 Future getImage(int type) async {
   final pickedImage = await ImagePicker().getImage(
       source: type == 1 ? ImageSource.camera : ImageSource.gallery,
       imageQuality: 50);
   return pickedImage;
 }
+
+enum ProductSearchBy { EAN, CommercialCode }
