@@ -93,6 +93,7 @@ class BusinessServices {
       return Product(
           EAN: '1234567891012',
           commercialCode: 'TV-LG-80I',
+          description: 'Televisor LG 80"',
           lastSell: DateTime(2022, 1, 1),
           photos: ['Frente', 'Dorso', 'Accesorios', 'Embalaje']);
     });
@@ -106,7 +107,8 @@ class BusinessServices {
       }
       return Product(
           EAN: '1234567891012',
-          commercialCode: 'TV-LG-80I',
+          commercialCode: 'PROD-LG-80I',
+          description: 'Televisor LG 80"',
           lastSell: DateTime(2018, 1, 1),
           photos: []);
     });

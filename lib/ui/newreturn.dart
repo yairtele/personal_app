@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:navigation_app/router/ui_pages.dart';
 import 'package:navigation_app/services/business/business_service_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
@@ -24,7 +25,7 @@ import '../app_state.dart';
 import 'package:thumbnailer/thumbnailer.dart';
 
 
-PickedFile imageFile;
+
 //FilePickerResult imageFile;
 String _ruta;
 var _searchParamTextController = TextEditingController();
@@ -33,7 +34,7 @@ var _barcodeReader = FlutterBarcodeSdk();
 
 var _loadReturn;
 var _quantity;
-XFile _quantityImage;
+
 
 var type;
 
@@ -46,6 +47,8 @@ class NewReturn extends StatefulWidget {
 }
 
 class _NewReturn extends State<NewReturn> {
+  XFile _quantityImage;
+  XFile imageFile;
   bool isAuditableProduct = true;
   var _productSearchBy = ProductSearchBy.EAN;
   Product _product = null;
@@ -98,26 +101,26 @@ class _NewReturn extends State<NewReturn> {
                             children: [
                               Expanded(
                                   child: RadioListTile<ProductSearchBy>(
-                                title: const Text('EAN'),
-                                groupValue: _productSearchBy,
-                                value: ProductSearchBy.EAN,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _productSearchBy = value;
-                                  });
-                                },
-                              )),
+                                    title: const Text('EAN'),
+                                    groupValue: _productSearchBy,
+                                    value: ProductSearchBy.EAN,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _productSearchBy = value;
+                                      });
+                                    },
+                                  )),
                               Expanded(
                                   child: RadioListTile<ProductSearchBy>(
-                                title: const Text('Cod. comercial'),
-                                groupValue: _productSearchBy,
-                                value: ProductSearchBy.CommercialCode,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _productSearchBy = value;
-                                  });
-                                },
-                              )),
+                                    title: const Text('Cod. comercial'),
+                                    groupValue: _productSearchBy,
+                                    value: ProductSearchBy.CommercialCode,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _productSearchBy = value;
+                                      });
+                                    },
+                                  )),
                             ],
                           ),
                           //Text('ID Lote Retail: '),
@@ -125,53 +128,92 @@ class _NewReturn extends State<NewReturn> {
                             children: [
                               Expanded(
                                   child: Container(
+                                    margin: const EdgeInsets.only(top: 8),
+                                    padding: const EdgeInsets.all(15),
+                                    child: TextField(
+                                      autofocus: true,
+                                      controller: _searchParamTextController,
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.send,
+                                      maxLength: 30,
+                                      decoration: const InputDecoration(
+                                          hintText: 'EAN/MOD',
+                                          helperText: 'Ej: 939482'),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _currentProductSearchParam =
+                                              _searchParamTextController.text;
+                                        });
+                                      },
+                                    ),
+                                  )),
+                              Container(
+                                width: 45,
                                 margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.all(15),
-                                child: TextField(
-                                  autofocus: true,
-                                  controller: _searchParamTextController,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.send,
-                                  maxLength: 30,
-                                  decoration: const InputDecoration(
-                                      hintText: 'EAN/MOD',
-                                      helperText: 'Ej: 939482'),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _currentProductSearchParam =
-                                          _searchParamTextController.text;
-                                    });
+                                padding: const EdgeInsets.only(left: 2, right: 2),
+                                child: ElevatedButton(
+                                  child: const Icon(FontAwesomeIcons.barcode),
+                                  onPressed: () async {
+                                    if (kIsWeb) {
+                                      /*final tmpFile = await getImage(1);
+                                    setState(() async {
+                                      imageFile = tmpFile;
+                                      var fileBytes = await imageFile.readAsBytes();
+                                      //print('Path: ' + imageFile.files.single.path);
+                                      //metodo no soportado en Flutter web, buscar otra libreria
+                                      List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                                      print('Barcode: ' + results[0].toString());
+                                      _controller.text = results[0].toString();
+                                    });*/
+                                    } else {
+                                      if (Platform.isAndroid ||
+                                          Platform.isIOS) {
+                                        setState(() async {
+                                          final barcode =
+                                          await BarcodeScanner.scan();
+                                          _searchParamTextController.text =
+                                              barcode.rawContent;
+                                        });
+                                      }
+                                    }
                                   },
                                 ),
-                              )),
+                              ),
                               Container(
+                                width: 45,
                                 margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.all(15),
+                                padding: const EdgeInsets.only(left: 2, right: 2),
                                 child: ElevatedButton(
-                                  child: const Text('Buscar'),
+                                  child: const Icon(
+                                      FontAwesomeIcons.search),
                                   onPressed: () async {
-                                    try{
+                                    try {
                                       // Buscar info del producto y actualizar el Future del FutureBuilder.
                                       Product product = null;
                                       if (_productSearchBy ==
                                           ProductSearchBy.EAN) {
-                                        product = await _getProductByEAN(_currentProductSearchParam);
-
+                                        product = await _getProductByEAN(
+                                            _currentProductSearchParam);
                                       } else {
-                                        product = await _getProductByCommercialCode(_currentProductSearchParam);
+                                        product =
+                                        await _getProductByCommercialCode(
+                                            _currentProductSearchParam);
                                       }
                                       setState(() {
-                                        isAuditableProduct = product.photos.length > 0;
+                                        isAuditableProduct =
+                                            product.photos.length > 0;
                                         _product = product;
                                       });
                                     }
-                                    on BusinessServiceException catch(e){
-                                      _showSnackBar('Error recuperando información del producto: ${e.message}');
+                                    on BusinessServiceException catch (e) {
+                                      _showSnackBar(
+                                          'Error recuperando información del producto: ${e
+                                              .message}');
                                     }
                                     on Exception catch (e) {
-                                      _showSnackBar('Ha ocurrido un error inesperado: $e');
+                                      _showSnackBar(
+                                          'Ha ocurrido un error inesperado: $e');
                                     }
-
                                   },
                                 ),
                               ),
@@ -196,81 +238,77 @@ class _NewReturn extends State<NewReturn> {
                                     ),
                                     isAuditableProduct
                                         ? Container(
-                                            margin:
-                                                const EdgeInsets.only(top: 8),
-                                            padding: const EdgeInsets.all(30),
+                                      margin:
+                                      const EdgeInsets.only(top: 8),
+                                      padding: const EdgeInsets.all(30),
+                                      child: TextField(
+                                          autofocus: true,
+                                          keyboardType:
+                                          TextInputType.text,
+                                          textInputAction:
+                                          TextInputAction.send,
+                                          maxLength: 30,
+                                          decoration: const InputDecoration(
+                                              labelText:
+                                              'Código Interno de Producto',
+                                              helperText:
+                                              'Ej: AEF54216CV'),
+                                          onChanged: (value) {
+                                            //_quantity = value;
+                                          }
+                                        //},
+                                      ),
+                                    )
+                                        : Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                top: 8),
+                                            padding:
+                                            const EdgeInsets.all(30),
                                             child: TextField(
                                                 autofocus: true,
                                                 keyboardType:
-                                                    TextInputType.text,
+                                                TextInputType.text,
                                                 textInputAction:
-                                                    TextInputAction.send,
-                                                maxLength: 30,
-                                                decoration: const InputDecoration(
+                                                TextInputAction.send,
+                                                maxLength: 10,
+                                                decoration:
+                                                const InputDecoration(
                                                     labelText:
-                                                        'Código Interno de Producto',
+                                                    'Cantidad devuelta',
                                                     helperText:
-                                                        'Ej: AEF54216CV'),
+                                                    'Ej: 12'),
                                                 onChanged: (value) {
-                                                  //_quantity = value;
+                                                  _quantity = value;
                                                 }
-                                                //},
-                                                ),
-                                          )
-                                        : Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                      top: 8),
-                                                  padding:
-                                                      const EdgeInsets.all(30),
-                                                  child: TextField(
-                                                      autofocus: true,
-                                                      keyboardType:
-                                                          TextInputType.text,
-                                                      textInputAction:
-                                                          TextInputAction.send,
-                                                      maxLength: 10,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                              labelText:
-                                                                  'Cantidad devuelta',
-                                                              helperText:
-                                                                  'Ej: 12'),
-                                                      onChanged: (value) {
-                                                        _quantity = value;
-                                                      }
-                                                      //},
-                                                      ),
-                                                ),
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                      top: 8),
-                                                  padding:
-                                                      const EdgeInsets.all(15),
-                                                  child: ElevatedButton(
-                                                      onPressed: () async {
-                                                        final temp_quant_image =
-                                                            await _picker.pickImage(
-                                                                source:
-                                                                    ImageSource
-                                                                        .gallery);
-                                                        setState(() =>
-                                                            _quantityImage =
-                                                                temp_quant_image);
-                                                      },
-                                                      child: const Text(
-                                                          'Cargar foto\n(opcional)'),
-                                                      style: ElevatedButton.styleFrom(
-                                                          primary: Colors.grey,
-                                                          textStyle: const TextStyle(
-                                                              fontSize: 14,
-                                                              //fontWeight: FontWeight.bold,
-                                                              color: Colors.white))),
-                                                ),
-                                                /*const Padding(
+                                              //},
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                top: 8),
+                                            padding:
+                                            const EdgeInsets.all(15),
+                                            child: ElevatedButton(
+                                                onPressed: () async {
+                                                  final temp_quant_image = await _picker.pickImage(source: ImageSource.camera);
+                                                  setState(() {
+                                                    _quantityImage = temp_quant_image;
+                                                  });
+                                                },
+                                                child: const Text(
+                                                    'Cargar foto\n(opcional)'),
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Colors.grey,
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 14,
+                                                        //fontWeight: FontWeight.bold,
+                                                        color: Colors.white))),
+                                          ),
+                                          /*const Padding(
                                                 padding: EdgeInsets.symmetric(horizontal: 7),
                                                 child: Text(
                                                   '(opcional)',
@@ -278,23 +316,18 @@ class _NewReturn extends State<NewReturn> {
                                                   textAlign: TextAlign.center,
                                                 ),
                                               ),*/
-                                                Thumbnail(
-                                                  dataResolver: () async {
-                                                    return (await DefaultAssetBundle
-                                                                .of(context)
-                                                            .load(_quantityImage
-                                                                .path
-                                                                .replaceAll(
-                                                                    'blob:',
-                                                                    '')))
-                                                        .buffer
-                                                        .asUint8List();
-                                                  },
-                                                  mimeType:
-                                                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                                  widgetSize: 100,
-                                                ),
-                                              ]),
+                                          Thumbnail(
+                                            dataResolver: () async {
+                                              final imagePath = _quantityImage.path.replaceAll('blob:','');
+                                              final assetBundle = await DefaultAssetBundle.of(context).load(imagePath);
+                                              final uInt8List = assetBundle.buffer.asUint8List();
+                                              return uInt8List;
+                                            },
+                                            mimeType:
+                                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                            widgetSize: 100,
+                                          ),
+                                        ]),
                                   ]),
                               //)
                               //)
@@ -303,7 +336,8 @@ class _NewReturn extends State<NewReturn> {
                               margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.all(15),
                               child: ElevatedButton(
-                                onPressed: () => appState.currentAction =
+                                onPressed: () =>
+                                appState.currentAction =
                                     PageAction(
                                         state: PageState.pop,
                                         page: NewBatchPageConfig),
@@ -324,7 +358,7 @@ class _NewReturn extends State<NewReturn> {
             ),*/
                           ListTile(
                               leading: const Icon(
-                                Icons.photo_library,
+                                FontAwesomeIcons.barcode,
                               ),
                               onTap: () async {
                                 if (kIsWeb) {
@@ -342,7 +376,7 @@ class _NewReturn extends State<NewReturn> {
                                   if (Platform.isAndroid || Platform.isIOS) {
                                     setState(() async {
                                       final barcode =
-                                          await BarcodeScanner.scan();
+                                      await BarcodeScanner.scan();
                                       _searchParamTextController.text =
                                           barcode.rawContent;
                                     });
@@ -355,7 +389,6 @@ class _NewReturn extends State<NewReturn> {
                   );
                 }));
           } else if (snapshot.hasError) {
-
             widget = Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -377,16 +410,16 @@ class _NewReturn extends State<NewReturn> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const <Widget>[
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text('Aguarde un momento por favor...'),
-                  )
-                ]));
+                      SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text('Aguarde un momento por favor...'),
+                      )
+                    ]));
           }
           return widget;
         });
@@ -404,6 +437,15 @@ class _NewReturn extends State<NewReturn> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
+  }
+
+  Future<XFile> _getPhotoFromCamera() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    return pickedFile;
   }
 }
 
