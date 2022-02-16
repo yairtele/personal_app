@@ -64,13 +64,19 @@ class _BatchDetailsState extends State<BatchDetails> {
     final batch = widget.batch;
     final title = _getBatchTitle(batch);
     final subTitle = _getBatchSubTitle(batch);
+    final observation = batch.observation;
     final appState = Provider.of<AppState>(context, listen: false);
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
+    final _observation = TextEditingController(text:observation);
+    const int numItems = 10;
+    List<bool> selected = List<bool>.generate(numItems, (int index) => false);
 
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
+          final data = snapshot.data;
+          final batches = data.data;
 
           Widget widget;
           if (snapshot.hasData) {
@@ -144,6 +150,21 @@ class _BatchDetailsState extends State<BatchDetails> {
                           ),
                         ),
                       ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 250,
+                          controller: _observation,
+                          decoration: const InputDecoration(
+                              hintText: 'Observacion',
+                              helperText: 'Ej: Con Fallas'
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding: EdgeInsets.only(top: 16.0),
                         child: Row(
@@ -169,24 +190,29 @@ class _BatchDetailsState extends State<BatchDetails> {
                       Container(
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
-                        child: ListView.builder(
-                          itemCount: data.data.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              leading: const Icon(Icons.art_track),
-                              title: Text(data.data[index].retailReference),
-                              onTap: () {
-                                appState.currentAction = PageAction(
-                                    state: PageState.addWidget,
-                                    widget: ReturnRequestDetails(returnRequest: data.data[index]),
-                                    page: DetailsReturnPageConfig);
-                              },
-                            );
-                          },
+                        child: DataTable(
+                            columns: const <DataColumn>[
+                              DataColumn(
+                                label: Text('Solicitudes'),
+                              ),
+                            ],
+                               rows: List<DataRow>.generate(
+                                 numItems,
+                                     (int index) => DataRow(
+                                       cells: <DataCell>[DataCell(Text('Solicitud $index'),onTap: () {
+                                         appState.currentAction = PageAction(
+                                             state: PageState.addWidget,
+                                             widget: ReturnRequestDetails(returnRequest: batches[index]),
+                                             page: DetailsReturnPageConfig);})],
+                                       selected: selected[index],
+                                ),
+                               ),
+                              //onTap: () {
+
+                          ),
                         ),
-                      ),
                     ],
-                  )
+                  ),
               ),
             );
           } else if (snapshot.hasError) {

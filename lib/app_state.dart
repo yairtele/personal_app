@@ -39,6 +39,8 @@ class AppState extends ChangeNotifier {
   String password;
   String description;
   String reference;
+  String observation;
+
   PageAction _currentAction = PageAction();
   PageAction get currentAction => _currentAction;
 
