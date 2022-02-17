@@ -61,7 +61,6 @@ class _BatchesState extends State<Batches> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-
     return FutureBuilder<ScreenData<void, List<Batch>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
@@ -71,13 +70,13 @@ class _BatchesState extends State<Batches> {
             final data = snapshot.data;
             final userInfo = data.userInfo;
             final batches = data.data;
-
+            List<bool> selected = List<bool>.generate(batches.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.grey,
                 title: const Text(
-                  'Lotes',
+                  '',
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
@@ -113,34 +112,40 @@ class _BatchesState extends State<Batches> {
                   }
                     ,
                     icon: Image.network(
-                        'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+                        'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                      height: 40.0,width: 40.0,),
                     label: const Text(''),
                     color: Colors.grey,
                   ),
                 ],
               ),
               body: SafeArea(
-                child: ListView.builder(
-                  itemCount: batches.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      isThreeLine: true,
-                      leading: const Icon(Icons.article),
-                      title: Text('${_getBatchTitle(batches[index])}',
-                          style: const TextStyle(fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black)
-                      ),
-                      subtitle: Text('${_getBatchSubTitle(batches[index])}\n'),
-                      onTap: () {
-                        appState.currentAction = PageAction(
-                            state: PageState.addWidget,
-                            widget: BatchDetails(batch: batches[index]),
-                            page: DetailsPageConfig);
-                      },
-                    );
-                  },
+                child: DataTable(columns: <DataColumn>[
+                const DataColumn(
+                    label: Text('Lotes Draft',style: const TextStyle(fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black)),
                 ),
+                ],
+                 rows: List<DataRow>.generate (
+                   batches.length,
+                       (int index) => DataRow(
+                     cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
+                       leading: const Icon(Icons.article,color: Colors.green),
+                       title: Text('${_getBatchTitle(batches[index])}',
+                         style: const TextStyle(fontSize: 14.0,
+                           fontWeight: FontWeight.bold,
+                         color: Colors.black)),
+                           subtitle: Text('${_getBatchSubTitle(batches[index])}\n\n\n'),
+                     ),onTap: () {
+                       appState.currentAction = PageAction(
+                           state: PageState.addWidget,
+                           widget: BatchDetails(batch: batches[index]),
+                           page: DetailsPageConfig);})],
+                     selected: selected[index],
+                   ),
+                 ),
+                      ),
               ),
             );
           } else if (snapshot.hasError) {
@@ -162,17 +167,15 @@ class _BatchesState extends State<Batches> {
             );
           } else {
             widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
+                child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
                     ]
                 )

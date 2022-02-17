@@ -59,10 +59,17 @@ class _ProductDetailsState extends State<ProductDetails> {
                     onPressed: () => appState.currentAction =
                         PageAction(state: PageState.addPage, page: SettingsPageConfig),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                  ),
                   RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
-                    ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+                    ,icon: Image.network(
+                      'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                      height: 40.0,width: 40.0,),
                     label: Text(''),
                     color: Colors.grey,
                   ),
@@ -119,17 +126,15 @@ class _ProductDetailsState extends State<ProductDetails> {
             );
           } else {
             widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
+                child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
                     ]
                 )

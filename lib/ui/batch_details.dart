@@ -69,8 +69,6 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
-    const int numItems = 10;
-    List<bool> selected = List<bool>.generate(numItems, (int index) => false);
 
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
@@ -79,8 +77,8 @@ class _BatchDetailsState extends State<BatchDetails> {
           Widget widget;
           if (snapshot.hasData) {
             final data = snapshot.data;
-            final batches = data.data;
-
+            final returns = data.data;
+            List<bool> selected = List<bool>.generate(returns.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -109,7 +107,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                   RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
-                    ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+                    ,icon: Image.network(
+                      'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                      height: 40.0,width: 40.0,),
                     label: Text(''),
                     color: Colors.grey,
                   ),
@@ -172,16 +172,25 @@ class _BatchDetailsState extends State<BatchDetails> {
                             onPressed: () => appState.currentAction =
                                 PageAction(state: PageState.addPage, page: DetailsPageConfig),
                             child: const Text('Guardar'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.green[400],
+                              )
                           ),
                             ElevatedButton(
                               onPressed: () => appState.currentAction =
                                   PageAction(state: PageState.addPage, page: DetailsPageConfig),
                               child: const Text('Enviar Lote'),
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.grey,
+                                )
                             ),
                             ElevatedButton(
                               onPressed: () => appState.currentAction =
                                   PageAction(state: PageState.addPage, page: DetailsPageConfig),
                               child: const Text('Borrar Lote'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                )
                             ),
                           ],
                         ),
@@ -196,14 +205,23 @@ class _BatchDetailsState extends State<BatchDetails> {
                               ),
                             ],
                                rows: List<DataRow>.generate(
-                                 numItems,
+                                 returns.length,
                                      (int index) => DataRow(
-                                       cells: <DataCell>[DataCell(Text('Solicitud $index'),onTap: () {
+                                       cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
+                                         leading: const Icon(Icons.art_track_sharp,color: Colors.grey,),
+                                         title: Text('${returns[index].retailReference}',
+                                             style: const TextStyle(fontSize: 14.0,
+                                                 fontWeight: FontWeight.bold,
+                                                 color: Colors.black)),
+                                         subtitle: Text('Cant.Prod: ${returns[index].cantidad.toString()}\n\n\n'),
+                                       ),onTap: () {
                                          appState.currentAction = PageAction(
                                              state: PageState.addWidget,
-                                             widget: ReturnRequestDetails(returnRequest: batches[index]),
+                                             widget: ReturnRequestDetails(returnRequest: returns[index]),
                                              page: DetailsReturnPageConfig);})],
                                        selected: selected[index],
+
+
                                 ),
                                ),
                               //onTap: () {
@@ -233,17 +251,15 @@ class _BatchDetailsState extends State<BatchDetails> {
             );
           } else {
             widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
+                child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
                     ]
                 )
@@ -254,23 +270,27 @@ class _BatchDetailsState extends State<BatchDetails> {
     );
   }
 
-  String _getBatchTitle(Batch batch) {
-    return batch.retailReference != '' ? batch.retailReference : batch.description;
+  String _getBatchTitle(Batch returns) {
+    return returns.retailReference != '' ? returns.retailReference : returns.description;
   }
-  String _getBatchSubTitle(Batch batch) {
-    return batch.description != '' ? (batch.retailReference == '' ? '(sin referencia)' : batch.description) : '(Sin descripción)';
+  String _getBatchSubTitle(Batch returns) {
+    return returns.description != '' ? (returns.retailReference == '' ? '(sin referencia)' : returns.description) : '(Sin descripción)';
   }
 
   Future<List<ReturnRequest>> _getReturnRequests(Batch batch) {
     final returnRequests = [
-      ReturnRequest(retailReference: 'Solicitud 1'),
-      ReturnRequest(retailReference: 'Solicitud 2'),
-      ReturnRequest(retailReference: 'Solicitud 3'),
-      ReturnRequest(retailReference: 'Solicitud 4'),
-      ReturnRequest(retailReference: 'Solicitud 5'),
-      ReturnRequest(retailReference: 'Solicitud 6'),
+      ReturnRequest(retailReference: 'LGTR-4581',cantidad: 5),
+      ReturnRequest(retailReference: 'PRUEB-7501',cantidad:3),
+      ReturnRequest(retailReference: 'FRAV-1105',cantidad:1),
+      ReturnRequest(retailReference: 'SOLPR-8889',cantidad:8),
+      ReturnRequest(retailReference: 'SOLI-4879',cantidad:1),
+      ReturnRequest(retailReference: 'TEST-7896',cantidad:4),
     ];
-
+    Future<List<Batch>> _getReturnRequests_Athento(something) async{
+      // Obtener lista de Solicitudes desde Athento
+      final returns = await BusinessServices.getReturns();
+      return returns;
+    }
     final returnValue = Future.delayed(const Duration(milliseconds: 100), () => returnRequests);
     return returnValue;
   }

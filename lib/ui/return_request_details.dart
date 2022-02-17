@@ -31,8 +31,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
-    const int numItems = 10;
-    List<bool> selected = List<bool>.generate(numItems, (int index) => false);
     return FutureBuilder<ScreenData<ReturnRequest, List<Product>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<ReturnRequest, List<Product>>> snapshot) {
@@ -41,6 +39,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           if (snapshot.hasData) {
             final data = snapshot.data;
             final products = data.data;
+            List<bool> selected = List<bool>.generate(products.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -61,10 +60,17 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     onPressed: () => appState.currentAction =
                         PageAction(state: PageState.addPage, page: SettingsPageConfig),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                  ),
                   RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
-                    ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+                    ,icon: Image.network(
+                      'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                      height: 40.0,width: 40.0,),
                     label: Text(''),
                     color: Colors.grey,
                   ),
@@ -79,9 +85,16 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     ),
                   ],
                   rows: List<DataRow>.generate(
-                    numItems,
+                    products.length,
                         (int index) => DataRow(
-                      cells: <DataCell>[DataCell(Text('Producto $index'),onTap: () {
+                      cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
+                          leading: const Icon(Icons.workspaces_filled,color: Colors.grey,),
+                          title: Text('EAN: ${products[index].EAN}',
+                              style: const TextStyle(fontSize: 14.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black)),
+                          subtitle: Text('${products[index].description}\n\n\n'),
+                        ),onTap: () {
                         appState.currentAction = PageAction(
                             state: PageState.addWidget,
                             widget: ProductDetails(product: products[index]),
@@ -112,17 +125,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             );
           } else {
             widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
+                child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
                     ]
                 )
@@ -136,12 +147,12 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
   Future<List<Product>> _getProducts(ReturnRequest batch) {
     final products = [
-      Product(retailReference: 'Producto 1'),
-      Product(retailReference: 'Producto 2'),
-      Product(retailReference: 'Producto 3'),
-      Product(retailReference: 'Producto 4'),
-      Product(retailReference: 'Producto 5'),
-      Product(retailReference: 'Producto 6'),
+      Product(EAN: 'RT5486536',description: 'LG-4789'),
+      Product(EAN: 'EXMP65452',description: 'SAMSUNG S9 EDGE'),
+      Product(EAN: 'COD654732',description: 'SAMSUNG S9 EDGE'),
+      Product(EAN: 'TEST54756',description: 'SAMSUNG S20'),
+      Product(EAN: 'PRUE58989',description: 'TV SONY'),
+      Product(EAN: 'FRAV58995',description: 'PARLANTE JBL'),
     ];
 
     final returnValue = Future.delayed(const Duration(milliseconds: 100), () => products);
