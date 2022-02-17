@@ -296,7 +296,7 @@ class _NewReturn extends State<NewReturn> {
                                                   final temp_quant_image = await _picker.pickImage(source: ImageSource.camera);
                                                   setState(() {
                                                     _quantityImage = temp_quant_image;
-                                                  });s
+                                                  });
                                                 },
                                                 child: const Text(
                                                     'Cargar foto\n(opcional)'),
@@ -406,19 +406,19 @@ class _NewReturn extends State<NewReturn> {
             );
           } else {
             widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
+                child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
-                    ]));
+                    ]
+                )
+            );
           }
           return widget;
         });

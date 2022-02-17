@@ -112,17 +112,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             );
           } else {
             widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
+                child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
                     ]
                 )
