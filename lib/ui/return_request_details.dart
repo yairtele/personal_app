@@ -61,6 +61,11 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     onPressed: () => appState.currentAction =
                         PageAction(state: PageState.addPage, page: SettingsPageConfig),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () => appState.currentAction =
+                        PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                  ),
                   RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
