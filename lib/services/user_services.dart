@@ -14,7 +14,7 @@ class UserServices{
 class InvalidLoginException implements Exception{
   String message;
 
-  InvalidLoginException([String this.message = 'Invalid value']);
+  InvalidLoginException([String this.message = 'Invalid login']);
 
   @override
   String toString() {
