@@ -77,7 +77,7 @@ class _BatchesState extends State<Batches> {
                 elevation: 0,
                 backgroundColor: Colors.grey,
                 title: const Text(
-                  'Lotes',
+                  '',
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
@@ -113,7 +113,8 @@ class _BatchesState extends State<Batches> {
                   }
                     ,
                     icon: Image.network(
-                        'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+                        'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                      height: 40.0,width: 40.0,),
                     label: const Text(''),
                     color: Colors.grey,
                   ),

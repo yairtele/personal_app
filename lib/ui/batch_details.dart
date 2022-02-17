@@ -109,7 +109,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                   RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
-                    ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+                    ,icon: Image.network(
+                      'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                      height: 40.0,width: 40.0,),
                     label: Text(''),
                     color: Colors.grey,
                   ),
