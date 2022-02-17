@@ -1,5 +1,5 @@
 class ReturnRequest {
   String retailReference;
-
-  ReturnRequest({this.retailReference});
+  int cantidad;
+  ReturnRequest({this.retailReference,this.cantidad});
 }

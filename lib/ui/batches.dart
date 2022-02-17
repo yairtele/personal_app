@@ -145,26 +145,7 @@ class _BatchesState extends State<Batches> {
                      selected: selected[index],
                    ),
                  ),
-                  //itemCount: batches.length,
-                  //itemBuilder: (context, index){
-                    //return ListTile(
-                      //isThreeLine: true,
-                      //leading: const Icon(Icons.article),
-                      //title: Text('${_getBatchTitle(batches[index])}',
-                        //  style: const TextStyle(fontSize: 14.0,
-                          //    fontWeight: FontWeight.bold,
-                            //  color: Colors.black)
                       ),
-                      //subtitle: Text('${_getBatchSubTitle(batches[index])}\n'),
-                      //onTap: () {
-                        //appState.currentAction = PageAction(
-                           // state: PageState.addWidget,
-                            //widget: BatchDetails(batch: batches[index]),
-                            //page: DetailsPageConfig);
-                      //},
-                    //);
-                  //},
-                //),
               ),
             );
           } else if (snapshot.hasError) {
