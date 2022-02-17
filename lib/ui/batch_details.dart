@@ -75,12 +75,11 @@ class _BatchDetailsState extends State<BatchDetails> {
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
-          final data = snapshot.data;
-          final batches = data.data;
 
           Widget widget;
           if (snapshot.hasData) {
             final data = snapshot.data;
+            final batches = data.data;
 
             widget = Scaffold(
               appBar: AppBar(

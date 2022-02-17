@@ -236,8 +236,7 @@ class _NewReturn extends State<NewReturn> {
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black),
                                     ),
-                                    isAuditableProduct
-                                        ? Container(
+                                    Container(
                                       margin:
                                       const EdgeInsets.only(top: 8),
                                       padding: const EdgeInsets.all(30),
@@ -250,7 +249,7 @@ class _NewReturn extends State<NewReturn> {
                                           maxLength: 30,
                                           decoration: const InputDecoration(
                                               labelText:
-                                              'Código Interno de Producto',
+                                              'Referencia interna',
                                               helperText:
                                               'Ej: AEF54216CV'),
                                           onChanged: (value) {
@@ -258,8 +257,8 @@ class _NewReturn extends State<NewReturn> {
                                           }
                                         //},
                                       ),
-                                    )
-                                        : Column(
+                                    ),
+                                    Column(
                                         mainAxisAlignment:
                                         MainAxisAlignment.start,
                                         children: [
@@ -297,7 +296,7 @@ class _NewReturn extends State<NewReturn> {
                                                   final temp_quant_image = await _picker.pickImage(source: ImageSource.camera);
                                                   setState(() {
                                                     _quantityImage = temp_quant_image;
-                                                  });
+                                                  });s
                                                 },
                                                 child: const Text(
                                                     'Cargar foto\n(opcional)'),
