@@ -198,12 +198,21 @@ class _BatchDetailsState extends State<BatchDetails> {
                                rows: List<DataRow>.generate(
                                  returns.length,
                                      (int index) => DataRow(
-                                       cells: <DataCell>[DataCell(Text('${returns[index].retailReference}'),onTap: () {
+                                       cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
+                                         leading: const Icon(Icons.art_track_sharp,color: Colors.grey,),
+                                         title: Text('${returns[index].retailReference}',
+                                             style: const TextStyle(fontSize: 14.0,
+                                                 fontWeight: FontWeight.bold,
+                                                 color: Colors.black)),
+                                         subtitle: Text('Cant.Prod: ${returns[index].cantidad.toString()}\n\n\n'),
+                                       ),onTap: () {
                                          appState.currentAction = PageAction(
                                              state: PageState.addWidget,
                                              widget: ReturnRequestDetails(returnRequest: returns[index]),
                                              page: DetailsReturnPageConfig);})],
                                        selected: selected[index],
+
+
                                 ),
                                ),
                               //onTap: () {
