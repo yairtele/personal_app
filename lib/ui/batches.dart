@@ -122,7 +122,9 @@ class _BatchesState extends State<Batches> {
               body: SafeArea(
                 child: DataTable(columns: <DataColumn>[
                 const DataColumn(
-                    label: Text('Lotes Draft:'),
+                    label: Text('Lotes Draft',style: const TextStyle(fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black)),
                 ),
                 ],
                  rows: List<DataRow>.generate (
@@ -139,7 +141,7 @@ class _BatchesState extends State<Batches> {
                        appState.currentAction = PageAction(
                            state: PageState.addWidget,
                            widget: BatchDetails(batch: batches[index]),
-                           page: DetailsReturnPageConfig);})],
+                           page: DetailsPageConfig);})],
                      selected: selected[index],
                    ),
                  ),

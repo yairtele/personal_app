@@ -70,7 +70,7 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
     const int numItems = 10;
-    List<bool> selected = List<bool>.generate(numItems, (int index) => false);
+    List<bool> selected_2 = List<bool>.generate(numItems, (int index2) => false);
 
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
@@ -199,13 +199,13 @@ class _BatchDetailsState extends State<BatchDetails> {
                             ],
                                rows: List<DataRow>.generate(
                                  numItems,
-                                     (int index) => DataRow(
-                                       cells: <DataCell>[DataCell(Text('Solicitud $index'),onTap: () {
+                                     (int index2) => DataRow(
+                                       cells: <DataCell>[DataCell(Text('Solicitud $index2'),onTap: () {
                                          appState.currentAction = PageAction(
                                              state: PageState.addWidget,
-                                             widget: ReturnRequestDetails(returnRequest: batches[index]),
+                                             widget: ReturnRequestDetails(returnRequest: batches[index2]),
                                              page: DetailsReturnPageConfig);})],
-                                       selected: selected[index],
+                                       selected: selected_2[index2],
                                 ),
                                ),
                               //onTap: () {
