@@ -286,7 +286,11 @@ class _BatchDetailsState extends State<BatchDetails> {
       ReturnRequest(retailReference: 'SOLI-4879',cantidad:1),
       ReturnRequest(retailReference: 'TEST-7896',cantidad:4),
     ];
-
+    Future<List<Batch>> _getReturnRequests_Athento(something) async{
+      // Obtener lista de Solicitudes desde Athento
+      final returns = await BusinessServices.getReturns();
+      return returns;
+    }
     final returnValue = Future.delayed(const Duration(milliseconds: 100), () => returnRequests);
     return returnValue;
   }

@@ -4,6 +4,7 @@ import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/business_service_exception.dart';
 import 'package:navigation_app/services/business/product.dart';
 import '../newsan_services.dart';
@@ -82,6 +83,26 @@ class BusinessServices {
     final batches = entries.map((e) => Batch.fromJSON(e));
     return batches.toList();
   }
+ //TODO: Completar armado de metadatos del formulario Solicitudes
+  static Future<List<Batch>> getReturns() async {
+    final fieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
+    final configProvider = await _getBearerConfigProvider(fieldNameInferenceConfig);
+    final selectFields = [
+      'ecm:uuid',
+      'dc:title',
+      ReturnAthentoFieldName.retailReference,
+      ReturnAthentoFieldName.cantidad,
+    ];
+
+    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
+
+    final entries = await SpAthentoServices.findDocuments(
+        configProvider, _batchDocType, selectFields, whereExpression);
+    final returns = entries.map((e) => Batch.fromJSON(e));
+    return returns.toList();
+  }
+
+
 
   static Future<Product> getProductByEAN(String eanCode) {
     //TODO: Consultar Athento
