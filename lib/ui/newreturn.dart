@@ -49,7 +49,8 @@ class NewReturn extends StatefulWidget {
 class _NewReturn extends State<NewReturn> {
   XFile _quantityImage;
   XFile imageFile;
-  bool isAuditableProduct = true;
+  final Map<String, XFile> _takenPictures = {};
+  bool _isAuditableProduct = false;
   var _productSearchBy = ProductSearchBy.EAN;
   Product _product = null;
   Future<ScreenData<void, void>> _localData;
@@ -73,13 +74,12 @@ class _NewReturn extends State<NewReturn> {
             AsyncSnapshot<ScreenData<void, void>> snapshot) {
           Widget widget;
           if (snapshot.hasData) {
-            final data = snapshot.data;
             widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
                   backgroundColor: Colors.grey,
                   title: const Text(
-                    'Nuevo Ingreso',
+                    'Nueva Devolución',
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -192,16 +192,24 @@ class _NewReturn extends State<NewReturn> {
                                       Product product = null;
                                       if (_productSearchBy ==
                                           ProductSearchBy.EAN) {
-                                        product = await _getProductByEAN(
-                                            _currentProductSearchParam);
+                                        product = await _getProductByEAN(_currentProductSearchParam);
                                       } else {
-                                        product =
-                                        await _getProductByCommercialCode(
-                                            _currentProductSearchParam);
+                                        product = await _getProductByCommercialCode(_currentProductSearchParam);
                                       }
+
+                                      _takenPictures.clear();
+
+                                      if (product.photos.length == 0){
+                                        _takenPictures['Foto'] = null;
+                                      }
+                                      else{
+                                        product.photos.forEach((photoName) {
+                                          _takenPictures[photoName] = null;
+                                        });
+                                      }
+
                                       setState(() {
-                                        isAuditableProduct =
-                                            product.photos.length > 0;
+                                        _isAuditableProduct = product.photos.length > 0;
                                         _product = product;
                                       });
                                     }
@@ -262,11 +270,10 @@ class _NewReturn extends State<NewReturn> {
                                         mainAxisAlignment:
                                         MainAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                top: 8),
-                                            padding:
-                                            const EdgeInsets.all(30),
+                                          if (!_isAuditableProduct)
+                                            Container(
+                                            margin: const EdgeInsets.only(top: 8),
+                                            padding: const EdgeInsets.all(30),
                                             child: TextField(
                                                 autofocus: true,
                                                 keyboardType:
@@ -286,46 +293,7 @@ class _NewReturn extends State<NewReturn> {
                                               //},
                                             ),
                                           ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                top: 8),
-                                            padding:
-                                            const EdgeInsets.all(15),
-                                            child: ElevatedButton(
-                                                onPressed: () async {
-                                                  final temp_quant_image = await _picker.pickImage(source: ImageSource.camera);
-                                                  setState(() {
-                                                    _quantityImage = temp_quant_image;
-                                                  });s
-                                                },
-                                                child: const Text(
-                                                    'Cargar foto\n(opcional)'),
-                                                style: ElevatedButton.styleFrom(
-                                                    primary: Colors.grey,
-                                                    textStyle: const TextStyle(
-                                                        fontSize: 14,
-                                                        //fontWeight: FontWeight.bold,
-                                                        color: Colors.white))),
-                                          ),
-                                          /*const Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: 7),
-                                                child: Text(
-                                                  '(opcional)',
-                                                  overflow: TextOverflow.clip,
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),*/
-                                          Thumbnail(
-                                            dataResolver: () async {
-                                              final imagePath = _quantityImage.path.replaceAll('blob:','');
-                                              final assetBundle = await DefaultAssetBundle.of(context).load(imagePath);
-                                              final uInt8List = assetBundle.buffer.asUint8List();
-                                              return uInt8List;
-                                            },
-                                            mimeType:
-                                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                            widgetSize: 100,
-                                          ),
+                                          _buildThumbnailsGridView(pictures:  _takenPictures),
                                         ]),
                                   ]),
                               //)
@@ -362,22 +330,20 @@ class _NewReturn extends State<NewReturn> {
                               onTap: () async {
                                 if (kIsWeb) {
                                   /*final tmpFile = await getImage(1);
-                setState(() async {
-                  imageFile = tmpFile;
-                  var fileBytes = await imageFile.readAsBytes();
-                  //print('Path: ' + imageFile.files.single.path);
-                  //metodo no soportado en Flutter web, buscar otra libreria
-                  List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
-                  print('Barcode: ' + results[0].toString());
-                  _controller.text = results[0].toString();
-                });*/
+                                  setState(() async {
+                                    imageFile = tmpFile;
+                                    var fileBytes = await imageFile.readAsBytes();
+                                    //print('Path: ' + imageFile.files.single.path);
+                                    //metodo no soportado en Flutter web, buscar otra libreria
+                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                                    print('Barcode: ' + results[0].toString());
+                                    _controller.text = results[0].toString();
+                                  });*/
                                 } else {
                                   if (Platform.isAndroid || Platform.isIOS) {
                                     setState(() async {
-                                      final barcode =
-                                      await BarcodeScanner.scan();
-                                      _searchParamTextController.text =
-                                          barcode.rawContent;
+                                      final barcode = await BarcodeScanner.scan();
+                                      _searchParamTextController.text = barcode.rawContent;
                                     });
                                   }
                                 }
@@ -446,6 +412,79 @@ class _NewReturn extends State<NewReturn> {
     );
     return pickedFile;
   }
+
+  Widget _buildThumbnailsGridView({@required Map<String, XFile> pictures}) {
+
+    return GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(20),
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        children: <Widget>[
+          for(final photoName in  pictures.keys)
+            _buildPhotoThumbnail(photoName, pictures)
+        ]
+    );
+  }
+
+  Widget _buildPhotoThumbnail(String photoName, Map<String, XFile> photos) {
+    final photo = photos[photoName];
+
+    return Container(
+        padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
+        ),
+        child: Column(
+          children: [
+            Expanded( // Show photo or icon
+                child: ((){
+                  if (photo != null)
+                    return  Image.file(File(photo.path));
+                  else
+                    return const Icon(FontAwesomeIcons.camera);
+                })()
+            ),
+            Row(
+              children: [
+                Expanded(child: Text(photoName, textAlign: TextAlign.center)), // Photo name
+                if(photo != null)
+                  ElevatedButton( // Delete photo
+                    child: const Icon(FontAwesomeIcons.trash),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.all(4),
+                    ),
+                    onPressed: () async {
+                      //TODO: ver si se debe borrar el archivo donde estaba la foto
+                      setState(() {
+                        photos[photoName] = null;
+                      });
+                    },
+                  )
+                else
+                  ElevatedButton( // Take photo
+                    child: const Icon(FontAwesomeIcons.camera),
+                    style: ElevatedButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.all(4),
+                    ),
+                    onPressed: () async {
+                      final pickedPhoto = await _getPhotoFromCamera();
+                      setState(() {
+                        photos[photoName] = pickedPhoto;
+                      });
+                    },
+                  )
+              ],
+            )
+          ],
+        )
+    );
+  }
 }
 
 Future getImage(int type) async {
@@ -454,5 +493,6 @@ Future getImage(int type) async {
       imageQuality: 50);
   return pickedImage;
 }
+
 
 enum ProductSearchBy { EAN, CommercialCode }
