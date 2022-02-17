@@ -61,7 +61,6 @@ class _BatchesState extends State<Batches> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-
     return FutureBuilder<ScreenData<void, List<Batch>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
@@ -71,7 +70,7 @@ class _BatchesState extends State<Batches> {
             final data = snapshot.data;
             final userInfo = data.userInfo;
             final batches = data.data;
-
+            List<bool> selected = List<bool>.generate(batches.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -121,27 +120,49 @@ class _BatchesState extends State<Batches> {
                 ],
               ),
               body: SafeArea(
-                child: ListView.builder(
-                  itemCount: batches.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      isThreeLine: true,
-                      leading: const Icon(Icons.article),
-                      title: Text('${_getBatchTitle(batches[index])}',
-                          style: const TextStyle(fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black)
-                      ),
-                      subtitle: Text('${_getBatchSubTitle(batches[index])}\n'),
-                      onTap: () {
-                        appState.currentAction = PageAction(
-                            state: PageState.addWidget,
-                            widget: BatchDetails(batch: batches[index]),
-                            page: DetailsPageConfig);
-                      },
-                    );
-                  },
+                child: DataTable(columns: <DataColumn>[
+                const DataColumn(
+                    label: Text('Lotes Draft:'),
                 ),
+                ],
+                 rows: List<DataRow>.generate (
+                   batches.length,
+                       (int index) => DataRow(
+                     cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
+                       leading: const Icon(Icons.article,color: Colors.lightGreenAccent,),
+                       title: Text('${_getBatchTitle(batches[index])}',
+                         style: const TextStyle(fontSize: 14.0,
+                           fontWeight: FontWeight.bold,
+                         color: Colors.black)),
+                           subtitle: Text('${_getBatchSubTitle(batches[index])}\n\n\n'),
+                     ),onTap: () {
+                       appState.currentAction = PageAction(
+                           state: PageState.addWidget,
+                           widget: BatchDetails(batch: batches[index]),
+                           page: DetailsReturnPageConfig);})],
+                     selected: selected[index],
+                   ),
+                 ),
+                  //itemCount: batches.length,
+                  //itemBuilder: (context, index){
+                    //return ListTile(
+                      //isThreeLine: true,
+                      //leading: const Icon(Icons.article),
+                      //title: Text('${_getBatchTitle(batches[index])}',
+                        //  style: const TextStyle(fontSize: 14.0,
+                          //    fontWeight: FontWeight.bold,
+                            //  color: Colors.black)
+                      ),
+                      //subtitle: Text('${_getBatchSubTitle(batches[index])}\n'),
+                      //onTap: () {
+                        //appState.currentAction = PageAction(
+                           // state: PageState.addWidget,
+                            //widget: BatchDetails(batch: batches[index]),
+                            //page: DetailsPageConfig);
+                      //},
+                    //);
+                  //},
+                //),
               ),
             );
           } else if (snapshot.hasError) {
