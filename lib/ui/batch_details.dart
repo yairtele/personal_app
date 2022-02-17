@@ -172,16 +172,25 @@ class _BatchDetailsState extends State<BatchDetails> {
                             onPressed: () => appState.currentAction =
                                 PageAction(state: PageState.addPage, page: DetailsPageConfig),
                             child: const Text('Guardar'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.green[400],
+                              )
                           ),
                             ElevatedButton(
                               onPressed: () => appState.currentAction =
                                   PageAction(state: PageState.addPage, page: DetailsPageConfig),
                               child: const Text('Enviar Lote'),
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.grey,
+                                )
                             ),
                             ElevatedButton(
                               onPressed: () => appState.currentAction =
                                   PageAction(state: PageState.addPage, page: DetailsPageConfig),
                               child: const Text('Borrar Lote'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                )
                             ),
                           ],
                         ),

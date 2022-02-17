@@ -131,7 +131,7 @@ class _BatchesState extends State<Batches> {
                    batches.length,
                        (int index) => DataRow(
                      cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
-                       leading: const Icon(Icons.article,color: Colors.lightGreenAccent,),
+                       leading: const Icon(Icons.article,color: Colors.green),
                        title: Text('${_getBatchTitle(batches[index])}',
                          style: const TextStyle(fontSize: 14.0,
                            fontWeight: FontWeight.bold,
