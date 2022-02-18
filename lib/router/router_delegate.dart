@@ -187,7 +187,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           _addPageData(NewBatch(), NewBatchPageConfig);
           break;
         case Pages.NewReturn:
-          _addPageData(NewReturn(), NewReturnPageConfig);
+          _addPageData(NewReturnScreen(), NewReturnPageConfig);
           break;
         case Pages.DetailsReturn:
           if (pageConfig.currentPageAction != null) {
@@ -389,7 +389,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case 'newreturn':
           setPath([
             _createPage(Batches(), ListItemsPageConfig),
-            _createPage(NewReturn(), NewBatchPageConfig)
+            _createPage(NewReturnScreen(), NewBatchPageConfig)
           ]);
           break;
       }

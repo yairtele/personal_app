@@ -38,15 +38,15 @@ var _quantity;
 
 var type;
 
-class NewReturn extends StatefulWidget {
+class NewReturnScreen extends StatefulWidget {
   final ReturnRequest returnRequest;
-  const NewReturn({Key key, this.returnRequest}) : super(key: key);
+  const NewReturnScreen({Key key, this.returnRequest}) : super(key: key);
 
   @override
-  State<NewReturn> createState() => _NewReturn();
+  State<NewReturnScreen> createState() => _NewReturn();
 }
 
-class _NewReturn extends State<NewReturn> {
+class _NewReturn extends State<NewReturnScreen> {
   XFile _quantityImage;
   XFile imageFile;
   final Map<String, XFile> _takenPictures = {};
@@ -303,12 +303,12 @@ class _NewReturn extends State<NewReturn> {
                               margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.all(15),
                               child: ElevatedButton(
-                                onPressed: () =>
-                                appState.currentAction =
-                                    PageAction(
-                                        state: PageState.pop,
-                                        page: NewBatchPageConfig),
-                                //devolver a new batch anterior
+                                onPressed: () async {
+                                  //final newReturn = NewReturn();
+                                  //await BusinessServices.registerNewProductReturn(batchUUID: batch.uuid, newReturn:  newReturn)
+                                },
+
+
                                 child: const Text('Confirmar'),
                               ),
                             ),
