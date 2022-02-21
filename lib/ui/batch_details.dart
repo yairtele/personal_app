@@ -62,8 +62,8 @@ class _BatchDetailsState extends State<BatchDetails> {
   @override
   Widget build(BuildContext context) {
     final batch = widget.batch;
-    final title = _getBatchTitle(batch);
-    final subTitle = _getBatchSubTitle(batch);
+    final title = batch.retailReference;
+    final subTitle = batch.description;
     final observation = batch.observation;
     final appState = Provider.of<AppState>(context, listen: false);
     final _reference = TextEditingController(text: title);
@@ -128,8 +128,18 @@ class _BatchDetailsState extends State<BatchDetails> {
                           maxLength: 30,
                           controller: _reference,
                           decoration: const InputDecoration(
-                              hintText: 'Referencia Interna Lote',
-                              helperText: 'Ej: 939482'
+                            hintText: 'Referencia Interna Lote',
+                            helperText: 'Ej: LOT-35266',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
                           ),
                         ),
                       ),
@@ -143,8 +153,18 @@ class _BatchDetailsState extends State<BatchDetails> {
                           maxLength: 50,
                           controller: _description,
                           decoration: const InputDecoration(
-                              hintText: 'Descripcion',
-                              helperText: 'Ej: Lote Fravega 4'
+                            hintText: 'Descripcion',
+                            helperText: 'Ej: Lote Fravega 4',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
                           ),
                         ),
                       ),
@@ -158,8 +178,18 @@ class _BatchDetailsState extends State<BatchDetails> {
                           maxLength: 250,
                           controller: _observation,
                           decoration: const InputDecoration(
-                              hintText: 'Observacion',
-                              helperText: 'Ej: Con Fallas'
+                            hintText: 'Observacion',
+                            helperText: 'Ej: Contiene fallas',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
                           ),
                         ),
                       ),

@@ -88,10 +88,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     children: [
                       Column(
                       children: [ Container(
-                        child: const Text('Solicitud:',
-                            style: const TextStyle(fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black)),
+                        child: const Text('Solicitud',style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.black)),
                       ),],
                       ),
                       Container(
