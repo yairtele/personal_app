@@ -31,6 +31,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
+
     return FutureBuilder<ScreenData<ReturnRequest, List<Product>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<ReturnRequest, List<Product>>> snapshot) {
@@ -39,7 +40,12 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           if (snapshot.hasData) {
             final data = snapshot.data;
             final products = data.data;
-            List<bool> selected = List<bool>.generate(products.length, (int index) => false);
+            final reference = returnRequest.retailReference;
+            final _reference = TextEditingController(text:reference);
+            final cantidad = returnRequest.cantidad;
+            final _cantidad = TextEditingController(text:cantidad.toString());
+            final descripcion = returnRequest.descripcion;
+            final _descripcion = TextEditingController(text:descripcion);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -78,31 +84,117 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               ),
 
               body: SafeArea(
-                child: DataTable(
-                  columns: const <DataColumn>[
-                    DataColumn(
-                      label: Text('Productos:'),
-                    ),
-                  ],
-                  rows: List<DataRow>.generate(
-                    products.length,
-                        (int index) => DataRow(
+                  child: ListView (
+                    children: [
+                      Column(
+                      children: [ Container(
+                        child: const Text('Solicitud:',
+                            style: const TextStyle(fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                      ),],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          enabled: false,
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _reference,
+                          decoration: const InputDecoration(
+                              hintText: '-',
+                              label: Text.rich(
+                                  TextSpan(
+                                    children: <InlineSpan>[
+                                        WidgetSpan(
+                                          child: Text(
+                                              'Referencia Interna:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                        ),
+                                     ],
+                                  )
+                              ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          enabled: false,
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _descripcion,
+                          decoration: const InputDecoration(
+                            hintText: '-',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          enabled: false,
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _cantidad,
+                          decoration: const InputDecoration(
+                            hintText: '-',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                        'Unidades:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataTable(
+                      columns: const <DataColumn>[
+                        DataColumn(
+                          label: Text('Productos:'),
+                        ),
+                      ],
+                      rows: List<DataRow>.generate(
+                      products.length,
+                      (int index) => DataRow(
                       cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
-                          leading: const Icon(Icons.workspaces_filled,color: Colors.grey,),
-                          title: Text('EAN: ${products[index].EAN}',
-                              style: const TextStyle(fontSize: 14.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
-                          subtitle: Text('${products[index].description}\n\n\n'),
-                        ),onTap: () {
-                        appState.currentAction = PageAction(
-                            state: PageState.addWidget,
-                            widget: ProductDetails(product: products[index]),
-                            page: DetailProductPageConfig);})],
-                      selected: selected[index],
-                    ),
-                  ),
-                  //onTap: () {
+                      leading: const Icon(Icons.workspaces_filled,color: Colors.grey,),
+                      title: Text('EAN: ${products[index].EAN}',
+                      style: const TextStyle(fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
+                      subtitle: Text('${products[index].description}\n\n\n'),
+                      ),onTap: () {
+                          appState.currentAction = PageAction(
+                          state: PageState.addWidget,
+                          widget: ProductDetails(product: products[index]),
+                          page: DetailProductPageConfig);})],
+
+                        ),
+                      ),
+                     ),
+                ],
                 ),
               ),
             );

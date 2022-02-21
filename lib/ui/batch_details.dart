@@ -78,7 +78,6 @@ class _BatchDetailsState extends State<BatchDetails> {
           if (snapshot.hasData) {
             final data = snapshot.data;
             final returns = data.data;
-            List<bool> selected = List<bool>.generate(returns.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -219,13 +218,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                                              state: PageState.addWidget,
                                              widget: ReturnRequestDetails(returnRequest: returns[index]),
                                              page: DetailsReturnPageConfig);})],
-                                       selected: selected[index],
-
-
                                 ),
                                ),
                               //onTap: () {
-
                           ),
                         ),
                     ],
@@ -279,12 +274,12 @@ class _BatchDetailsState extends State<BatchDetails> {
 
   Future<List<ReturnRequest>> _getReturnRequests(Batch batch) {
     final returnRequests = [
-      ReturnRequest(retailReference: 'LGTR-4581',cantidad: 5),
-      ReturnRequest(retailReference: 'PRUEB-7501',cantidad:3),
-      ReturnRequest(retailReference: 'FRAV-1105',cantidad:1),
-      ReturnRequest(retailReference: 'SOLPR-8889',cantidad:8),
-      ReturnRequest(retailReference: 'SOLI-4879',cantidad:1),
-      ReturnRequest(retailReference: 'TEST-7896',cantidad:4),
+      ReturnRequest(retailReference: 'LGTR-4581',cantidad: 5,descripcion: 'Nueva Solicitud 1'),
+      ReturnRequest(retailReference: 'PRUEB-7501',cantidad:3,descripcion: 'Nueva Solicitud 2'),
+      ReturnRequest(retailReference: 'FRAV-1105',cantidad:1,descripcion: 'Nueva Solicitud 3'),
+      ReturnRequest(retailReference: 'SOLPR-8889',cantidad:8,descripcion: 'Nueva Solicitud 4'),
+      ReturnRequest(retailReference: 'SOLI-4879',cantidad:1,descripcion: 'Nueva Solicitud 5'),
+      ReturnRequest(retailReference: 'TEST-7896',cantidad:4,descripcion: 'Nueva Solicitud 6'),
     ];
     Future<List<Batch>> _getReturnRequests_Athento(something) async{
       // Obtener lista de Solicitudes desde Athento

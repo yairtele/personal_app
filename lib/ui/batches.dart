@@ -70,8 +70,6 @@ class _BatchesState extends State<Batches> {
             final data = snapshot.data;
             final userInfo = data.userInfo;
             final batches = data.data;
-            //TODO: manejar selected con datos reales
-            final selected = List<bool>.generate(batches.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -143,7 +141,6 @@ class _BatchesState extends State<Batches> {
                            state: PageState.addWidget,
                            widget: BatchDetails(batch: batches[index]),
                            page: DetailsPageConfig);})],
-                     selected: selected[index],
                    ),
                  ),
                       ),
