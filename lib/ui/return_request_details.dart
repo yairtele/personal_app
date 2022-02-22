@@ -86,11 +86,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               body: SafeArea(
                   child: ListView (
                     children: [
-                      Column(
-                      children: [ Container(
-                        child: const Text('Solicitud',style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.black)),
-                      ),],
-                      ),
                       Container(
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),
