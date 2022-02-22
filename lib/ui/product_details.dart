@@ -165,6 +165,15 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ],
                     ),
                    ),
+                  Container(
+                    child: ElevatedButton(
+                            onPressed: () => appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                            child: const Text('Guardar'),
+                            style: ElevatedButton.styleFrom(
+                            primary: Colors.green[400],
+                              )
+                            ),
+                      ),
                   ],
                 )
               ),
