@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
-import 'package:navigation_app/ui/batch_details.dart';
 import 'package:navigation_app/ui/product_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +38,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           if (snapshot.hasData) {
             final data = snapshot.data;
             final products = data.data;
-            List<bool> selected = List<bool>.generate(products.length, (int index) => false);
+            //List<bool> selected = List<bool>.generate(products.length, (int index) => false);
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -99,7 +98,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                             state: PageState.addWidget,
                             widget: ProductDetails(product: products[index]),
                             page: DetailProductPageConfig);})],
-                      selected: selected[index],
+                      //selected: selected[index],
                     ),
                   ),
                   //onTap: () {
@@ -127,11 +126,11 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             widget = Center(
                 child: Stack(
                     children: <Widget>[
-                      Opacity(
+                      const Opacity(
                         opacity: 1,
                         child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(top: 16),
                         child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
@@ -146,17 +145,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   }
 
   Future<List<Product>> _getProducts(ReturnRequest batch) {
-    final products = [
-      Product(EAN: 'RT5486536',description: 'LG-4789'),
-      Product(EAN: 'EXMP65452',description: 'SAMSUNG S9 EDGE'),
-      Product(EAN: 'COD654732',description: 'SAMSUNG S9 EDGE'),
-      Product(EAN: 'TEST54756',description: 'SAMSUNG S20'),
-      Product(EAN: 'PRUE58989',description: 'TV SONY'),
-      Product(EAN: 'FRAV58995',description: 'PARLANTE JBL'),
-    ];
-
-    final returnValue = Future.delayed(const Duration(milliseconds: 100), () => products);
-    return returnValue;
+    throw Exception('No implementado');
   }
 
 }

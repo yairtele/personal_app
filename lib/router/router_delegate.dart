@@ -172,7 +172,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           _addPageData(CreateAccount(), CreateAccountPageConfig);
           break;
         case Pages.List:
-          _addPageData(Batches(), ListItemsPageConfig);
+          _addPageData(const Batches(), ListItemsPageConfig);
           break;
         case Pages.Cart:
           _addPageData(Cart(), CartPageConfig);
@@ -184,10 +184,12 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           _addPageData(Settings(), SettingsPageConfig);
           break;
         case Pages.NewBatch:
-          _addPageData(NewBatch(), NewBatchPageConfig);
+          _addPageData(const NewBatch(), NewBatchPageConfig);
           break;
         case Pages.NewReturn:
-          _addPageData(NewReturnScreen(), NewReturnPageConfig);
+          if (pageConfig.currentPageAction != null) {
+            _addPageData(pageConfig.currentPageAction.widget, pageConfig);
+          }
           break;
         case Pages.DetailsReturn:
           if (pageConfig.currentPageAction != null) {
@@ -387,10 +389,11 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           ]);
           break;
         case 'newreturn':
-          setPath([
-            _createPage(Batches(), ListItemsPageConfig),
-            _createPage(NewReturnScreen(), NewBatchPageConfig)
-          ]);
+          throw Exception('Parseo de ruta para newreturn no implementada.');
+          //setPath([
+          //  _createPage(Batches(), ListItemsPageConfig),
+          //  _createPage(NewReturnScreen(), NewBatchPageConfig)
+          //]);
           break;
       }
     }

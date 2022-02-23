@@ -110,9 +110,9 @@ class _NewBatchState extends State<NewBatch> {
                 margin: EdgeInsets.only(top: 8),
                 padding: EdgeInsets.all(15),
                 child: ElevatedButton(
+                  child: const Text('Crear'),
                   onPressed: () => appState.currentAction =
                       PageAction(state: PageState.addPage, page: NewReturnPageConfig),
-                    child: const Text('Crear'),
                   ),
               ),
 

@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_endpoint.dart';
 import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
-import 'package:navigation_app/services/sp_ws.dart';
+import 'package:navigation_app/services/athento/athento_field_name.dart';
+import 'package:navigation_app/services/sp_ws/multipart_message_builder.dart';
+import 'package:navigation_app/services/sp_ws/sp_ws.dart';
 import 'config_provider.dart';
 
 class SpAthentoServices {
@@ -38,14 +41,7 @@ class SpAthentoServices {
 
 
     final parameters = Map<String, String>();
-    /*final parameters = {
-      'grant_type': 'password',
-      'username': Configuration.athentoUser,
-      'password': Configuration.athentoPassword,
-      'client_id': Configuration.athentoClientId,
-      'client_secret': Configuration.athentoClientSecret,
-      'scope': 'write',
-    };*/
+
     final headers = configProvider.getHttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded'
     });
@@ -63,10 +59,12 @@ class SpAthentoServices {
     return TokenInfo.fromJSON(jsonResponse);
   }
 
-  static Future<Map<String, dynamic>> createDocument(
-      ConfigProvider configProvider,
-      String containerUUID, String docType, String title,
-      Map<String, dynamic> fieldValues, [String auditMessage = '']) async {
+  static Future<Map<String, dynamic>> createDocument({
+      @required ConfigProvider configProvider,
+      @required String containerUUID, @required String docType, @required String title,
+      @required Map<String, dynamic> fieldValues, String auditMessage = ''}) async {
+
+    fieldValues.removeWhere((key, value) => key == AthentoFieldName.uuid);
 
     final renamedFieldValues = configProvider.getFieldValues(
         title, fieldValues);
@@ -93,13 +91,89 @@ class SpAthentoServices {
 
     return configProvider.parseResponse(response.body);
   }
+
+
+  static Future<Map<String,dynamic>> createDocumentWithContent({
+    @required ConfigProvider configProvider,
+    @required String containerUUID, @required String docType, @required String title,
+    @required Map<String, dynamic> fieldValues, @required List<int> content, @required String friendlyFileName, String auditMessage = ''}) async {
+    if (content == null || content.length == 0) {
+      throw Exception(
+          '"content" cannot be neitether null nor a zero length byte array');
+    }
+
+    final documentContentType = SpWS.getContentTypeFromFilePath(
+        friendlyFileName);
+    final contentAsBase64 = base64Encode(content);
+
+    final renamedFieldValues = configProvider.getFieldValues(
+        title, fieldValues);
+
+    final jsonRequestBody = {
+      'input': containerUUID,
+      'params': {
+        'type': docType,
+        'audit': auditMessage,
+        'properties': renamedFieldValues
+      }
+    };
+
+    final mb = MultipartMessageBuilder();
+
+    /// Define message parts ///
+    // Document info part: Athento Document container uuid, docType, custom fields, etc
+    final documentInfoPartHeaders = {
+      'Content-Disposition': 'form-data; name="input"'
+    };
+    final documentInfoPartContent = jsonEncode(jsonRequestBody).replaceAll(
+        '{', '{\n');
+
+    // Document content part: file to be uploaded in base64 format.
+    final documentContentPartHeaders = {
+      //'Content-Disposition': 'form-data; name="Michelle"; filename="sample.pdf"'
+      'Content-Disposition': 'form-data; name="$friendlyFileName", filename="$friendlyFileName"',
+      'Content-Type': documentContentType,
+      'Content-Transfer-Encoding': 'base64'
+    };
+
+    final documentContentPartContent = contentAsBase64;
+
+    //Add parts to the message builder
+    mb.addPart(documentInfoPartHeaders, documentInfoPartContent);
+    mb.addPart(documentContentPartHeaders, documentContentPartContent);
+    final messageBody = mb.build();
+
+    //console.log("messageBody: " + messageBody);
+
+    final messageHeaders = configProvider.getHttpHeaders({
+      'Content-Type': 'multipart/form-data; boundary=' +
+          mb.getBoundaryString()
+    });
+
+    //console.log("messageHeaders: " + messageHeaders);
+
+    //fs.write("C:\\Temp\\borrarme\\svcMessageHeaders.txt", getPartHeadersString(messageHeaders));
+    //fs.write("C:\\Temp\\borrarme\\svcMessageBody.txt", messageBody);
+
+    final response = await SpWS.post(
+        configProvider.getEndpointUrl('createDocumentWithContent'),
+        parameters: null,
+        headers: messageHeaders,
+        body: messageBody);
+
+    //console.log("Athento Response.status: " + response.statusCode);
+    return configProvider.parseResponse(response.body);
+    //console.log(JSON.stringify(jsonRequestBody));
+
+  }
+
   static String _getFirstWord(String inputString) {
     final wordList = inputString.split('');
     return wordList.isNotEmpty ? wordList[0] : '';
   }
 
   static Future<Map<String, dynamic>> getDocument(ConfigProvider configProvider, String docType,
-      String documentUUID, List<String> selectFields, String uuid) async {
+      String documentUUID, List<String> selectFields) async {
 
     final whereExpression = 'WHERE ecm:uuid = $documentUUID';
 
@@ -168,6 +242,8 @@ class SpAthentoServices {
     return renamedEntries;
   }
 }
+
+
 
 class FindResults{
   bool isNextPageAvailable;

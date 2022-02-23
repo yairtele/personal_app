@@ -115,6 +115,7 @@ class _LoginState extends State<Login> {
                         ),
                         Expanded(
                           child: ElevatedButton(
+                            child: const Text('Login', style: TextStyle(color: Colors.black),),
                             style: ElevatedButton.styleFrom(
                               primary: Colors.grey,
                               shape: RoundedRectangleBorder(
@@ -136,7 +137,6 @@ class _LoginState extends State<Login> {
                                 _showSnackBar('Ha ocurrido un error inesperado autenticando al usuario.');
                               }
                             },
-                            child: const Text('Login', style: TextStyle(color: Colors.black),),
                           ),
                         ),
                         const SizedBox(
