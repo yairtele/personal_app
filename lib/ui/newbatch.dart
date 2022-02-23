@@ -42,8 +42,7 @@ class _NewBatchState extends State<NewBatch> {
       body: SafeArea(
          child: Form(
            key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: ListView(
             children: [
               //Text('ID Lote Retail: '),
               Container(
@@ -56,7 +55,17 @@ class _NewBatchState extends State<NewBatch> {
                   maxLength: 30,
                   decoration: const InputDecoration(
                     hintText: 'Referencia Interna Lote',
-                    helperText: 'Ej: 939482'
+                    helperText: 'Ej: LOT-35266',
+                    label: Text.rich(
+                        TextSpan(
+                          children: <InlineSpan>[
+                            WidgetSpan(
+                              child: Text(
+                                  'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        )
+                    ),
                   ),
                   onChanged: (reference) => appState.reference = reference,
                   controller: referenceTextController,
@@ -70,9 +79,19 @@ class _NewBatchState extends State<NewBatch> {
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.send,
                     maxLength: 50,
-                    decoration: const InputDecoration(
-                      hintText: 'Descripcion',
-                      helperText: 'Ej: Lote Fravega 4'
+                  decoration: const InputDecoration(
+                    hintText: 'Descripcion',
+                    helperText: 'Ej: Lote Fravega 4',
+                    label: Text.rich(
+                        TextSpan(
+                          children: <InlineSpan>[
+                            WidgetSpan(
+                              child: Text(
+                                  'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        )
+                    ),
                   ),
                     onChanged: (description) => appState.description = description,
                     controller: descriptionTextController,
@@ -87,8 +106,18 @@ class _NewBatchState extends State<NewBatch> {
                   textInputAction: TextInputAction.send,
                   maxLength: 250,
                   decoration: const InputDecoration(
-                      hintText: 'Observacion',
-                      helperText: 'Ej: Contiene fallas'
+                    hintText: 'Observacion',
+                    helperText: 'Ej: Contiene Fallas',
+                    label: Text.rich(
+                        TextSpan(
+                          children: <InlineSpan>[
+                            WidgetSpan(
+                              child: Text(
+                                  'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        )
+                    ),
                   ),
                   onChanged: (observation) => appState.observation = observation,
                   controller: observationTextController,
@@ -98,7 +127,7 @@ class _NewBatchState extends State<NewBatch> {
                 margin: EdgeInsets.only(top: 8),
                 padding: EdgeInsets.all(15),
                 child: ElevatedButton(
-                    child: const Text('Enviar a Athento'),
+                    child: const Text('Enviar a Auditar'),
                     onPressed: () async {
                     final userInfo = await Cache.getUserInfo();
                     _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
@@ -110,9 +139,9 @@ class _NewBatchState extends State<NewBatch> {
                 margin: EdgeInsets.only(top: 8),
                 padding: EdgeInsets.all(15),
                 child: ElevatedButton(
-                  child: const Text('Crear'),
                   onPressed: () => appState.currentAction =
                       PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                    child: const Text('Siguiente'),
                   ),
               ),
 

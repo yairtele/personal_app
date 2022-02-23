@@ -38,6 +38,10 @@ class _ProductDetailsState extends State<ProductDetails> {
           if (snapshot.hasData) {
             final data = snapshot.data;
             final photos = data.data;
+            final EAN = product.EAN;
+            final _EAN = TextEditingController(text:EAN);
+            final descripcion = product.description;
+            final _descripcion = TextEditingController(text:descripcion);
 
             widget = Scaffold(
               appBar: AppBar(
@@ -76,35 +80,102 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ],
               ),
               body: SafeArea(
-                child: GridView.count(
-                  primary: false,
-                  padding: const EdgeInsets.all(20),
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: 2,
-                  children: <Widget>[
+                child: ListView(
+                  children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(photos[0].label),
-                      color: Colors.grey[500],
+                      margin: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.all(15),
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        maxLength: 30,
+                        enabled: false,
+                        controller: _EAN,
+                        decoration: const InputDecoration(
+                          hintText: '-',
+                          label: Text.rich(
+                              TextSpan(
+                                children: <InlineSpan>[
+                                  WidgetSpan(
+                                    child: Text(
+                                        'EAN:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              )
+                          ),
+                        ),
+                      ),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(photos[1].label),
-                      color: Colors.grey[600],
+                      margin: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.all(15),
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        maxLength: 50,
+                        enabled: false,
+                        controller: _descripcion,
+                        decoration: const InputDecoration(
+                          hintText: '-',
+                          label: Text.rich(
+                              TextSpan(
+                                children: <InlineSpan>[
+                                  WidgetSpan(
+                                    child: Text(
+                                        'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              )
+                          ),
+                        ),
+                      ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(photos[2].label),
-                      color: Colors.grey[700],
+                Container(
+                    child: GridView.count(
+                      primary: false,
+                      padding: const EdgeInsets.all(20),
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      crossAxisCount: 2,
+                      physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                      shrinkWrap: true,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(photos[0].label),
+                          color: Colors.grey[500],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(photos[1].label),
+                          color: Colors.grey[600],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(photos[2].label),
+                          color: Colors.grey[700],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(photos[3].label),
+                          color: Colors.grey[800],
+                        ),
+                      ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(photos[3].label),
-                      color: Colors.grey[800],
-                    ),
+                   ),
+                  Container(
+                    child: ElevatedButton(
+                            onPressed: () => appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig),
+                            child: const Text('Guardar'),
+                            style: ElevatedButton.styleFrom(
+                            primary: Colors.green[400],
+                              )
+                            ),
+                      ),
                   ],
-                ),
+                )
               ),
             );
           } else if (snapshot.hasError) {
