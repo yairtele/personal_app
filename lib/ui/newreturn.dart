@@ -1,61 +1,49 @@
 //import 'dart:html';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:navigation_app/router/ui_pages.dart';
-import 'package:navigation_app/services/business/business_service_exception.dart';
+import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
-import 'package:navigation_app/services/business/product.dart';
+import 'package:navigation_app/services/business/new_return.dart';
+import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-//import 'package:file_picker/file_picker.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'dart:async';
-import 'package:universal_html/html.dart' as html;
 import 'package:barcode_scan2/barcode_scan2.dart';
-import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart';
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
-import 'package:thumbnailer/thumbnailer.dart';
 
 
-
-//FilePickerResult imageFile;
-String _ruta;
-var _searchParamTextController = TextEditingController();
-final ImagePicker _picker = ImagePicker();
-var _barcodeReader = FlutterBarcodeSdk();
-
-var _loadReturn;
-var _quantity;
 
 
 var type;
 
 class NewReturnScreen extends StatefulWidget {
   final ReturnRequest returnRequest;
-  const NewReturnScreen({Key key, this.returnRequest}) : super(key: key);
+  final Batch batch;
+  const NewReturnScreen({Key key, @required this.batch, this.returnRequest}) : super(key: key);
 
   @override
-  State<NewReturnScreen> createState() => _NewReturn();
+  State<NewReturnScreen> createState() => _NewReturnScreenState();
 }
 
-class _NewReturn extends State<NewReturnScreen> {
-  XFile _quantityImage;
+class _NewReturnScreenState extends State<NewReturnScreen> {
+  final _searchParamTextController = TextEditingController();
+  final _retailReferenceTextController = TextEditingController();
+  final _quantityTextController = TextEditingController();
+
+
   XFile imageFile;
   final Map<String, XFile> _takenPictures = {};
   bool _isAuditableProduct = false;
   var _productSearchBy = ProductSearchBy.EAN;
-  Product _product = null;
+  ReturnRequest _existingReturnRequest = null;
+  ProductInfo _product = null;
   Future<ScreenData<void, void>> _localData;
-
-  String _currentProductSearchParam = null;
 
   @override
   void initState() {
@@ -74,6 +62,7 @@ class _NewReturn extends State<NewReturnScreen> {
             AsyncSnapshot<ScreenData<void, void>> snapshot) {
           Widget widget;
           if (snapshot.hasData) {
+            final batch = this.widget.batch;
             widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -139,12 +128,6 @@ class _NewReturn extends State<NewReturnScreen> {
                                       decoration: const InputDecoration(
                                           hintText: 'EAN/MOD',
                                           helperText: 'Ej: 939482'),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _currentProductSearchParam =
-                                              _searchParamTextController.text;
-                                        });
-                                      },
                                     ),
                                   )),
                               Container(
@@ -189,31 +172,37 @@ class _NewReturn extends State<NewReturnScreen> {
                                   onPressed: () async {
                                     try {
                                       // Buscar info del producto y actualizar el Future del FutureBuilder.
-                                      Product product = null;
+                                      ProductInfo productInfo = null;
                                       if (_productSearchBy ==
                                           ProductSearchBy.EAN) {
-                                        product = await _getProductByEAN(_currentProductSearchParam);
+                                        productInfo = await _getProductInfoByEAN(_searchParamTextController.text);
                                       } else {
-                                        product = await _getProductByCommercialCode(_currentProductSearchParam);
+                                        productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
                                       }
 
-                                      _takenPictures.clear();
+                                      _clearProductFields();
 
-                                      if (product.photos.length == 0){
-                                        _takenPictures['Foto'] = null;
+
+
+                                      if (productInfo.photos.length == 0){
+                                        _takenPictures['otra'] = null;
                                       }
                                       else{
-                                        product.photos.forEach((photoName) {
+                                        productInfo.photos.forEach((photoName) {
                                           _takenPictures[photoName] = null;
                                         });
                                       }
 
+                                      //TODO: Mostrar advertecia de que ya existe una siolicitud con el mismo EAN en caso de que el producto NO SEA auditable
+                                      final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: batch, productInfo: productInfo);
+
                                       setState(() {
-                                        _isAuditableProduct = product.photos.length > 0;
-                                        _product = product;
+                                        _isAuditableProduct = productInfo.isAuditable;
+                                        _existingReturnRequest = existingReturnRequest;
+                                        _product = productInfo;
                                       });
                                     }
-                                    on BusinessServiceException catch (e) {
+                                    on BusinessException catch (e) {
                                       _showSnackBar(
                                           'Error recuperando información del producto: ${e
                                               .message}');
@@ -249,6 +238,7 @@ class _NewReturn extends State<NewReturnScreen> {
                                       const EdgeInsets.only(top: 8),
                                       padding: const EdgeInsets.all(30),
                                       child: TextField(
+                                          controller: _retailReferenceTextController,
                                           autofocus: true,
                                           keyboardType:
                                           TextInputType.text,
@@ -258,12 +248,8 @@ class _NewReturn extends State<NewReturnScreen> {
                                           decoration: const InputDecoration(
                                               labelText:
                                               'Referencia interna',
-                                              helperText:
-                                              'Ej: AEF54216CV'),
-                                          onChanged: (value) {
-                                            //_quantity = value;
-                                          }
-                                        //},
+                                              helperText:'Ej: AEF54216CV'
+                                          ),
                                       ),
                                     ),
                                     Column(
@@ -275,6 +261,7 @@ class _NewReturn extends State<NewReturnScreen> {
                                             margin: const EdgeInsets.only(top: 8),
                                             padding: const EdgeInsets.all(30),
                                             child: TextField(
+                                                controller: _quantityTextController,
                                                 autofocus: true,
                                                 keyboardType:
                                                 TextInputType.text,
@@ -287,13 +274,10 @@ class _NewReturn extends State<NewReturnScreen> {
                                                     'Cantidad devuelta',
                                                     helperText:
                                                     'Ej: 12'),
-                                                onChanged: (value) {
-                                                  _quantity = value;
-                                                }
                                               //},
                                             ),
                                           ),
-                                          _buildThumbnailsGridView(pictures:  _takenPictures),
+                                          _buildThumbnailsGridView(photos:  _takenPictures),
                                         ]),
                                   ]),
                               //)
@@ -303,13 +287,40 @@ class _NewReturn extends State<NewReturnScreen> {
                               margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.all(15),
                               child: ElevatedButton(
+                                child: const Text('Confirmar'),
                                 onPressed: () async {
-                                  //final newReturn = NewReturn();
-                                  //await BusinessServices.registerNewProductReturn(batchUUID: batch.uuid, newReturn:  newReturn)
+                                  try{
+
+                                    final thumbsWithPhotos = _takenPictures.entries
+                                        .where((entry) => entry.value != null)
+                                        .map((e) => MapEntry<String, String>(e.key, e.value.path));
+
+                                    final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
+
+                                    final newReturn = NewReturn(
+                                      EAN: _product.EAN,
+                                      retailReference: _retailReferenceTextController.text,
+                                      commercialCode: _product.commercialCode,
+                                      description: _product.description,
+                                      quantity: _getQuantity(),
+                                      isAuditable: _isAuditableProduct,
+                                      photos: photosToSave,
+                                    );
+                                    await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
+                                  }
+                                  on BusinessException catch(e){
+                                    _showSnackBar(e.message);
+                                  }
+                                  on Exception catch(e){
+                                    //TODO: EN GENRERAL: los errores inesperados se deben loguear o reportar al equipo de soporte atomáticamente
+                                    //TODO: EN GENERAL: Detectar si los errores se deben a falta de conexión a internet, y ver como se loguean o reportan estos casos
+                                    _showSnackBar('Ha ocurrido un error al guardar la nueva devolución. Error: ${e}');
+                                  }
+                                  catch (e){
+                                    final pepe = e;
+                                  }
                                 },
 
-
-                                child: const Text('Confirmar'),
                               ),
                             ),
                           ],
@@ -390,12 +401,12 @@ class _NewReturn extends State<NewReturnScreen> {
         });
   }
 
-  Future<Product> _getProductByEAN(String eanCode) {
-    return BusinessServices.getProductByEAN(eanCode);
+  Future<ProductInfo> _getProductInfoByEAN(String eanCode) {
+    return BusinessServices.getProductInfoByEAN(eanCode);
   }
 
-  Future<Product> _getProductByCommercialCode(String commercialCode) {
-    return BusinessServices.getProductByCommercialCode(commercialCode);
+  Future<ProductInfo> _getProductInfoByCommercialCode(String commercialCode) {
+    return BusinessServices.getProductInfoByCommercialCode(commercialCode);
   }
 
   void _showSnackBar(String message){
@@ -413,7 +424,7 @@ class _NewReturn extends State<NewReturnScreen> {
     return pickedFile;
   }
 
-  Widget _buildThumbnailsGridView({@required Map<String, XFile> pictures}) {
+  Widget _buildThumbnailsGridView({@required Map<String, XFile> photos}) {
 
     return GridView.count(
         primary: false,
@@ -423,8 +434,8 @@ class _NewReturn extends State<NewReturnScreen> {
         crossAxisCount: 2,
         shrinkWrap: true,
         children: <Widget>[
-          for(final photoName in  pictures.keys)
-            _buildPhotoThumbnail(photoName, pictures)
+          for(final photoName in  photos.keys)
+            _buildPhotoThumbnail(photoName, photos)
         ]
     );
   }
@@ -484,6 +495,48 @@ class _NewReturn extends State<NewReturnScreen> {
           ],
         )
     );
+  }
+
+  Future<ReturnRequest> _getExistingReturnRequestInBatch({Batch batch, ProductInfo productInfo}) async {
+    ReturnRequest existingReturnRequest;
+    // Buscar todas las solicitudes del batch.
+    final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
+
+    // Si no hay ninguna, retornar null
+    if(returnRequests.length == 0){
+      return null;
+    }
+
+
+
+    if (productInfo.isAuditable == true){
+      // Entre las existentes, buscar las que tienen el mismo EAN que el producto a devolver
+      final returnRequestsWithSameEAN = returnRequests.where((returnRequest) => returnRequest.EAN == productInfo.EAN);
+      if(returnRequestsWithSameEAN.length > 1){
+        throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
+      }
+      existingReturnRequest = returnRequestsWithSameEAN.first;
+    }
+
+    return existingReturnRequest;
+  }
+
+  void _clearProductFields() {
+    _retailReferenceTextController.text = '';
+    _quantityTextController.text = '';
+    _takenPictures.clear();
+  }
+
+  int _getQuantity() {
+    int quantity = null;
+
+    if(!_product.isAuditable) {
+      quantity = int.tryParse(_quantityTextController.text);
+      if(quantity == null || quantity <= 0){
+        throw BusinessException('Por favor indique la cantidad a devolver. No puede ser cero ni vacía.');
+      }
+    }
+    return quantity;
   }
 }
 

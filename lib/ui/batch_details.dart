@@ -28,8 +28,6 @@
  * THE SOFTWARE.
  */
 import 'package:flutter/material.dart';
-import 'package:navigation_app/config/cache.dart';
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
@@ -242,7 +240,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                              style: const TextStyle(fontSize: 14.0,
                                                  fontWeight: FontWeight.bold,
                                                  color: Colors.black)),
-                                         subtitle: Text('Cant.Prod: ${returns[index].cantidad.toString()}\n\n\n'),
+                                         subtitle: Text('Cant.Prod: ${returns[index].quantity.toString()}\n\n\n'),
                                        ),onTap: () {
                                          appState.currentAction = PageAction(
                                              state: PageState.addWidget,
@@ -302,30 +300,9 @@ class _BatchDetailsState extends State<BatchDetails> {
     return returns.description != '' ? (returns.retailReference == '' ? '(sin referencia)' : returns.description) : '(Sin descripción)';
   }
 
-  Future<List<ReturnRequest>> _getReturnRequests(Batch batch) {
-    final returnRequests = [
-      ReturnRequest(retailReference: 'LGTR-4581',cantidad: 5,descripcion: 'Nueva Solicitud 1'),
-      ReturnRequest(retailReference: 'PRUEB-7501',cantidad:3,descripcion: 'Nueva Solicitud 2'),
-      ReturnRequest(retailReference: 'FRAV-1105',cantidad:1,descripcion: 'Nueva Solicitud 3'),
-      ReturnRequest(retailReference: 'SOLPR-8889',cantidad:8,descripcion: 'Nueva Solicitud 4'),
-      ReturnRequest(retailReference: 'SOLI-4879',cantidad:1,descripcion: 'Nueva Solicitud 5'),
-      ReturnRequest(retailReference: 'TEST-7896',cantidad:4,descripcion: 'Nueva Solicitud 6'),
-    ];
-
-    Future<List<Batch>> _getReturnRequests_Athento(something) async{
-      // Obtener lista de Solicitudes desde Athento
-      final returns = await BusinessServices.getReturns();
-      return returns;
-    }
-
-    //TODO: Completar update, antes teniendo el uuid que se trae de Athento para identificar caga solicitud a actualizar
-    void _updateBranch_Athento(something) async{
-      // Obtener lista de Solicitudes desde Athento
-      //final branch = await BusinessServices.updateBatch(uuid);
-    }
-
-    final returnValue = Future.delayed(const Duration(milliseconds: 100), () => returnRequests);
-    return returnValue;
+  Future<List<ReturnRequest>> _getReturnRequests(Batch batch) async {
+    final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
+    return returnRequests;
   }
 }
 

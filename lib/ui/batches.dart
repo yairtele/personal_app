@@ -70,6 +70,7 @@ class _BatchesState extends State<Batches> {
             final data = snapshot.data;
             final userInfo = data.userInfo;
             final batches = data.data;
+
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -105,7 +106,7 @@ class _BatchesState extends State<Batches> {
                         PageAction(
                             state: PageState.addPage, page: NewBatchPageConfig),
                   ),
-                  RaisedButton.icon(onPressed: () {
+                  ElevatedButton.icon(onPressed: () {
                     launch(
                         'https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
@@ -114,14 +115,14 @@ class _BatchesState extends State<Batches> {
                         'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
                       height: 40.0,width: 40.0,),
                     label: const Text(''),
-                    color: Colors.grey,
+                    //color: Colors.grey,
                   ),
                 ],
               ),
               body: SafeArea(
                 child: DataTable(columns: <DataColumn>[
                 const DataColumn(
-                    label: Text('Lotes Draft',style: const TextStyle(fontSize: 18.0,
+                    label: Text('Lotes Draft',style: TextStyle(fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black)),
                 ),
@@ -141,6 +142,7 @@ class _BatchesState extends State<Batches> {
                            state: PageState.addWidget,
                            widget: BatchDetails(batch: batches[index]),
                            page: DetailsPageConfig);})],
+                     //selected: selected[index],
                    ),
                  ),
                       ),
@@ -167,11 +169,11 @@ class _BatchesState extends State<Batches> {
             widget = Center(
                 child: Stack(
                     children: <Widget>[
-                      Opacity(
+                      const Opacity(
                         opacity: 1,
                         child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(top: 16),
                         child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
