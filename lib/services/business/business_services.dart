@@ -99,11 +99,11 @@ class BusinessServices {
 
     // Construir WHERE expression
     final batchNumberFieldName = '${fieldNameInferenceConfig['defaultPrefix']}${ReturnRequestAthentoFieldName.batchNumber}';
-    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $batchNumberFieldName = $batchNumber";
+    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $batchNumberFieldName = '$batchNumber'";
 
     // Invocar a Athento
     final entries = await SpAthentoServices.findDocuments(
-        configProvider, _batchDocType, selectFields, whereExpression);
+        configProvider, _returnRequestDocType, selectFields, whereExpression);
 
     //Convertir resultado a objetos ReturnRequest y retornar resultado
     final returns = entries.map((e) => ReturnRequest.fromJSON(e));
@@ -386,6 +386,37 @@ class BusinessServices {
   static List<int> _getImageByteArray({@required String path}) {
     final file = File(path);
     return file.readAsBytesSync();
+  }
+
+  static Future<List<Product>> getProductsByReturnRequestNumber(String returnRequestNumber) async{
+    //Obtener diccionario de inferencia de nombres de campo
+    final fieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
+
+    // Obtener config provider para Bearer Token
+    final configProvider = await _getBearerConfigProvider(fieldNameInferenceConfig);
+
+    //Definir campos del SELECT
+    final selectFields = [
+      AthentoFieldName.uuid,
+      AthentoFieldName.title,
+      ProductAthentoFieldName.requestNumber,
+      ProductAthentoFieldName.EAN,
+      ProductAthentoFieldName.commercialCode,
+      ProductAthentoFieldName.description,
+      ProductAthentoFieldName.retailReference,
+    ];
+
+    // Construir WHERE expression
+    final returnRequestNumberFieldName = '${fieldNameInferenceConfig['defaultPrefix']}${ProductAthentoFieldName.requestNumber}';
+    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $returnRequestNumberFieldName = $returnRequestNumber";
+
+    // Invocar a Athento
+    final entries = await SpAthentoServices.findDocuments(
+        configProvider, _productDocType, selectFields, whereExpression);
+
+    //Convertir resultado a objetos ReturnRequest y retornar resultado
+    final returns = entries.map((e) => Product.fromJSON(e));
+    return returns.toList();
   }
 
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/batch_details.dart';
@@ -19,12 +20,12 @@ class  ReturnRequestDetails extends StatefulWidget {
 
 class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
-  Future<ScreenData<ReturnRequest, List<Product>>> _localData;
+  Future<ScreenData<String, List<Product>>> _localData;
 
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<ReturnRequest, List<Product>>(dataGetter: _getProducts).getScreenData(dataGetterParam: widget.returnRequest);
+    _localData = ScreenData<String, List<Product>>(dataGetter: _getProducts).getScreenData(dataGetterParam: widget.returnRequest.requestNumber);
   }
 
   @override
@@ -32,9 +33,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
 
-    return FutureBuilder<ScreenData<ReturnRequest, List<Product>>>(
+    return FutureBuilder<ScreenData<String, List<Product>>>(
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<ReturnRequest, List<Product>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<String, List<Product>>> snapshot) {
 
           Widget widget;
           if (snapshot.hasData) {
@@ -42,9 +43,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             final products = data.data;
             final reference = returnRequest.retailReference;
             final _reference = TextEditingController(text:reference);
-            final cantidad = returnRequest.cantidad;
+            final cantidad = returnRequest.quantity;
             final _cantidad = TextEditingController(text:cantidad.toString());
-            final descripcion = returnRequest.descripcion;
+            final descripcion = returnRequest.description;
             final _descripcion = TextEditingController(text:descripcion);
             widget = Scaffold(
               appBar: AppBar(
@@ -211,11 +212,11 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             widget = Center(
                 child: Stack(
                     children: <Widget>[
-                      Opacity(
+                      const Opacity(
                         opacity: 1,
                         child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(top: 16),
                         child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
@@ -229,18 +230,10 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
   }
 
-  Future<List<Product>> _getProducts(ReturnRequest batch) {
-    final products = [
-      Product(EAN: 'RT5486536',description: 'LG-4789'),
-      Product(EAN: 'EXMP65452',description: 'SAMSUNG S9 EDGE'),
-      Product(EAN: 'COD654732',description: 'SAMSUNG S9 EDGE'),
-      Product(EAN: 'TEST54756',description: 'SAMSUNG S20'),
-      Product(EAN: 'PRUE58989',description: 'TV SONY'),
-      Product(EAN: 'FRAV58995',description: 'PARLANTE JBL'),
-    ];
+  Future<List<Product>> _getProducts(String returnRequestNumber) async {
+    final products = await BusinessServices.getProductsByReturnRequestNumber(returnRequestNumber);
 
-    final returnValue = Future.delayed(const Duration(milliseconds: 100), () => products);
-    return returnValue;
+    return products;
   }
 
 }

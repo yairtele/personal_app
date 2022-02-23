@@ -52,8 +52,8 @@ class ReturnRequest{
     commercialCode = json[ReturnRequestAthentoFieldName.commercialCode];
     retailReference = json[ReturnRequestAthentoFieldName.retailReference];
     description = json[ReturnRequestAthentoFieldName.description];
-    isAuditable = json[ReturnRequestAthentoFieldName.isAuditable];
-    quantity = json[ReturnRequestAthentoFieldName.quantity];
+    isAuditable = json[ReturnRequestAthentoFieldName.isAuditable] == 'true';
+    quantity =  json[ReturnRequestAthentoFieldName.quantity] == null ? null : int.tryParse(json[ReturnRequestAthentoFieldName.quantity]);
   }
 }
 
