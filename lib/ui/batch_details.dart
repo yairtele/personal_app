@@ -311,11 +311,19 @@ class _BatchDetailsState extends State<BatchDetails> {
       ReturnRequest(retailReference: 'SOLI-4879',cantidad:1,descripcion: 'Nueva Solicitud 5'),
       ReturnRequest(retailReference: 'TEST-7896',cantidad:4,descripcion: 'Nueva Solicitud 6'),
     ];
+
     Future<List<Batch>> _getReturnRequests_Athento(something) async{
       // Obtener lista de Solicitudes desde Athento
       final returns = await BusinessServices.getReturns();
       return returns;
     }
+
+    //TODO: Completar update, antes teniendo el uuid que se trae de Athento para identificar caga solicitud a actualizar
+    void _updateBranch_Athento(something) async{
+      // Obtener lista de Solicitudes desde Athento
+      //final branch = await BusinessServices.updateBatch(uuid);
+    }
+
     final returnValue = Future.delayed(const Duration(milliseconds: 100), () => returnRequests);
     return returnValue;
   }

@@ -12,6 +12,9 @@ import '../newsan_services.dart';
 class BusinessServices {
   static const String _batchDocType = 'lote_lif';
 
+  static Future<void> updateBatch(String uuid) async{
+
+  }
   static Future<UserInfo> getUserInfo(String userNameOrUUID) async {
     final configProvider = await _getBearerConfigProvider();
     return SpAthentoServices.getUserInfo(configProvider, userNameOrUUID);
