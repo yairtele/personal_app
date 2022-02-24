@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
+import 'package:navigation_app/ui/newreturn.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -99,7 +100,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                        PageAction(state: PageState.addPage, widget: NewReturnScreen(batch: this.widget.batch), page: NewReturnPageConfig),
                   ),
                   RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');

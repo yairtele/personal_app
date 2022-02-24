@@ -174,6 +174,11 @@ class BusinessServices {
       final fieldValues = _getReturnRequestFieldValues(
           returnRequestTitle, batch, newReturn);
 
+      // Validar retailReference. No debería haber otra con el mismo valor
+      if(newReturn.retailReference?.trim() == existingReturnRequest.retailReference?.trim()){
+        throw BusinessException('Ya existe una solicitud de devolución no auditable con la misma referencia interna. Por favor ');
+      }
+
       // Crear solicitud con su foto opcional y salir
       // Si no hay fotos
       final configProvider = await  _createConfigProvider(
@@ -236,6 +241,10 @@ class BusinessServices {
         // Obtener valores de campos para la nueva solicitud
         final fieldValues = _getReturnRequestFieldValues(
             returnRequestTitle, batch, newReturn);
+
+        // Las solicitudes de productos auditables no deben tener referencia interna. Esta se asigna a cada producto unitario devuelto.
+        fieldValues.removeWhere((fieldName, value) => fieldName == ReturnRequestAthentoFieldName.retailReference);
+
         final configProvider = await  _createConfigProvider(
             _getReturnRequestFieldNameInferenceConfig());
         // Crear solicitud
@@ -264,7 +273,7 @@ class BusinessServices {
         final productSelectFields = [AthentoFieldName.uuid];
         const requestNumberFieldName = '${_productDocType}_${ProductAthentoFieldName.requestNumber}';
         const retailreferenceFieldName = '${_productDocType}_${ProductAthentoFieldName.retailReference}';
-        final whereExpression = 'WHERE $requestNumberFieldName = $returnRequestNumber AND $retailreferenceFieldName = ${newReturn.retailReference}';
+        final whereExpression = 'WHERE $requestNumberFieldName = $returnRequestNumber';
         final foundProducts = await SpAthentoServices.findDocuments(productConfigProvider, _productDocType, productSelectFields, whereExpression);
 
         if (foundProducts.length > 0){
