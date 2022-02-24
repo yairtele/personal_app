@@ -216,7 +216,7 @@ class BusinessServices {
     }
     /// Si es producto auditable, crear solicitud (si no existe) y crear el documento de producto unitario y documentos de fotos
     else {
-      // Validar retail reference. //TODO: verificar que no exista otro producto dentro de esta solicitud con el mismo retail Reference
+      // Validar retail reference.
       if(newReturn.retailReference == null || newReturn.retailReference.trim() == ''){
         throw BusinessException('La referencia interna no puede ser nula ni blancos.');
       }

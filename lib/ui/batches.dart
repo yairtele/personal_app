@@ -111,8 +111,8 @@ class _BatchesState extends State<Batches> {
                         'https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
                     ,
-                    icon: Image.network(
-                        'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
+                    icon: Image.asset(
+                        'assets/images/boton_athento.png',
                       height: 40.0,width: 40.0,),
                     label: const Text(''),
                     //color: Colors.grey,
@@ -214,7 +214,7 @@ class _BatchesState extends State<Batches> {
           RaisedButton.icon(onPressed:(){
             launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
               }
-              ,icon: Image.network('https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png'),
+              ,icon: Image.asset('assets/images/boton_athento.png'),
                label: const Text(''),
                color: Colors.grey,
           ),
