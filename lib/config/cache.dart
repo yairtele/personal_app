@@ -10,6 +10,8 @@ class Cache{
   static const _TOKENINFO_KEY = 'TokenInfo';
   static const _USERINFO_KEY = 'UserInfo';
   static const _USERNAME_KEY = 'UserName';
+  static const _USERPWD_KEY = 'UserPwd';
+
   static const _COMPANYNAME_KEY = 'CompanyName';
 
   static Future<SharedPreferences> _getRepo() async{
@@ -58,6 +60,18 @@ class Cache{
     return  prefs.getString(_USERNAME_KEY);
   }
 
+
+  static Future<void> saveUserPassword(String password) async{
+    final prefs = await _getRepo();
+    prefs.setString(_USERPWD_KEY, password);
+  }
+
+  static Future<String> getUserPassword() async{
+    final prefs = await _getRepo();
+    return  prefs.getString(_USERPWD_KEY);
+  }
+
+
   static Future<void> saveCompanyName(String companyName) async{
     final prefs = await _getRepo();
     prefs.setString(_COMPANYNAME_KEY, companyName);
@@ -67,4 +81,6 @@ class Cache{
     final prefs = await _getRepo();
     return  prefs.getString(_COMPANYNAME_KEY);
   }
+
+
 }

@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
+import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
+import 'package:navigation_app/services/athento/config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/product.dart';
@@ -23,7 +25,7 @@ class BusinessServices {
 
 
   static Future<UserInfo> getUserInfo(String userNameOrUUID) async {
-    final configProvider = await _getBearerConfigProvider();
+    final configProvider = await  _createConfigProvider();
     return SpAthentoServices.getUserInfo(configProvider, userNameOrUUID);
   }
 
@@ -34,7 +36,7 @@ class BusinessServices {
   static Future<void> createBatch(Batch batch) async {
     final fieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
 
-    final configProvider = await _getBearerConfigProvider(fieldNameInferenceConfig);
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
 
     //TODO: ver cómo obtener el id del espacio.
     //TODO: DIRECTAMENTE CONSUKLTAR SIN containerUUID (nosotros deberíamos tener un usuario retail para saber buscar nuestras pruebas).
@@ -56,7 +58,7 @@ class BusinessServices {
   static Future<List<Batch>> getBatches() async {
     final fieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
     final configProvider =
-        await _getBearerConfigProvider(fieldNameInferenceConfig);
+        await  _createConfigProvider(fieldNameInferenceConfig);
     final selectFields = [
       BatchAthentoFieldName.uuid,
       BatchAthentoFieldName.title,
@@ -81,7 +83,7 @@ class BusinessServices {
     final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
 
     // Obtener config provider para Bearer Token
-    final configProvider = await _getBearerConfigProvider(fieldNameInferenceConfig);
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
 
     //Definir campos del SELECT
     final selectFields = [
@@ -171,7 +173,7 @@ class BusinessServices {
 
       // Crear solicitud con su foto opcional y salir
       // Si no hay fotos
-      final configProvider = await _getBearerConfigProvider(
+      final configProvider = await  _createConfigProvider(
           _getReturnRequestFieldNameInferenceConfig());
       // Crear solicitud de devolución
       final createdReturnRequestInfo = await SpAthentoServices.createDocument(
@@ -188,7 +190,7 @@ class BusinessServices {
         final photoName = photoEntry.key;
         final photoPath = photoEntry.value;
         final photoFileExtension = SpFileUtils.getFileExtension(photoPath);
-        final configProvider = await _getBearerConfigProvider(_getPhotoFieldNameInferenceConfig());
+        final configProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
         final fieldValues = _getPhotoFieldValues(photoName);
         final photoTitle = '$photoName'; //TODO: En Athento agregar al título de la foto el nro de solicitud???
         final createdPhotoInfo = await SpAthentoServices.createDocumentWithContent(
@@ -231,7 +233,7 @@ class BusinessServices {
         // Obtener valores de campos para la nueva solicitud
         final fieldValues = _getReturnRequestFieldValues(
             returnRequestTitle, batch, newReturn);
-        final configProvider = await _getBearerConfigProvider(
+        final configProvider = await  _createConfigProvider(
             _getReturnRequestFieldNameInferenceConfig());
         // Crear solicitud
         final createdReturnRequestInfo = await SpAthentoServices.createDocument(
@@ -255,7 +257,7 @@ class BusinessServices {
         returnRequestNumber = existingReturnRequest.requestNumber;
 
         // Verificar que no haya otro producto con la misma referencia interna dentro de la misma solicitud
-        final productConfigProvider = await _getBearerConfigProvider(_getProductFieldNameInferenceConfig());
+        final productConfigProvider = await  _createConfigProvider(_getProductFieldNameInferenceConfig());
         final productSelectFields = [AthentoFieldName.uuid];
         const requestNumberFieldName = '${_productDocType}_${ProductAthentoFieldName.requestNumber}';
         const retailreferenceFieldName = '${_productDocType}_${ProductAthentoFieldName.retailReference}';
@@ -269,7 +271,7 @@ class BusinessServices {
       }
 
       // Crear producto unitario.
-      final configProvider = await _getBearerConfigProvider(
+      final configProvider = await  _createConfigProvider(
           _getProductFieldNameInferenceConfig());
       final fieldValues = _getProductFieldValues(returnRequestTitle, returnRequestNumber, newReturn);
       final productTitle = '${returnRequestNumber}-${newReturn.EAN}-${newReturn.retailReference}'; //TODO: ver qué título por defecto guardar (para todos los docs en GENERAL)
@@ -286,7 +288,7 @@ class BusinessServices {
         final photoTitle = '${newReturn.retailReference}-$photoName';  //TODO: hacer en Athento algo similar
         final photoFileExtension = SpFileUtils.getFileExtension(photoPath);
         final fieldValues = _getPhotoFieldValues(photoName);
-        final photoConfigProvider = await _getBearerConfigProvider(_getPhotoFieldNameInferenceConfig());
+        final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
 
         final results = await SpAthentoServices.createDocumentWithContent(
           configProvider: photoConfigProvider,
@@ -356,7 +358,7 @@ class BusinessServices {
     return _getFieldNameInferenceConfig(defaultPrefix: 'lote_lif_');
   }
 
-  static Future<BearerAuthConfigProvider> _getBearerConfigProvider(
+  static Future<BearerAuthConfigProvider> _createBearerConfigProvider(
       [Map<String, String> fieldNameInferenceConfig]) async {
     final tokenInfo = await Cache.getTokenInfo();
     final token = tokenInfo.token;
@@ -367,6 +369,26 @@ class BusinessServices {
         token,
         referer,
         fieldNameInferenceConfig);
+
+    return configProvider;
+  }
+
+  static Future<ConfigProvider> _createConfigProvider([Map<String, String>fieldNameInferenceConfig]) async {
+    final authenticationType = Configuration.authenticationType;
+
+    ConfigProvider configProvider = null;
+    switch(authenticationType){
+      case 'basic':
+        final userName = await Cache.getUserName();
+        final password = await Cache.getUserPassword();
+        configProvider = BasicAuthConfigProvider(Configuration.athentoAPIBaseURL, userName , password, fieldNameInferenceConfig);
+        break;
+      case 'bearer_token':
+        configProvider = await  _createBearerConfigProvider(fieldNameInferenceConfig);
+        break;
+      default:
+        throw Exception('Authentication type "$authenticationType" not supported.');
+    }
 
     return configProvider;
   }
@@ -393,7 +415,7 @@ class BusinessServices {
     final fieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
 
     // Obtener config provider para Bearer Token
-    final configProvider = await _getBearerConfigProvider(fieldNameInferenceConfig);
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
 
     //Definir campos del SELECT
     final selectFields = [
@@ -418,6 +440,7 @@ class BusinessServices {
     final returns = entries.map((e) => Product.fromJSON(e));
     return returns.toList();
   }
+
 
 
 }

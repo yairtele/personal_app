@@ -182,8 +182,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
                                       _clearProductFields();
 
-
-
                                       if (productInfo.photos.length == 0){
                                         _takenPictures['otra'] = null;
                                       }

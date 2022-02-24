@@ -84,11 +84,11 @@ class AppState extends ChangeNotifier {
   }
 
   Future<bool> login() async{
-    final tokenInfo = await UserServices.login(emailAddress, password);
+    await UserServices.login(emailAddress, password);
 
 
     await Cache.saveUserName(emailAddress); //TODO: usar o no await?
-    await Cache.saveTokenInfo(tokenInfo); //TODO: usar o no await?
+    await Cache.saveUserPassword(password); //TODO: usar o no await?
 
     _loggedIn = true;
     Cache.saveLoginState(loggedIn);//TODO: usar o no await? En el código original no lo usaba
