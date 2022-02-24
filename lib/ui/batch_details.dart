@@ -31,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
-import 'package:navigation_app/ui/newreturn.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -61,8 +60,8 @@ class _BatchDetailsState extends State<BatchDetails> {
   @override
   Widget build(BuildContext context) {
     final batch = widget.batch;
-    final title = _getBatchTitle(batch);
-    final subTitle = _getBatchSubTitle(batch);
+    final title = batch.retailReference;
+    final subTitle = batch.description;
     final observation = batch.observation;
     final appState = Provider.of<AppState>(context, listen: false);
     final _reference = TextEditingController(text: title);
@@ -77,7 +76,6 @@ class _BatchDetailsState extends State<BatchDetails> {
           if (snapshot.hasData) {
             final data = snapshot.data;
             final returns = data.data;
-
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -101,16 +99,16 @@ class _BatchDetailsState extends State<BatchDetails> {
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, widget: NewReturnScreen(batch: this.widget.batch), page: NewReturnPageConfig),
+                        PageAction(state: PageState.addPage, page: NewReturnPageConfig),
                   ),
-                  ElevatedButton.icon(onPressed:(){
+                  RaisedButton.icon(onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
                     ,icon: Image.network(
                       'https://pbs.twimg.com/profile_images/1721100976/boton-market_sombra24_400x400.png',
                       height: 40.0,width: 40.0,),
-                    label: const Text(''),
-                   // color: Colors.grey,
+                    label: Text(''),
+                    color: Colors.grey,
                   ),
                 ],
               ),
@@ -119,8 +117,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                   child: ListView(
                     children: [
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
                         child: TextField(
                           autofocus: true,
                           keyboardType: TextInputType.text,
@@ -128,14 +126,24 @@ class _BatchDetailsState extends State<BatchDetails> {
                           maxLength: 30,
                           controller: _reference,
                           decoration: const InputDecoration(
-                              hintText: 'Referencia Interna Lote',
-                              helperText: 'Ej: 939482'
+                            hintText: 'Referencia Interna Lote',
+                            helperText: 'Ej: LOT-35266',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
                           ),
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
                         child: TextField(
                           autofocus: true,
                           keyboardType: TextInputType.text,
@@ -143,14 +151,24 @@ class _BatchDetailsState extends State<BatchDetails> {
                           maxLength: 50,
                           controller: _description,
                           decoration: const InputDecoration(
-                              hintText: 'Descripcion',
-                              helperText: 'Ej: Lote Fravega 4'
+                            hintText: 'Descripcion',
+                            helperText: 'Ej: Lote Fravega 4',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
                           ),
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
                         child: TextField(
                           autofocus: true,
                           keyboardType: TextInputType.text,
@@ -158,13 +176,23 @@ class _BatchDetailsState extends State<BatchDetails> {
                           maxLength: 250,
                           controller: _observation,
                           decoration: const InputDecoration(
-                              hintText: 'Observacion',
-                              helperText: 'Ej: Con Fallas'
+                            hintText: 'Observacion',
+                            helperText: 'Ej: Contiene fallas',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
+                        padding: EdgeInsets.only(top: 16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [  ElevatedButton(
@@ -218,13 +246,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                                              state: PageState.addWidget,
                                              widget: ReturnRequestDetails(returnRequest: returns[index]),
                                              page: DetailsReturnPageConfig);})],
-                                       //selected: selected[index],
-
-
                                 ),
                                ),
                               //onTap: () {
-
                           ),
                         ),
                     ],
@@ -252,13 +276,13 @@ class _BatchDetailsState extends State<BatchDetails> {
             widget = Center(
                 child: Stack(
                     children: <Widget>[
-                      const Opacity(
+                      Opacity(
                         opacity: 1,
                         child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: Text('Cargando...',style: const TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
                     ]
                 )
