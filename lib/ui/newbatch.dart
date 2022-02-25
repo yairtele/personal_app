@@ -135,12 +135,13 @@ class _NewBatchState extends State<NewBatch> {
                   }
                 ),
               ),
+              //TODO: Descomentar accion de Siguiente y realizar bien la navegacion
               Container(
                 margin: EdgeInsets.only(top: 8),
                 padding: EdgeInsets.all(15),
-                child: ElevatedButton(
-                  onPressed: () => appState.currentAction =
-                      PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                child: ElevatedButton(onPressed: () {  },
+                  //onPressed: () =>
+                  //appState.currentAction = PageAction(state: PageState.addPage, page: NewReturnPageConfig),
                     child: const Text('Siguiente'),
                   ),
               ),
