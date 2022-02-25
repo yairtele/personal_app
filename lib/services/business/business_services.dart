@@ -135,14 +135,14 @@ class BusinessServices {
   static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      if (commercialCode != 'PROD') {
+      if (commercialCode != 'PLANCHA') {
         throw BusinessException(
             'No se ha encontrado el código comercial "$commercialCode".');
       }
       return ProductInfo(
-        EAN: '1234567891012',
-        commercialCode: 'PROD-LG-80I',
-        description: 'Televisor LG 80"',
+        EAN: '987654321012',
+        commercialCode: 'PLANCHA',
+        description: 'Plancha 1200 W"',
         lastSell: DateTime(2018, 1, 1),
         photos: [],
       );
@@ -175,9 +175,10 @@ class BusinessServices {
           returnRequestTitle, batch, newReturn);
 
       // Validar retailReference. No debería haber otra con el mismo valor
-      if(newReturn.retailReference?.trim() == existingReturnRequest.retailReference?.trim()){
-        throw BusinessException('Ya existe una solicitud de devolución no auditable con la misma referencia interna. Por favor ');
-      }
+      // Por ahora no validar esto
+      //if(newReturn.retailReference?.trim() == existingReturnRequest?.retailReference?.trim()){
+      //  throw BusinessException('Ya existe una solicitud de devolución no auditable con la misma referencia interna. Por favor busque esa solicitud y actualice la cantidad');
+      //}
 
       // Crear solicitud con su foto opcional y salir
       // Si no hay fotos
@@ -217,9 +218,10 @@ class BusinessServices {
     /// Si es producto auditable, crear solicitud (si no existe) y crear el documento de producto unitario y documentos de fotos
     else {
       // Validar retail reference.
-      if(newReturn.retailReference == null || newReturn.retailReference.trim() == ''){
-        throw BusinessException('La referencia interna no puede ser nula ni blancos.');
-      }
+      // Por ahora no validar esto
+      //if(newReturn.retailReference == null || newReturn.retailReference.trim() == ''){
+      //  throw BusinessException('La referencia interna no puede ser nula ni blancos.');
+      //}
 
       // Validar cantidad
       if (newReturn.quantity != null) {

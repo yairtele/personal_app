@@ -167,7 +167,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                 margin: const EdgeInsets.only(top: 8),
                                 padding: const EdgeInsets.only(left: 2, right: 2),
                                 child: ElevatedButton(
-                                  child: const Icon(
+                                  child: const Icon(// Botón Buscar
                                       FontAwesomeIcons.search),
                                   onPressed: () async {
                                     try {
@@ -514,6 +514,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
         throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
       }
       existingReturnRequest = returnRequestsWithSameEAN.first;
+    }
+    else {
+      // Por ahora no importa si existe otra solicitud con el mismo EAN. Luego podemos mostrar un cartelito sugiriendo que actualice
+      // la cantidad en la existente.
     }
 
     return existingReturnRequest;
