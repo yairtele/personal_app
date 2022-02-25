@@ -106,7 +106,11 @@ class _BatchesState extends State<Batches> {
                         PageAction(
                             state: PageState.addPage, page: NewBatchPageConfig),
                   ),
-                  ElevatedButton.icon(onPressed: () {
+                  ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.grey,
+                  ),
+                    onPressed: () {
                     launch(
                         'https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }

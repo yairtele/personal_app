@@ -68,14 +68,17 @@ class _ProductDetailsState extends State<ProductDetails> {
                     onPressed: () => appState.currentAction =
                         PageAction(state: PageState.addPage, page: NewReturnPageConfig),
                   ),
-                  RaisedButton.icon(onPressed:(){
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.grey,
+                    ),
+                    onPressed:(){
                     launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
                   }
                     ,icon: Image.asset(
                       'assets/images/boton_athento.png',
                       height: 40.0,width: 40.0,),
                     label: Text(''),
-                    color: Colors.grey,
                   ),
                 ],
               ),
