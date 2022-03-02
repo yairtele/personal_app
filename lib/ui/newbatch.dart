@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:navigation_app/config/cache.dart';
-import 'package:navigation_app/router/ui_pages.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart';
+import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
+
 
 import '../app_state.dart';
 
@@ -127,10 +129,23 @@ class _NewBatchState extends State<NewBatch> {
                 margin: EdgeInsets.only(top: 8),
                 padding: EdgeInsets.all(15),
                 child: ElevatedButton(
-                    child: const Text('Enviar a Auditar'),
+                    child: const Text('Crear lote'),
                     onPressed: () async {
-                    final userInfo = await Cache.getUserInfo();
-                    _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
+                      try{
+                        WorkingIndicatorDialog().show(context, text: 'Creando nuevo lote...');
+                        await _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
+                        _showSnackBar('Nuevo batch creado con éxito');
+                      }
+                      on BusinessException catch (e){
+                        _showSnackBar(e.message);
+                      }
+                      on Exception catch (e){
+                        _showSnackBar('Ha ocurrido un error inesperado guardardo el nuevo lote: $e');
+                      }
+                      finally{
+                        WorkingIndicatorDialog().dismiss();
+                      }
+
                     //_makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
                   }
                 ),
@@ -153,7 +168,7 @@ class _NewBatchState extends State<NewBatch> {
     );
   }
 
-  void _createBatch(String retailReference, String description, String observation) async {
+  Future<void> _createBatch(String retailReference, String description, String observation) async {
 
     String cuitRetail;
     final retailCompanyName = await Cache.getCompanyName();
@@ -162,6 +177,12 @@ class _NewBatchState extends State<NewBatch> {
         description: description, cuitRetail: cuitRetail,
         retailCompanyName: retailCompanyName,observation:observation));
 
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
 

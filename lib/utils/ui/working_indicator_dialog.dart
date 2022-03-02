@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/widgets.dart';
 
 class WorkingIndicatorDialog {
-  static final WorkingIndicatorDialog _singleton =
-  WorkingIndicatorDialog._internal();
   BuildContext _context;
+  static final WorkingIndicatorDialog _singleton = WorkingIndicatorDialog._internal();
+
 
   factory WorkingIndicatorDialog() {
     return _singleton;
@@ -13,11 +13,12 @@ class WorkingIndicatorDialog {
   WorkingIndicatorDialog._internal();
 
   void show(BuildContext context, {String text = 'Loading...'}) {
+    _context = context;
+
     showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          _context = context;
           return WillPopScope(
             onWillPop: () async => false,
             child: SimpleDialog(
