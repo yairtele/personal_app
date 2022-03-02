@@ -9,6 +9,7 @@ import 'package:navigation_app/services/business/new_return.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -191,7 +192,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         });
                                       }
 
-                                      //TODO: Mostrar advertecia de que ya existe una siolicitud con el mismo EAN en caso de que el producto NO SEA auditable
+                                      //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
                                       final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: batch, productInfo: productInfo);
 
                                       setState(() {
@@ -284,11 +285,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                             Container(
                               margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.all(15),
-                              child: ElevatedButton(
-                                child: const Text('Confirmar'),
+                              child: ElevatedButton( // Botón Registrar
+                                child: const Text('Registrar'),
                                 onPressed: () async {
                                   try{
-
+                                    WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
                                     final thumbsWithPhotos = _takenPictures.entries
                                         .where((entry) => entry.value != null)
                                         .map((e) => MapEntry<String, String>(e.key, e.value.path));
@@ -305,6 +306,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       photos: photosToSave,
                                     );
                                     await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
+                                    _showSnackBar('La nueva devolución fue registrada con éxito');
+                                    _clearProductFields();
+                                    setState(() {
+                                      // Nada, para que muestre limpie el form
+                                    });
                                   }
                                   on BusinessException catch(e){
                                     _showSnackBar(e.message);
@@ -316,6 +322,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   }
                                   catch (e){
                                     final pepe = e;
+                                  }
+                                  finally{
+                                    WorkingIndicatorDialog().dismiss();
                                   }
                                 },
 
@@ -332,31 +341,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                         fit: BoxFit.cover)),
               ),
             ),*/
-                          ListTile(
-                              leading: const Icon(
-                                FontAwesomeIcons.barcode,
-                              ),
-                              onTap: () async {
-                                if (kIsWeb) {
-                                  /*final tmpFile = await getImage(1);
-                                  setState(() async {
-                                    imageFile = tmpFile;
-                                    var fileBytes = await imageFile.readAsBytes();
-                                    //print('Path: ' + imageFile.files.single.path);
-                                    //metodo no soportado en Flutter web, buscar otra libreria
-                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
-                                    print('Barcode: ' + results[0].toString());
-                                    _controller.text = results[0].toString();
-                                  });*/
-                                } else {
-                                  if (Platform.isAndroid || Platform.isIOS) {
-                                    setState(() async {
-                                      final barcode = await BarcodeScanner.scan();
-                                      _searchParamTextController.text = barcode.rawContent;
-                                    });
-                                  }
-                                }
-                              }),
                         ],
                       ),
                     ),

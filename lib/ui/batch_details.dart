@@ -84,179 +84,206 @@ class _BatchDetailsState extends State<BatchDetails> {
                 title: Text(
                   '$title',
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
                 ),
                 actions: [
-                  Text(
-                    '\nBienvenido, ${data.userInfo.firstName}!\nCUIT: ${data.userInfo.idNumber}',
-                    style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
-                  ),
+
                   IconButton(
                     icon: const Icon(Icons.settings),
-                    onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, page: SettingsPageConfig),
+                    onPressed: () =>
+                    appState.currentAction =
+                        PageAction(
+                            state: PageState.addPage, page: SettingsPageConfig),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
-                    onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, widget: NewReturnScreen(batch: this.widget.batch), page: NewReturnPageConfig),
+                    onPressed: () =>
+                    appState.currentAction =
+                        PageAction(state: PageState.addPage,
+                            widget: NewReturnScreen(batch: this.widget.batch),
+                            page: NewReturnPageConfig),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       primary: Colors.grey,
                     ),
-                    onPressed:(){
-                    launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
-                  }
-                    ,icon: Image.asset(
-                      'assets/images/boton_athento.png',
-                      height: 40.0,width: 40.0,),
+                    onPressed: () {
+                      launch(
+                          'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                    }
+                    , icon: Image.asset(
+                    'assets/images/boton_athento.png',
+                    height: 40.0, width: 40.0,),
                     label: Text(''),
                   ),
                 ],
               ),
               body: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListView(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: TextField(
-                          autofocus: true,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.send,
-                          maxLength: 30,
-                          controller: _reference,
-                          decoration: const InputDecoration(
-                            hintText: 'Referencia Interna Lote',
-                            helperText: 'Ej: LOT-35266',
-                            label: Text.rich(
-                                TextSpan(
-                                  children: <InlineSpan>[
-                                    WidgetSpan(
-                                      child: Text(
-                                          'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                )
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: TextField(
-                          autofocus: true,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.send,
-                          maxLength: 50,
-                          controller: _description,
-                          decoration: const InputDecoration(
-                            hintText: 'Descripcion',
-                            helperText: 'Ej: Lote Fravega 4',
-                            label: Text.rich(
-                                TextSpan(
-                                  children: <InlineSpan>[
-                                    WidgetSpan(
-                                      child: Text(
-                                          'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                )
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: TextField(
-                          autofocus: true,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.send,
-                          maxLength: 250,
-                          controller: _observation,
-                          decoration: const InputDecoration(
-                            hintText: 'Observacion',
-                            helperText: 'Ej: Contiene fallas',
-                            label: Text.rich(
-                                TextSpan(
-                                  children: <InlineSpan>[
-                                    WidgetSpan(
-                                      child: Text(
-                                          'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                )
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [  ElevatedButton(
-                            onPressed: () => appState.currentAction =
-                                PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                            child: const Text('Guardar'),
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.green[400],
+                padding: const EdgeInsets.all(16.0),
+                child: ListView(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.all(15),
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        maxLength: 30,
+                        controller: _reference,
+                        decoration: const InputDecoration(
+                          hintText: 'Referencia Interna Lote',
+                          helperText: 'Ej: LOT-35266',
+                          label: Text.rich(
+                              TextSpan(
+                                children: <InlineSpan>[
+                                  WidgetSpan(
+                                    child: Text(
+                                        'Referencia Interna Lote:',
+                                        style: const TextStyle(fontSize: 18.0,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
                               )
                           ),
-                            ElevatedButton(
-                              onPressed: () => appState.currentAction =
-                                  PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                              child: const Text('Enviar Lote'),
-                                style: ElevatedButton.styleFrom(
-                                    primary: Colors.grey,
-                                )
-                            ),
-                            ElevatedButton(
-                              onPressed: () => appState.currentAction =
-                                  PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                              child: const Text('Borrar Lote'),
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                )
-                            ),
-                          ],
                         ),
                       ),
-                      Container(
-                        height: 500.0, // Change as you wish
-                        width: 500.0, // Change as you wish
-                        child: DataTable(
-                            columns: const <DataColumn>[
-                              DataColumn(
-                                label: Text('Solicitudes'),
-                              ),
-                            ],
-                               rows: List<DataRow>.generate(
-                                 returns.length,
-                                     (int index) => DataRow(
-                                       cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
-                                         leading: const Icon(Icons.art_track_sharp,color: Colors.grey,),
-                                         title: Text('${returns[index].retailReference}',
-                                             style: const TextStyle(fontSize: 14.0,
-                                                 fontWeight: FontWeight.bold,
-                                                 color: Colors.black)),
-                                         subtitle: Text('Cant.Prod: ${returns[index].quantity.toString()}\n\n\n'),
-                                       ),onTap: () {
-                                         appState.currentAction = PageAction(
-                                             state: PageState.addWidget,
-                                             widget: ReturnRequestDetails(returnRequest: returns[index]),
-                                             page: DetailsReturnPageConfig);})],
-                                ),
-                               ),
-                              //onTap: () {
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.all(15),
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        maxLength: 50,
+                        controller: _description,
+                        decoration: const InputDecoration(
+                          hintText: 'Descripcion',
+                          helperText: 'Ej: Lote Fravega 4',
+                          label: Text.rich(
+                              TextSpan(
+                                children: <InlineSpan>[
+                                  WidgetSpan(
+                                    child: Text(
+                                        'Descripcion:', style: const TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              )
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.all(15),
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        maxLength: 250,
+                        controller: _observation,
+                        decoration: const InputDecoration(
+                          hintText: 'Observacion',
+                          helperText: 'Ej: Contiene fallas',
+                          label: Text.rich(
+                              TextSpan(
+                                children: <InlineSpan>[
+                                  WidgetSpan(
+                                    child: Text(
+                                        'Observacion:', style: const TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              )
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [ ElevatedButton(
+                            onPressed: () =>
+                            appState.currentAction =
+                                PageAction(state: PageState.addPage,
+                                    page: DetailsPageConfig),
+                            child: const Text('Guardar'),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.green[400],
+                            )
+                        ),
+                          ElevatedButton(
+                              onPressed: () =>
+                              appState.currentAction =
+                                  PageAction(state: PageState.addPage,
+                                      page: DetailsPageConfig),
+                              child: const Text('Enviar Lote'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.grey,
+                              )
+                          ),
+                          ElevatedButton(
+                              onPressed: () =>
+                              appState.currentAction =
+                                  PageAction(state: PageState.addPage,
+                                      page: DetailsPageConfig),
+                              child: const Text('Borrar Lote'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: 500.0, // Change as you wish
+                      width: 500.0, // Change as you wish
+                      child: DataTable(
+                        columns: const <DataColumn>[
+                          DataColumn(
+                            label: Text('Solicitudes'),
+                          ),
+                        ],
+                        rows: List<DataRow>.generate(
+                          returns.length,
+                              (int index) {
+                            final returnRequest = returns[index];
+                            final title = returnRequest.retailReference ?? returnRequest.description;
+                            final subtitle = returnRequest.quantity != null ? 'Unidades: ${returnRequest.quantity}' : '';
+                            return DataRow(
+                              cells: <DataCell>[
+                                DataCell(ListTile(isThreeLine: true,
+                                  leading: const Icon(
+                                    Icons.art_track_sharp, color: Colors.grey,),
+                                  title: Text(
+                                      title,
+                                      style: const TextStyle(fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black)),
+                                  subtitle: Text(subtitle),
+                                ), onTap: () {
+                                  appState.currentAction = PageAction(
+                                      state: PageState.addWidget,
+                                      widget: ReturnRequestDetails(
+                                          returnRequest: returns[index]),
+                                      page: DetailsReturnPageConfig);
+                                })
+                              ],
+                            );
+                          },
+                        ),
+                        //onTap: () {
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           } else if (snapshot.hasError) {

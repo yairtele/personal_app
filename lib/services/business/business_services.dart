@@ -84,6 +84,7 @@ class BusinessServices {
   static Future<List<ReturnRequest>> getReturnRequestsByBatchNumber({@required String batchNumber}) async {
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
+    final batchFieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
 
     // Obtener config provider para Bearer Token
     final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
@@ -103,8 +104,8 @@ class BusinessServices {
     ];
 
     // Construir WHERE expression
-    final batchNumberFieldName = '${fieldNameInferenceConfig['defaultPrefix']}${ReturnRequestAthentoFieldName.batchNumber}';
-    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $batchNumberFieldName = '$batchNumber'";
+    final parentBatchNumber = ' parent:metadata.${batchFieldNameInferenceConfig['defaultPrefix']}${BatchAthentoFieldName.batchNumber}';
+    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $parentBatchNumber = '$batchNumber'";
 
     // Invocar a Athento
     final entries = await SpAthentoServices.findDocuments(
@@ -118,34 +119,64 @@ class BusinessServices {
   static Future<ProductInfo> getProductInfoByEAN(String eanCode) {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      if (eanCode != '1234') {
+      final products= <String, ProductInfo>{
+        '1234': ProductInfo(
+          EAN: '1234567891012',
+          commercialCode: 'TV-LG-80I',
+          description: 'Televisor LG 80"',
+          lastSell: DateTime(2022, 1, 1),
+          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
+        ),
+        '4321': ProductInfo(
+          EAN: '25698742224',
+          commercialCode: 'AC-BGH-3000',
+          description: 'Aire Acondicionado BGH 3000',
+          lastSell: DateTime(2022, 1, 1),
+          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
+        ),
+
+      };
+
+      final product = products[eanCode];
+
+      if(product == null){
         throw BusinessException('No se ha encontrado el EAN "$eanCode".');
       }
 
-      return ProductInfo(
-        EAN: '1234567891012',
-        commercialCode: 'TV-LG-80I',
-        description: 'Televisor LG 80"',
-        lastSell: DateTime(2022, 1, 1),
-        photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
-      );
+      return product;
+
     });
   }
 
   static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      if (commercialCode != 'PLANCHA') {
+      var products= <String, ProductInfo>{
+        'PLANCHA': ProductInfo(
+          EAN: '987654321012',
+          commercialCode: 'PLANCHA',
+          description: 'Plancha 1200 W"',
+          lastSell: DateTime(2018, 1, 1),
+          photos: [],
+        ),
+        'AFEITADORA': ProductInfo(
+          EAN: '69415464654',
+          commercialCode: 'AFEITADORA',
+          description: 'Afeitadora Braun Shower',
+          lastSell: DateTime(2018, 1, 1),
+          photos: [],
+        )
+
+      };
+
+      var product = products[commercialCode];
+
+      if(product == null){
         throw BusinessException(
             'No se ha encontrado el código comercial "$commercialCode".');
       }
-      return ProductInfo(
-        EAN: '987654321012',
-        commercialCode: 'PLANCHA',
-        description: 'Plancha 1200 W"',
-        lastSell: DateTime(2018, 1, 1),
-        photos: [],
-      );
+
+      return product;
     });
   }
 
@@ -427,6 +458,7 @@ class BusinessServices {
   static Future<List<Product>> getProductsByReturnRequestNumber(String returnRequestNumber) async{
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
+    final returnRequestFieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
 
     // Obtener config provider para Bearer Token
     final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
@@ -442,9 +474,10 @@ class BusinessServices {
       ProductAthentoFieldName.retailReference,
     ];
 
+
     // Construir WHERE expression
-    final returnRequestNumberFieldName = '${fieldNameInferenceConfig['defaultPrefix']}${ProductAthentoFieldName.requestNumber}';
-    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $returnRequestNumberFieldName = $returnRequestNumber";
+    final parentReturnRequestNumber = ' parent:metadata.${returnRequestFieldNameInferenceConfig['defaultPrefix']}${ReturnRequestAthentoFieldName.requestNumber}';
+    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $parentReturnRequestNumber = '$returnRequestNumber'";
 
     // Invocar a Athento
     final entries = await SpAthentoServices.findDocuments(

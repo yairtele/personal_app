@@ -53,11 +53,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                       fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
                 ),
                 actions: [
-                  Text(
-                    '\nBienvenido, ${data.userInfo.firstName}!\nCUIT: ${data.userInfo.idNumber}',
-                    style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
-                  ),
                   IconButton(
                     icon: const Icon(Icons.settings),
                     onPressed: () => appState.currentAction =
