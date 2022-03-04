@@ -18,11 +18,6 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
 
-
-
-
-var type;
-
 class NewReturnScreen extends StatefulWidget {
   final ReturnRequest returnRequest;
   final Batch batch;
@@ -36,7 +31,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _searchParamTextController = TextEditingController();
   final _retailReferenceTextController = TextEditingController();
   final _quantityTextController = TextEditingController();
-
+  final _descriptionTextController = TextEditingController();
 
   XFile imageFile;
   final Map<String, XFile> _takenPictures = {};
@@ -172,6 +167,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       FontAwesomeIcons.search),
                                   onPressed: () async {
                                     try {
+                                      // Limpiar campos
+                                      _clearProductFields();
+
                                       // Buscar info del producto y actualizar el Future del FutureBuilder.
                                       ProductInfo productInfo = null;
                                       if (_productSearchBy ==
@@ -181,7 +179,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
                                       }
 
-                                      _clearProductFields();
+                                      // Cargar datos del producto
+                                      _descriptionTextController.text = productInfo.description;
+
 
                                       if (productInfo.photos.length == 0){
                                         _takenPictures['otra'] = null;
@@ -225,12 +225,25 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                               child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Descripcion: ${_product.description}',
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black),
+                                    Container(
+                                      margin:
+                                      const EdgeInsets.only(top: 8),
+                                      padding: const EdgeInsets.all(30),
+                                      child: TextField(
+                                        controller: _descriptionTextController,
+                                        autofocus: true,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction:
+                                        TextInputAction.send,
+                                        readOnly: true,
+                                        maxLength: 30,
+
+                                        decoration: const InputDecoration(
+                                            labelText: 'Descripción',
+                                            border: InputBorder.none,
+                                            counter: Offstage()
+                                        ),
+                                      ),
                                     ),
                                     Container(
                                       margin:
@@ -510,6 +523,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   void _clearProductFields() {
     _retailReferenceTextController.text = '';
     _quantityTextController.text = '';
+    _descriptionTextController.text = '';
     _takenPictures.clear();
   }
 
@@ -525,13 +539,5 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     return quantity;
   }
 }
-
-Future getImage(int type) async {
-  final pickedImage = await ImagePicker().getImage(
-      source: type == 1 ? ImageSource.camera : ImageSource.gallery,
-      imageQuality: 50);
-  return pickedImage;
-}
-
 
 enum ProductSearchBy { EAN, CommercialCode }
