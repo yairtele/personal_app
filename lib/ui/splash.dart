@@ -34,8 +34,6 @@ import 'package:provider/provider.dart';
 
 import '../app_state.dart';
 
-const String LoggedInKey = 'LoggedIn';
-
 class Splash extends StatefulWidget {
   @override
   _SplashState createState() => _SplashState();

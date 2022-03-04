@@ -244,6 +244,34 @@ class SpAthentoServices {
     final renamedEntries = results.entries.map((e) =>  configProvider.renameResultItemFields(e)).toList();
     return renamedEntries;
   }
+
+
+  static Future<Map<String, dynamic>> deleteDocument ({@required ConfigProvider configProvider, @required String documentUUID, String auditMessage}) async {
+    final jsonRequestBody = {
+      'input': documentUUID,
+      'params': {
+        'audit': auditMessage,
+      }
+    };
+
+    final headers = configProvider.getHttpHeaders();
+
+    //console.log("endpoint: " + configProvider.getServiceUrl() + configProvider.getEndpointName("deleteDocument"));
+    final response = await SpWS.post(configProvider.getEndpointUrl(AthentoEndpoint.deleteDocument),parameters:  {}, headers:  headers,
+        body:  jsonRequestBody);
+
+    //console.log("response.status: " + response.statusCode);
+    //console.log("response.body: " + response.body);
+
+    return configProvider.parseResponse(response.body);
+
+
+    //console.log(JSON.stringify(jsonRequestBody));
+  }
+
+
+
+
 }
 
 
