@@ -30,7 +30,8 @@ class SpAthentoServices {
   }
 
   static Future<TokenInfo> getAuthenticationToken(
-      BasicAuthConfigProvider configProvider, String userName, String password) async {
+      BasicAuthConfigProvider configProvider, String userName,
+      String password) async {
     //TODO: usar SpWS en lugar de http directo.
 
     final requestBody = {
@@ -63,10 +64,10 @@ class SpAthentoServices {
   }
 
   static Future<Map<String, dynamic>> createDocument({
-      @required ConfigProvider configProvider,
-      @required String containerUUID, @required String docType, @required String title,
-      @required Map<String, dynamic> fieldValues, String auditMessage = ''}) async {
-
+    @required ConfigProvider configProvider,
+    @required String containerUUID, @required String docType, @required String title,
+    @required Map<String,
+        dynamic> fieldValues, String auditMessage = ''}) async {
     fieldValues.removeWhere((key, value) => key == AthentoFieldName.uuid);
 
     final renamedFieldValues = configProvider.getFieldValues(
@@ -85,7 +86,8 @@ class SpAthentoServices {
 
     //console.log("endpoint: " + configProvider.getServiceUrl() + "Athento.DocumentCreate/");
     //console.log(JSON.stringify(jsonRequestBody));
-    final response = await SpWS.post(configProvider.getEndpointUrl('createDocument'), parameters: {},
+    final response = await SpWS.post(
+        configProvider.getEndpointUrl('createDocument'), parameters: {},
         headers: headers,
         body: jsonRequestBody);
 
@@ -96,10 +98,11 @@ class SpAthentoServices {
   }
 
 
-  static Future<Map<String,dynamic>> createDocumentWithContent({
+  static Future<Map<String, dynamic>> createDocumentWithContent({
     @required ConfigProvider configProvider,
     @required String containerUUID, @required String docType, @required String title,
-    @required Map<String, dynamic> fieldValues, @required List<int> content, @required String friendlyFileName, String auditMessage = ''}) async {
+    @required Map<String, dynamic> fieldValues, @required List<
+        int> content, @required String friendlyFileName, String auditMessage = ''}) async {
     if (content == null || content.length == 0) {
       throw Exception(
           '"content" cannot be neitether null nor a zero length byte array');
@@ -175,40 +178,47 @@ class SpAthentoServices {
     return wordList.isNotEmpty ? wordList[0] : '';
   }
 
-  static Future<Map<String, dynamic>> getDocument(ConfigProvider configProvider, String docType,
+  static Future<Map<String, dynamic>> getDocument(ConfigProvider configProvider,
+      String docType,
       String documentUUID, List<String> selectFields) async {
-
     final whereExpression = 'WHERE ecm:uuid = $documentUUID';
 
-    final entries = await SpAthentoServices.findDocuments(configProvider, docType, selectFields, whereExpression);
+    final entries = await SpAthentoServices.findDocuments(
+        configProvider, docType, selectFields, whereExpression);
 
     // Validar si Athento devolvió como mucho un sólo un documento
-    if(entries.length > 1){
-      throw Exception('Athento should have returned at most 1 document, instead of ${entries.length}.');
+    if (entries.length > 1) {
+      throw Exception(
+          'Athento should have returned at most 1 document, instead of ${entries
+              .length}.');
     }
     var foo = entries[0];
     // Validar si Athento devolvió uno un sólo un documento
-    if(entries.length != 1){
-      throw Exception('Document with UUID="$documentUUID" not found in Athento.');
+    if (entries.length != 1) {
+      throw Exception(
+          'Document with UUID="$documentUUID" not found in Athento.');
     }
 
     return entries[0];
   }
 
-  static Future<List<dynamic>> findDocuments(ConfigProvider configProvider, String docType,
+  static Future<List<dynamic>> findDocuments(ConfigProvider configProvider,
+      String docType,
       List<String> selectFields, String whereExpression) async {
     //TODO: revisar el resultado de Athento y arrojar un error en caso de que el response incluya un error en el JSON body.
     //TODO: estaría bueno limpiar los nombres feos de los metadatos por los nombres amigables, y poner un parámetro al final para indicar si se desean los nombres feos o no.
 
-    if(!whereExpression.startsWith('WHERE')){
+    if (!whereExpression.startsWith('WHERE')) {
       var whereStartWord = _getFirstWord(whereExpression);
-      throw Exception('the "whereExpresion" argument must start with "WHERE" instead of "$whereStartWord".');
+      throw Exception(
+          'the "whereExpresion" argument must start with "WHERE" instead of "$whereStartWord".');
     }
 
     final renamedFieldValues = configProvider.getSelectFields(selectFields);
-    final query = "SELECT ${renamedFieldValues.join(', ')} FROM $docType $whereExpression";
+    final query = "SELECT ${renamedFieldValues.join(
+        ', ')} FROM $docType $whereExpression";
     final jsonRequestBody = {
-      'params' :  {
+      'params': {
         'pageSize': 20,
         'page': 0,
         'query': query
@@ -222,7 +232,7 @@ class SpAthentoServices {
 
     final response = await SpWS.post(
         configProvider.getEndpointUrl(AthentoEndpoint.getDocument),
-        headers:headers,
+        headers: headers,
         parameters: {},
         body: jsonRequestBody);
 
@@ -234,19 +244,22 @@ class SpAthentoServices {
     final results = FindResults.fromJSON(jsonBody);
     // Validar si el response no trajo errores
     // TODO: parsear mejor el error de Athento
-    if(results.hasError){
-      throw Exception('An error occurred finding documents in Athento: ${results.errorMessage}');
+    if (results.hasError) {
+      throw Exception('An error occurred finding documents in Athento: ${results
+          .errorMessage}');
     }
     //TODO: manejar paginación?? O hacerlo fuera mejor....
 
     //TODO: reemplazar los nombres feos de metadatos por otros más agradables.
     // Devolver sólo el JSON del documento
-    final renamedEntries = results.entries.map((e) =>  configProvider.renameResultItemFields(e)).toList();
+    final renamedEntries = results.entries.map((e) =>
+        configProvider.renameResultItemFields(e)).toList();
     return renamedEntries;
   }
 
 
-  static Future<Map<String, dynamic>> deleteDocument ({@required ConfigProvider configProvider, @required String documentUUID, String auditMessage}) async {
+  static Future<Map<String, dynamic>> deleteDocument(
+      {@required ConfigProvider configProvider, @required String documentUUID, String auditMessage}) async {
     final jsonRequestBody = {
       'input': documentUUID,
       'params': {
@@ -257,8 +270,10 @@ class SpAthentoServices {
     final headers = configProvider.getHttpHeaders();
 
     //console.log("endpoint: " + configProvider.getServiceUrl() + configProvider.getEndpointName("deleteDocument"));
-    final response = await SpWS.post(configProvider.getEndpointUrl(AthentoEndpoint.deleteDocument),parameters:  {}, headers:  headers,
-        body:  jsonRequestBody);
+    final response = await SpWS.post(
+        configProvider.getEndpointUrl(AthentoEndpoint.deleteDocument),
+        parameters: {}, headers: headers,
+        body: jsonRequestBody);
 
     //console.log("response.status: " + response.statusCode);
     //console.log("response.body: " + response.body);
@@ -269,7 +284,35 @@ class SpAthentoServices {
     //console.log(JSON.stringify(jsonRequestBody));
   }
 
+  Future<Map<String, dynamic>> updateDocument({ @required ConfigProvider configProvider, @required String documentUUID,
+          @required String title, @required Map<String, dynamic> fieldValues, String auditMessage) async {
 
+    final  renamedFieldValues = configProvider.getFieldValues(title, fieldValues);
+
+    final jsonRequestBody = {
+      'input': documentUUID,
+      'params': {
+      'audit': auditMessage,
+        'properties': renamedFieldValues
+      }
+    };
+
+    final headers = configProvider.getHttpHeaders();
+
+    //console.log("endpoint: " + configProvider.getServiceUrl() + configProvider.getEndpointName("updateDocument"));
+    final response = await SpWS.post(configProvider.getEndpointUrl(AthentoEndpoint.updateDocument), parameters:  {}, headers:  headers,
+        body: jsonRequestBody);
+
+    //console.log("response.status: " + response.statusCode);
+    //console.log("response.body: " + response.body);
+
+    return configProvider.parseResponse(response.body);
+
+
+    //console.log(JSON.stringify(jsonRequestBody));
+
+
+  }
 
 
 }
