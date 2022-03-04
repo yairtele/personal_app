@@ -230,10 +230,10 @@ class _BatchDetailsState extends State<BatchDetails> {
                               )
                           ),
                           ElevatedButton(
-                              onPressed: () =>
-                              appState.currentAction =
-                                  PageAction(state: PageState.addPage,
-                                      page: DetailsPageConfig),
+                              onPressed: () {
+
+
+                              },
                               child: const Text('Borrar Lote'),
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.red,
@@ -335,6 +335,7 @@ class _BatchDetailsState extends State<BatchDetails> {
     final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
     return returnRequests;
   }
+
 }
 
 

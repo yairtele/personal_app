@@ -24,9 +24,6 @@ class BusinessServices {
   static const String _photoDocType = 'foto_oxc';
 
 
-  static Future<void> updateBatch(String uuid) async{
-
-  }
   static Future<UserInfo> getUserInfo(String userNameOrUUID) async {
     final configProvider = await  _createConfigProvider();
     return SpAthentoServices.getUserInfo(configProvider, userNameOrUUID);
@@ -487,9 +484,6 @@ class BusinessServices {
     final returns = entries.map((e) => Product.fromJSON(e));
     return returns.toList();
   }
-
-
-
 }
 
 
