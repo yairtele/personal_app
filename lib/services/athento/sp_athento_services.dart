@@ -285,7 +285,7 @@ class SpAthentoServices {
   }
 
   Future<Map<String, dynamic>> updateDocument({ @required ConfigProvider configProvider, @required String documentUUID,
-          @required String title, @required Map<String, dynamic> fieldValues, String auditMessage) async {
+          @required String title, @required Map<String, dynamic> fieldValues, String auditMessage}) async {
 
     final  renamedFieldValues = configProvider.getFieldValues(title, fieldValues);
 

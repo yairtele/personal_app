@@ -29,10 +29,12 @@
  */
 import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/newreturn.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
@@ -230,8 +232,21 @@ class _BatchDetailsState extends State<BatchDetails> {
                               )
                           ),
                           ElevatedButton(
-                              onPressed: () {
-
+                              onPressed: () async {
+                                try{
+                                  WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
+                                  await _deleteBatch(batch);
+                                  _showSnackBar('Lote eliminado con éxito');
+                                }
+                                on BusinessException catch (e){
+                                  _showSnackBar(e.message);
+                                }
+                                on Exception catch (e){
+                                  _showSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
+                                }
+                                finally{
+                                  WorkingIndicatorDialog().dismiss();
+                                }
 
                               },
                               child: const Text('Borrar Lote'),
@@ -334,6 +349,16 @@ class _BatchDetailsState extends State<BatchDetails> {
   Future<List<ReturnRequest>> _getReturnRequests(Batch batch) async {
     final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
     return returnRequests;
+  }
+
+  Future<void> _deleteBatch(Batch batch) async {
+    final returnDelete = await BusinessServices.deleteBatchByUUID(batch.uuid);
+    return returnDelete;
+  }
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
 }
