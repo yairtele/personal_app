@@ -280,7 +280,7 @@ class SpAthentoServices {
     //console.log(JSON.stringify(jsonRequestBody));
   }
 
-  Future<Map<String, dynamic>> updateDocument({ @required ConfigProvider configProvider, @required String documentUUID,
+  static Future<Map<String, dynamic>> updateDocument({ @required ConfigProvider configProvider, @required String documentUUID,
           @required String title, @required Map<String, dynamic> fieldValues, String auditMessage}) async {
 
     final  renamedFieldValues = configProvider.getFieldValues(title, fieldValues);
