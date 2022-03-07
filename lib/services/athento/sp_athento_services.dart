@@ -1,13 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_endpoint.dart';
 import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
-import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
 import 'package:navigation_app/services/sp_ws/multipart_message_builder.dart';
 import 'package:navigation_app/services/sp_ws/sp_ws.dart';
 import 'config_provider.dart';
@@ -192,7 +188,7 @@ class SpAthentoServices {
           'Athento should have returned at most 1 document, instead of ${entries
               .length}.');
     }
-    var foo = entries[0];
+
     // Validar si Athento devolvió uno un sólo un documento
     if (entries.length != 1) {
       throw Exception(
@@ -209,7 +205,7 @@ class SpAthentoServices {
     //TODO: estaría bueno limpiar los nombres feos de los metadatos por los nombres amigables, y poner un parámetro al final para indicar si se desean los nombres feos o no.
 
     if (!whereExpression.startsWith('WHERE')) {
-      var whereStartWord = _getFirstWord(whereExpression);
+      final whereStartWord = _getFirstWord(whereExpression);
       throw Exception(
           'the "whereExpresion" argument must start with "WHERE" instead of "$whereStartWord".');
     }
