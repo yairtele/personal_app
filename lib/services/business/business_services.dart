@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/config/cache.dart';
@@ -113,7 +115,12 @@ class BusinessServices {
     return returns.toList();
   }
 
-  static Future<ProductInfo> getProductInfoByEAN(String eanCode) {
+  static Future<ProductInfo> getProductInfoByEAN(String eanCode) async {
+    //TODO: Consultar Athento o servicio de Newsan
+    return getProductInfoByEANfromArray(eanCode);
+  }
+
+  static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
       final products= <String, ProductInfo>{
@@ -144,8 +151,29 @@ class BusinessServices {
 
     });
   }
+/*
+  static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
+    //TODO: Consultar Athento
+    final productFile = File('assets/products/products_db_small.csv');
 
-  static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) {
+    final productRndFile = productFile.openSync(mode: FileMode.read);
+
+    const chunkSize = 32 * 1024;
+
+    final size = productRndFile.lengthSync();
+
+    final readBytesBuffer = List<int>.empty(growable: true);
+
+    while
+
+    final readString = utf8.decoder.convert(productRndFile.readSync(chunkSize));
+
+
+
+
+  }
+*/
+  static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) async {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
       var products= <String, ProductInfo>{
