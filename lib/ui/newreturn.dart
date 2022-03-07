@@ -40,6 +40,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   ReturnRequest _existingReturnRequest = null;
   ProductInfo _product = null;
   Future<ScreenData<void, void>> _localData;
+  Batch _globalBatch;
 
   @override
   void initState() {
@@ -59,6 +60,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
           Widget widget;
           if (snapshot.hasData) {
             final batch = this.widget.batch;
+            _globalBatch = batch;
             widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -147,12 +149,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     } else {
                                       if (Platform.isAndroid ||
                                           Platform.isIOS) {
-                                        setState(() async {
-                                          final barcode =
-                                          await BarcodeScanner.scan();
-                                          _searchParamTextController.text =
-                                              barcode.rawContent;
-                                        });
+                                        final barcode = await BarcodeScanner.scan();
+                                        //setState((){
+                                          _lookForProduct(barcode);
+                                        //});
                                       }
                                     }
                                   },
@@ -165,52 +165,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                 child: ElevatedButton(
                                   child: const Icon(// Botón Buscar
                                       FontAwesomeIcons.search),
-                                  onPressed: () async {
-                                    try {
-                                      // Limpiar campos
-                                      _clearProductFields();
-
-                                      // Buscar info del producto y actualizar el Future del FutureBuilder.
-                                      ProductInfo productInfo = null;
-                                      if (_productSearchBy ==
-                                          ProductSearchBy.EAN) {
-                                        productInfo = await _getProductInfoByEAN(_searchParamTextController.text);
-                                      } else {
-                                        productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
-                                      }
-
-                                      // Cargar datos del producto
-                                      _descriptionTextController.text = productInfo.description;
-
-
-                                      if (productInfo.photos.length == 0){
-                                        _takenPictures['otra'] = null;
-                                      }
-                                      else{
-                                        productInfo.photos.forEach((photoName) {
-                                          _takenPictures[photoName] = null;
-                                        });
-                                      }
-
-                                      //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
-                                      final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: batch, productInfo: productInfo);
-
-                                      setState(() {
-                                        _isAuditableProduct = productInfo.isAuditable;
-                                        _existingReturnRequest = existingReturnRequest;
-                                        _product = productInfo;
-                                      });
-                                    }
-                                    on BusinessException catch (e) {
-                                      _showSnackBar(
-                                          'Error recuperando información del producto: ${e
-                                              .message}');
-                                    }
-                                    on Exception catch (e) {
-                                      _showSnackBar(
-                                          'Ha ocurrido un error inesperado: $e');
-                                    }
-                                  },
+                                  onPressed: _lookForProduct,
                                 ),
                               ),
                             ],
@@ -537,6 +492,56 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       }
     }
     return quantity;
+  }
+
+  void _lookForProduct ([ScanResult barcode]) async {
+    try {
+      // Limpiar campos
+      _clearProductFields();
+
+      if(barcode != null){
+        _searchParamTextController.text = barcode.rawContent;
+      }
+
+      // Buscar info del producto y actualizar el Future del FutureBuilder.
+      ProductInfo productInfo = null;
+      if (_productSearchBy == ProductSearchBy.EAN) {
+        productInfo = await _getProductInfoByEAN(_searchParamTextController.text);
+      } else {
+        productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
+      }
+
+      // Cargar datos del producto
+      _descriptionTextController.text = productInfo.description;
+
+
+      if (productInfo.photos.length == 0){
+        _takenPictures['otra'] = null;
+      }
+      else{
+        productInfo.photos.forEach((photoName) {
+          _takenPictures[photoName] = null;
+        });
+      }
+
+      //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
+      final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: _globalBatch, productInfo: productInfo);
+
+      setState(() {
+        _isAuditableProduct = productInfo.isAuditable;
+        _existingReturnRequest = existingReturnRequest;
+        _product = productInfo;
+      });
+    }
+    on BusinessException catch (e) {
+      _showSnackBar(
+          'Error recuperando información del producto: ${e
+              .message}');
+    }
+    on Exception catch (e) {
+      _showSnackBar(
+          'Ha ocurrido un error inesperado: $e');
+    }
   }
 }
 
