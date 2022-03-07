@@ -488,6 +488,18 @@ class BusinessServices {
     final configProvider = await  _createConfigProvider();
     SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);
   }
+
+  static Future <void> updateBatch (Batch batch,String batchreference,String batchdescr,String batchobserv) async{
+    final configProvider = await  _createConfigProvider();
+    Map<String, dynamic> fieldValues = {
+      '${BatchAthentoFieldName.retailReference}': '${batchreference}',
+      '${BatchAthentoFieldName.description}': '${batchdescr}',
+      '${BatchAthentoFieldName.observation}': '${batchobserv}',
+    };
+    final title = '${batchreference}-${batchdescr}-${batch.batchNumber}';
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
+  }
+
 }
 
 

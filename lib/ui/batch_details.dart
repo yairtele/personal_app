@@ -212,10 +212,22 @@ class _BatchDetailsState extends State<BatchDetails> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [ ElevatedButton(
-                            onPressed: () =>
-                            appState.currentAction =
-                                PageAction(state: PageState.addPage,
-                                    page: DetailsPageConfig),
+                            onPressed: () async {
+                              try{
+                                WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
+                                await _updateBatch(batch,_reference.text,_description.text,_observation.text);
+                                _showSnackBar('Lote actualizado con éxito');
+                              }
+                              on BusinessException catch (e){
+                                _showSnackBar(e.message);
+                              }
+                              on Exception catch (e){
+                                _showSnackBar('Ha ocurrido un error inesperado al actualizar el lote: $e');
+                              }
+                              finally{
+                                WorkingIndicatorDialog().dismiss();
+                              }
+                            },
                             child: const Text('Guardar'),
                             style: ElevatedButton.styleFrom(
                               primary: Colors.green[400],
@@ -352,9 +364,12 @@ class _BatchDetailsState extends State<BatchDetails> {
   }
 
   Future<void> _deleteBatch(Batch batch) async {
-    final returnDelete = await BusinessServices.deleteBatchByUUID(batch.uuid);
-    return returnDelete;
+    await BusinessServices.deleteBatchByUUID(batch.uuid);
   }
+  Future<void> _updateBatch(Batch batch,String reference, String description,String observation) async {
+    await BusinessServices.updateBatch(batch,reference,description,observation);
+  }
+
   void _showSnackBar(String message){
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
