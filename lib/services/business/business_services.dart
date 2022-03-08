@@ -528,6 +528,15 @@ class BusinessServices {
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
   }
 
+  static Future <void> updateBatchState (Batch batch) async{
+    final configProvider = await  _createConfigProvider();
+    Map<String, dynamic> fieldValues = {
+      '${AthentoFieldName.state}': 'Enviado'
+    };
+    final title = '${batch.retailReference}-${batch.description}-${batch.batchNumber}';
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
+  }
+
 }
 
 
