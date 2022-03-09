@@ -27,15 +27,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:navigation_app/services/user_services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../app_state.dart';
 import '../router/ui_pages.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/services.dart' show rootBundle;
 //import 'package:keycloak_flutter/keycloak_flutter.dart';
 
 class Login extends StatefulWidget {
@@ -47,6 +51,13 @@ class _LoginState extends State<Login> {
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState()  {
+    super.initState();
+    updateLocalFiles();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +169,30 @@ class _LoginState extends State<Login> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuario o clave inválida' )),
     );
+  }
+
+  Future<void> updateLocalFiles() async {
+    final localFolderPath = (await getApplicationDocumentsDirectory()).path;
+    final productsFolderPath = Directory('$localFolderPath/products');
+
+    // Check if the product files folder exists in the local app folder. If not, create it
+    if(!productsFolderPath.existsSync()){
+      await productsFolderPath.create();
+    }
+
+    // Check if the product file exists in the local app products folder. If not, retrieve it
+    //TODO: check if file needs update
+    final productsFile = File('${productsFolderPath.path}/products_db_small.csv');
+    if(!productsFile.existsSync()){
+      //TODO: For now, copy the file from assets
+      // Read file contents
+      final productsFileContents = await rootBundle.loadString('assets/products/products_db_small.csv');
+      
+      // Write file to local folder
+      productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+    }
+
+
   }
 }
 /*
