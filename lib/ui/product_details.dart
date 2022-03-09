@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/product_photo.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
@@ -163,15 +165,34 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ],
                     ),
                    ),
-                  Container(
-                    child: ElevatedButton(
-                            onPressed: () => appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                            child: const Text('Guardar'),
-                            style: ElevatedButton.styleFrom(
-                            primary: Colors.green[400],
-                              )
-                            ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(100,0,100,0),
+                    child: Container(
+                              child: ElevatedButton(
+                                  onPressed: () async {
+                                    try{
+                                      WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
+                                      //await _updateProduct(product);//TODO: Ver qué le tengo que pasar
+                                      //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
+                                      _showSnackBar('Producto actualizado con éxito');
+                                    }
+                                    on BusinessException catch (e){
+                                      _showSnackBar(e.message);
+                                    }
+                                    on Exception catch (e){
+                                      _showSnackBar('Ha ocurrido un error inesperado al actualizar el producto: $e');
+                                    }
+                                    finally{
+                                      WorkingIndicatorDialog().dismiss();
+                                    }
+                                    },
+                                  child: const Text('Guardar'),//TODO: Únicamente sirve para guardar fotos, ya que EAN y Descripcion no se pueden modificar
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.green[400],
+                                  )
+                              ),
                       ),
+                  )
                   ],
                 )
               ),
@@ -225,6 +246,12 @@ class _ProductDetailsState extends State<ProductDetails> {
 
     final returnValue = Future.delayed(const Duration(milliseconds: 100), () => productPhotos);
     return returnValue;
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
 

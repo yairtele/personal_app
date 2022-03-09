@@ -512,6 +512,33 @@ class BusinessServices {
     final returns = entries.map((e) => Product.fromJSON(e));
     return returns.toList();
   }
+
+  static Future<List<Product>> getPhotosByProductUUID(String productUuid) async{ //TODO: Terminar para recuperar fotos relacionadas
+    //Obtener diccionario de inferencia de nombres de campo
+    final fieldNameInferenceConfig = _getPhotoFieldNameInferenceConfig();
+    final returnRequestFieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
+
+    // Obtener config provider para Bearer Token
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
+
+    //Definir campos del SELECT
+    final selectFields = [
+      AthentoFieldName.uuid,
+      AthentoFieldName.title
+    ];
+
+    // Construir WHERE expression
+    final whereExpression = "WHERE ecm:parentId = '$productUuid'";
+
+    // Invocar a Athento
+    final entries = await SpAthentoServices.findDocuments(configProvider, _photoDocType, selectFields, whereExpression);
+
+    //Convertir resultado a objetos ReturnRequest y retornar resultado
+    final returns = entries.map((e) => Product.fromJSON(e));
+    return returns.toList();
+  }
+
+
   static Future <void> deleteBatchByUUID (String batchUuid) async{
     final configProvider = await  _createConfigProvider();
     SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);

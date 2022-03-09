@@ -207,7 +207,7 @@ class SpAthentoServices {
     if (!whereExpression.startsWith('WHERE')) {
       final whereStartWord = _getFirstWord(whereExpression);
       throw Exception(
-          'the "whereExpresion" argument must start with "WHERE" instead of "$whereStartWord".');
+          'the "whereExpression" argument must start with "WHERE" instead of "$whereStartWord".');
     }
 
     final renamedFieldValues = configProvider.getSelectFields(selectFields);
