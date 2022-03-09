@@ -118,8 +118,8 @@ class BusinessServices {
 
   static Future<ProductInfo> getProductInfoByEAN(String eanCode) async {
     //TODO: Consultar Athento o servicio de Newsan
-    //return getProductInfoByEANfromArray(eanCode);
-    return getProductInfoByEANfromFile(eanCode);
+    return getProductInfoByEANfromArray(eanCode);
+    //return getProductInfoByEANfromFile(eanCode);
   }
 
   static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
