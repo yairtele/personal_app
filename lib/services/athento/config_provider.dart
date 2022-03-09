@@ -7,7 +7,7 @@ abstract class ConfigProvider {
     AthentoEndpoint.createDocument: 'nuxeo/site/automation/Athento.DocumentCreate/',
     AthentoEndpoint.createDocumentWithContent: 'nuxeo/site/automation/Athento.DocumentCreate/',
     AthentoEndpoint.deleteDocument: 'nuxeo/site/automation/Athento.DocumentDelete/',
-    AthentoEndpoint.getContentAsBytes: '',
+    AthentoEndpoint.getContentAsBytes: 'nuxeo/api/v1/id/{file_uuid}/@blob/file:content',
     AthentoEndpoint.getDocument: 'nuxeo/site/automation/Athento.DocumentResultSet/',
     AthentoEndpoint.updateDocument: 'nuxeo/site/automation/Athento.DocumentUpdate/',
     AthentoEndpoint.updateDocumentContent: 'Blob.Attach/',

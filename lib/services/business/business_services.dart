@@ -18,6 +18,7 @@ import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/utils/sp_file_utils.dart';
 import '../newsan_services.dart';
 import 'new_return.dart';
+import 'package:path_provider/path_provider.dart';
 
 class BusinessServices {
   static const String _batchDocType = 'lote_lif';
@@ -118,6 +119,7 @@ class BusinessServices {
   static Future<ProductInfo> getProductInfoByEAN(String eanCode) async {
     //TODO: Consultar Athento o servicio de Newsan
     return getProductInfoByEANfromArray(eanCode);
+    //return getProductInfoByEANfromFile(eanCode);
   }
 
   static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
@@ -151,28 +153,75 @@ class BusinessServices {
 
     });
   }
-/*
+
   static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
     //TODO: Consultar Athento
-    final productFile = File('assets/products/products_db_small.csv');
-
-    final productRndFile = productFile.openSync(mode: FileMode.read);
-
-    const chunkSize = 32 * 1024;
-
-    final size = productRndFile.lengthSync();
-
-    final readBytesBuffer = List<int>.empty(growable: true);
-
-    while
-
-    final readString = utf8.decoder.convert(productRndFile.readSync(chunkSize));
+    //const chunkSize = 32 * 1024;
 
 
+    final producMasterInfo = await getRowAsObjectFromFile(
+        fileName: 'products_db_small.csv' ,
+        chunkSize: 256, // 32 * 1024;
+        lineSeparator: '\r\n',
+        columnSeparator: '\r\n',
+        keyColumnIndex: 0,
+        searchKey: eanCode,
+        objectBuilder: createProductMasterInfo);
+
+    return getProductInfoByEANfromArray(eanCode);
 
 
   }
-*/
+
+  static Future<ProductMasterInfo> getRowAsObjectFromFile({@required String fileName, @required int chunkSize,
+        @required String lineSeparator, @required String columnSeparator, @required int keyColumnIndex,
+        @required String searchKey, @required ProductMasterInfo objectBuilder(List<String> row)}) async {
+
+    final localFolderPath = (await getApplicationDocumentsDirectory()).path;
+    final productsFolderPath = Directory('$localFolderPath/products');
+
+    final productsFile = File('${productsFolderPath.path}/$fileName');
+
+    final productsRndFile = productsFile.openSync(mode: FileMode.read);
+
+    var accumulatedReads = '';
+    const start = 0;
+
+    int bytesRead;
+    do {
+      final readBuffer = List<int>.filled(chunkSize, null);
+      bytesRead = productsRndFile.readIntoSync(readBuffer, start);
+      accumulatedReads += utf8.decoder.convert(readBuffer, 0, bytesRead);
+
+      final newLines = accumulatedReads.split(lineSeparator);
+
+      if(newLines.length > 1 || bytesRead < chunkSize){
+        // Buscar producto por EAN en cada línea
+        for(var i=0; i<newLines.length; i++){
+          final row = newLines[0].split(columnSeparator);
+          if(row[keyColumnIndex] == searchKey){
+            return objectBuilder(row);
+          }
+        }
+      }
+
+      //start += chunkSize;
+    } while (bytesRead == chunkSize);
+
+    return null;
+  }
+
+  static ProductMasterInfo createProductMasterInfo(List<String> row){
+    return ProductMasterInfo(
+      ean: row[0],
+      commercialCode: row[2],
+      description: row[3],
+      brand: row[6],
+      businessUnit: row[8],
+      legalEntity: row[5]
+    );
+  }
+
   static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) async {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
@@ -563,7 +612,33 @@ class BusinessServices {
     final title = '${batch.retailReference}-${batch.description}-${batch.batchNumber}';
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
   }
-
+  static Future <void> deleteReqReturnByUUID (String ReqReturnUuid) async{
+    final configProvider = await  _createConfigProvider();
+    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: ReqReturnUuid);
+  }
+  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities) async{
+    final configProvider = await  _createConfigProvider();
+    Map<String, dynamic> fieldValues = {
+      '${ReturnRequestAthentoFieldName.EAN}': '${returnEAN}',
+      '${ReturnRequestAthentoFieldName.retailReference}': '${returnreference}',
+      '${ReturnRequestAthentoFieldName.description}': '${returndescr}',
+      '${ReturnRequestAthentoFieldName.quantity}': '${returnunities}',
+    };
+    //TODO:Armado con orden correcto del titulo para la solicitud.
+    final title = '${returnreference}-${returndescr}-${req_return.batchNumber}';
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid, title: title, fieldValues: fieldValues);
+  }
 }
 
+class ProductMasterInfo{
+  String ean;
+  String commercialCode;
+  String description;
+  String brand;
+  String businessUnit;
+  String legalEntity; //Persona jurídica
 
+  ProductMasterInfo({ @required this.ean, @required this.commercialCode,
+              @required this.description, @required this.brand,
+    @required this.businessUnit, @required this.legalEntity});
+}

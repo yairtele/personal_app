@@ -57,4 +57,5 @@ flutter:
 
   assets:
    - assets/images/
+   - assets/products/products_db_small.csv
 #   - assets/cfg/

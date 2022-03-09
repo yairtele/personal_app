@@ -6,6 +6,7 @@ import 'package:navigation_app/services/athento/basic_auth_config_provider.dart'
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 import 'package:navigation_app/services/sp_ws/multipart_message_builder.dart';
 import 'package:navigation_app/services/sp_ws/sp_ws.dart';
+import 'binary_file_info.dart';
 import 'config_provider.dart';
 
 class SpAthentoServices {
@@ -308,6 +309,30 @@ class SpAthentoServices {
     //console.log(JSON.stringify(jsonRequestBody));
 
 
+  }
+
+
+  Future<BinaryFileInfo> getContentAsBytes ({ @required ConfigProvider configProvider, @required String documentUUID}) async {
+
+    final headers = configProvider.getHttpHeaders();
+
+    //Invocar a Athento para obtener el archivo
+    final url = configProvider.getEndpointUrl('getContentAsBytes').replaceFirst('{file_uuid}', documentUUID);
+
+
+    final response = await SpWS.get(url,parameters: {}, headers: headers);
+
+    //Obtener el content type del archivo guardado en Athento.
+    final contentType = response.headers['Content-Type'];
+
+    //Obtener la extensión de archivo
+    final fileExtension = SpWS.getExtensionFromMimeType(contentType);
+
+    return BinaryFileInfo(
+      contentType: contentType,
+      fileExtension: fileExtension,
+      bytes: response.bodyBytes
+    );
   }
 
 
