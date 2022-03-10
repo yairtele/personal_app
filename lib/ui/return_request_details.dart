@@ -215,15 +215,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         children: [ ElevatedButton(
                             onPressed: () async {
                               try{
-                                WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
+                                WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
                                 await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text);
-                                _showSnackBar('Lote actualizado con éxito');
+                                _showSnackBar('Solicitud actualizada con éxito');
                               }
                               on BusinessException catch (e){
                                 _showSnackBar(e.message);
                               }
                               on Exception catch (e){
-                                _showSnackBar('Ha ocurrido un error inesperado al actualizar el lote: $e');
+                                _showSnackBar('Ha ocurrido un error inesperado al actualizar la solicitud: $e');
                               }
                               finally{
                                 WorkingIndicatorDialog().dismiss();
@@ -238,7 +238,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               onPressed: () async {
                                 try {
                                   WorkingIndicatorDialog().show(
-                                      context, text: 'Eliminando lote...');
+                                      context, text: 'Eliminando Solicitud...');
                                   await _deleteReqReturn(returnRequest);
                                   _showSnackBar(
                                       'Solicitud eliminada con éxito');
