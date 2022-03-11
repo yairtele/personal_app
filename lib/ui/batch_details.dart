@@ -214,7 +214,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         children: [ ElevatedButton(
                             onPressed: () async {
                               try{
-                                WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
+                                WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
                                 await _updateBatch(batch,_reference.text,_description.text,_observation.text);
                                 _showSnackBar('Lote actualizado con éxito');
                               }

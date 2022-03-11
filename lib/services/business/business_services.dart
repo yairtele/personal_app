@@ -642,7 +642,22 @@ class BusinessServices {
     final title = '${batch.retailReference}-${batch.description}-${batch.batchNumber}';
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
   }
-
+  static Future <void> deleteReqReturnByUUID (String ReqReturnUuid) async{
+    final configProvider = await  _createConfigProvider();
+    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: ReqReturnUuid);
+  }
+  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities) async{
+    final configProvider = await  _createConfigProvider();
+    Map<String, dynamic> fieldValues = {
+      '${ReturnRequestAthentoFieldName.EAN}': '${returnEAN}',
+      '${ReturnRequestAthentoFieldName.retailReference}': '${returnreference}',
+      '${ReturnRequestAthentoFieldName.description}': '${returndescr}',
+      '${ReturnRequestAthentoFieldName.quantity}': '${returnunities}',
+    };
+    //TODO:Armado con orden correcto del titulo para la solicitud.
+    final title = '${returnreference}-${returndescr}-${req_return.batchNumber}';
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid, title: title, fieldValues: fieldValues);
+  }
 }
 
 class ProductMasterInfo{
