@@ -40,6 +40,8 @@ import '../app_state.dart';
 import '../router/ui_pages.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:dio/dio.dart';
+
 //import 'package:keycloak_flutter/keycloak_flutter.dart';
 
 class Login extends StatefulWidget {
@@ -175,6 +177,7 @@ class _LoginState extends State<Login> {
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
     final productsFolderPath = Directory('$localFolderPath/products');
 
+    const  filesFolderURL = 'https://socialpath.com.ar/bandeja/newsan';
     // Check if the product files folder exists in the local app folder. If not, create it
     if(!productsFolderPath.existsSync()){
       await productsFolderPath.create();
@@ -182,17 +185,48 @@ class _LoginState extends State<Login> {
 
     // Check if the product file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
-    final productsFile = File('${productsFolderPath.path}/products_db_small.csv');
+    const productsFileName = 'products_db.csv';
+    final productsFile = File('${productsFolderPath.path}/$productsFileName');
     if(!productsFile.existsSync()){
       //TODO: For now, copy the file from assets
       // Read file contents
-      final productsFileContents = await rootBundle.loadString('assets/products/products_db_small.csv');
+      //final productsFileContents = await rootBundle.loadString('assets/products/$productsFileName');
       
       // Write file to local folder
-      productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+      const productsFileURL = '$filesFolderURL/$productsFileName';
+
+      final response = await Dio().download(productsFileURL, productsFile.path,
+          onReceiveProgress: (value1, value2) {
+          //  setState(() {
+                final progress = value1 / value2;
+          //  });
+          }
+      );
+      //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
     }
 
+    // Check if the sales file exists in the local app products folder. If not, retrieve it
+    //TODO: check if file needs update
 
+    const salesFileName = 'sales_db.csv';
+    final salesFile = File('${productsFolderPath.path}/$salesFileName');
+    if(!salesFile.existsSync()){
+      //TODO: For now, copy the file from assets
+      // Read file contents
+      //final salesFileContents = await rootBundle.loadString('assets/products/$salesFileName');
+
+      // Write file to local folder
+      const salesFileURL = '$filesFolderURL/$salesFileName';
+
+      final response = await Dio().download(salesFileURL, salesFile.path,
+        onReceiveProgress: (value1, value2) {
+        //  setState(() {
+              final progress = value1 / value2;
+        //  });
+        }
+      );
+      //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+    }
   }
 }
 /*

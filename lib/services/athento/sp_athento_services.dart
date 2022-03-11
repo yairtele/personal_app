@@ -320,7 +320,7 @@ class SpAthentoServices {
     final url = configProvider.getEndpointUrl('getContentAsBytes').replaceFirst('{file_uuid}', documentUUID);
 
 
-    final response = await SpWS.get(url,parameters: {}, headers: headers);
+    final response = await SpWS.get(url, parameters: {}, headers: headers);
 
     //Obtener el content type del archivo guardado en Athento.
     final contentType = response.headers['Content-Type'];
