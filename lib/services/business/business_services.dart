@@ -58,7 +58,7 @@ class BusinessServices {
     );
   }
 
-  static Future<List<Batch>> getBatches() async {
+  static Future<List<Batch>> getRetailActiveBatches() async {
     final fieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
     final configProvider =
         await  _createConfigProvider(fieldNameInferenceConfig);
@@ -73,7 +73,7 @@ class BusinessServices {
       BatchAthentoFieldName.observation,
     ];
 
-    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
+    var whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
 
     final entries = await SpAthentoServices.findDocuments(
         configProvider, _batchDocType, selectFields, whereExpression);
