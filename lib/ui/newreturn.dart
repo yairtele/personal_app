@@ -465,7 +465,12 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       if(returnRequestsWithSameEAN.length > 1){
         throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
       }
-      existingReturnRequest = returnRequestsWithSameEAN.first;
+      else if(returnRequestsWithSameEAN.length == 1) {
+        existingReturnRequest = returnRequestsWithSameEAN.first;
+      }
+      else {
+        existingReturnRequest = null; // Ya estaba en null, pero para que quede claro
+      }
     }
     else {
       // Por ahora no importa si existe otra solicitud con el mismo EAN. Luego podemos mostrar un cartelito sugiriendo que actualice
