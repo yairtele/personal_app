@@ -6,15 +6,19 @@ class ProductInfo {
   String EAN;
   String commercialCode;
   String description;
-  UnmodifiableListView<String> _photos;
+  String retailAccount;
   DateTime lastSell;
+  double lastSellPrice;
+  UnmodifiableListView<String> _photos;
   bool _isAuditable;
 
   ProductInfo({
     @required this.EAN,
     @required this.commercialCode,
     @required this.description,
+    @required this.retailAccount,
     @required this.lastSell,
+    @required this.lastSellPrice,
     @required List<String> photos}){
     _photos = UnmodifiableListView(photos);
     _isAuditable = (photos != null && photos.length > 0);

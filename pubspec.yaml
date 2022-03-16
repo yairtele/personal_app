@@ -42,6 +42,7 @@ dependencies:
   universal_html: ^2.0.8
   font_awesome_flutter: ^9.2.0
   uuid: ^3.0.6
+  dio: ^4.0.4
 
 #  keycloak_flutter: ^0.0.3
   thumbnailer: ^2.0.1
@@ -57,5 +58,4 @@ flutter:
 
   assets:
    - assets/images/
-   - assets/products/products_db_small.csv
 #   - assets/cfg/

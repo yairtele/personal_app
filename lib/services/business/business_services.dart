@@ -61,7 +61,7 @@ class BusinessServices {
     );
   }
 
-  static Future<List<Batch>> getBatches() async {
+  static Future<List<Batch>> getRetailActiveBatches() async {
     final fieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
     final configProvider =
         await  _createConfigProvider(fieldNameInferenceConfig);
@@ -76,7 +76,7 @@ class BusinessServices {
       BatchAthentoFieldName.observation,
     ];
 
-    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
+    var whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
 
     final entries = await SpAthentoServices.findDocuments(
         configProvider, _batchDocType, selectFields, whereExpression);
@@ -121,8 +121,8 @@ class BusinessServices {
 
   static Future<ProductInfo> getProductInfoByEAN(String eanCode) async {
     //TODO: Consultar Athento o servicio de Newsan
-    return getProductInfoByEANfromArray(eanCode);
-    //return getProductInfoByEANfromFile(eanCode);
+    //return getProductInfoByEANfromArray(eanCode);
+    return getProductInfoByEANfromFile(eanCode);
   }
 
   static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
@@ -133,14 +133,18 @@ class BusinessServices {
           EAN: '1234567891012',
           commercialCode: 'TV-LG-80I',
           description: 'Televisor LG 80"',
+          retailAccount: '012345',
           lastSell: DateTime(2022, 1, 1),
+          lastSellPrice: 123455.56,
           photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
         ),
         '4321': ProductInfo(
           EAN: '25698742224',
           commercialCode: 'AC-BGH-3000',
           description: 'Aire Acondicionado BGH 3000',
+          retailAccount: '012345',
           lastSell: DateTime(2022, 1, 1),
+          lastSellPrice: 12345.56,
           photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
         ),
 
@@ -158,74 +162,17 @@ class BusinessServices {
   }
 
   static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
-    //TODO: Consultar Athento
-    //const chunkSize = 32 * 1024;
+    const EAN_INDEX = 0;
+    return getProductInfoByEANorCodefromFile(EAN_INDEX, eanCode);
 
-
-    final producMasterInfo = await getRowAsObjectFromFile(
-        fileName: 'products_db_small.csv' ,
-        chunkSize: 256, // 32 * 1024;
-        lineSeparator: '\r\n',
-        columnSeparator: '\r\n',
-        keyColumnIndex: 0,
-        searchKey: eanCode,
-        objectBuilder: createProductMasterInfo);
-
-    return getProductInfoByEANfromArray(eanCode);
-
-
-  }
-
-  static Future<ProductMasterInfo> getRowAsObjectFromFile({@required String fileName, @required int chunkSize,
-        @required String lineSeparator, @required String columnSeparator, @required int keyColumnIndex,
-        @required String searchKey, @required ProductMasterInfo objectBuilder(List<String> row)}) async {
-
-    final localFolderPath = (await getApplicationDocumentsDirectory()).path;
-    final productsFolderPath = Directory('$localFolderPath/products');
-
-    final productsFile = File('${productsFolderPath.path}/$fileName');
-
-    final productsRndFile = productsFile.openSync(mode: FileMode.read);
-
-    var accumulatedReads = '';
-    const start = 0;
-
-    int bytesRead;
-    do {
-      final readBuffer = List<int>.filled(chunkSize, null);
-      bytesRead = productsRndFile.readIntoSync(readBuffer, start);
-      accumulatedReads += utf8.decoder.convert(readBuffer, 0, bytesRead);
-
-      final newLines = accumulatedReads.split(lineSeparator);
-
-      if(newLines.length > 1 || bytesRead < chunkSize){
-        // Buscar producto por EAN en cada línea
-        for(var i=0; i<newLines.length; i++){
-          final row = newLines[0].split(columnSeparator);
-          if(row[keyColumnIndex] == searchKey){
-            return objectBuilder(row);
-          }
-        }
-      }
-
-      //start += chunkSize;
-    } while (bytesRead == chunkSize);
-
-    return null;
-  }
-
-  static ProductMasterInfo createProductMasterInfo(List<String> row){
-    return ProductMasterInfo(
-      ean: row[0],
-      commercialCode: row[2],
-      description: row[3],
-      brand: row[6],
-      businessUnit: row[8],
-      legalEntity: row[5]
-    );
   }
 
   static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) async {
+    //TODO: Consultar Athento
+    //return getProductInfoByCommercialCodeFromArray(commercialCode);
+    return getProductInfoByCommercialCodefromFile(commercialCode);
+  }
+  static Future<ProductInfo> getProductInfoByCommercialCodeFromArray(String commercialCode) async {
     //TODO: Consultar Athento
     return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
       var products= <String, ProductInfo>{
@@ -233,6 +180,8 @@ class BusinessServices {
           EAN: '987654321012',
           commercialCode: 'PLANCHA',
           description: 'Plancha 1200 W"',
+          retailAccount: '012345',
+          lastSellPrice: 2345.56,
           lastSell: DateTime(2018, 1, 1),
           photos: [],
         ),
@@ -240,6 +189,8 @@ class BusinessServices {
           EAN: '69415464654',
           commercialCode: 'AFEITADORA',
           description: 'Afeitadora Braun Shower',
+          retailAccount: '012345',
+          lastSellPrice: 1345.56,
           lastSell: DateTime(2018, 1, 1),
           photos: [],
         )
@@ -256,6 +207,111 @@ class BusinessServices {
       return product;
     });
   }
+
+  static Future<ProductInfo> getProductInfoByCommercialCodefromFile(String eanCode) async {
+    const COMMERCIAL_CODE_INDEX = 1;
+    return getProductInfoByEANorCodefromFile(COMMERCIAL_CODE_INDEX, eanCode);
+
+  }
+
+  static Future<ProductInfo> getProductInfoByEANorCodefromFile(int productFileSearchColumnIndex, String productFileSearchKey) async {
+    //TODO: Consultar Athento
+    const chunkSize = 32 * 1024;
+
+
+    final producMasterInfo = await getRowAsObjectFromFile(
+        fileName: 'products_db.csv' ,
+        chunkSize: chunkSize,
+        lineSeparator: '\r\n',
+        columnSeparator: '\t',
+        equals: (List<String> row) => row[productFileSearchColumnIndex] == productFileSearchKey,
+        objectBuilder: createProductMasterInfo);
+
+    if(producMasterInfo == null){
+      throw BusinessException('No se ha podido encontrar un producto con el código "$productFileSearchKey" en el maestro de productos.');
+    }
+
+    const SKU_INDEX = 5;
+    const CUIT_INDEX = 10;
+    final retailCUIT = (await Cache.getUserInfo()).idNumber;
+    final producSalesInfo = await getRowAsObjectFromFile(
+        fileName: 'sales_db.csv' ,
+        chunkSize: chunkSize,
+        lineSeparator: '\r\n',
+        columnSeparator: '\t',
+        equals: (List<String> row) => row[SKU_INDEX] == producMasterInfo.sku && row[CUIT_INDEX] == retailCUIT,
+        objectBuilder: createProductSalesInfo);
+
+    //if(producSalesInfo == null){
+    //  throw BusinessException('No se ha podido encontrar un producto con el SKU "${producMasterInfo.sku}" en la base de ventas.');
+    //}
+
+    return ProductInfo(
+        EAN: producMasterInfo.ean,
+        commercialCode: producMasterInfo.commercialCode,
+        description: producMasterInfo.description,
+        retailAccount: producSalesInfo?.retailAccount,
+        lastSell: producSalesInfo?.lastSellDate,
+        lastSellPrice: producSalesInfo?.price,
+        photos: ['frente', 'dorso', 'accesorios', 'embalaje']);
+
+    //return getProductInfoByEANfromArray(eanCode);
+
+
+  }
+
+  static Future<TRowObject> getRowAsObjectFromFile<TRowObject>({@required String fileName, @required int chunkSize,
+        @required String lineSeparator, @required String columnSeparator, @required bool Function(List<String> row)  equals,
+        @required TRowObject objectBuilder(List<String> row)}) async {
+
+    final localFolderPath = (await getApplicationDocumentsDirectory()).path;
+    final productsFolderPath = Directory('$localFolderPath/products');
+
+    final productsFile = File('${productsFolderPath.path}/$fileName');
+
+    final productsRndFile = productsFile.openSync(mode: FileMode.read);
+
+    var accumulatedReads = '';
+    const start = 0;
+
+    int bytesRead;
+    final utf8Decoder = Utf8Decoder(allowMalformed: true);
+    do {
+      final readBuffer = List<int>.filled(chunkSize, null);
+
+      bytesRead = productsRndFile.readIntoSync(readBuffer, start);
+      //accumulatedReads += utf8.decoder.convert(readBuffer, 0, bytesRead);
+      accumulatedReads += utf8Decoder.convert(readBuffer, 0, bytesRead);
+      //TODO: unir fragmento de línea final con línea siguiente
+      final newLines = accumulatedReads.split(lineSeparator);
+
+      if(newLines.length > 1 || bytesRead < chunkSize){
+        final linesToProcess = (bytesRead < chunkSize ? newLines.length : newLines.length - 1);
+        // Buscar producto por EAN en cada línea
+        for(var i=0; i< linesToProcess; i++){
+          final row = newLines[i].split(columnSeparator);
+          if(equals(row)){
+            return objectBuilder(row);
+          }
+        }
+        accumulatedReads = newLines.last;
+      }
+
+      //start += chunkSize;
+    } while (bytesRead == chunkSize);
+
+    return null;
+  }
+
+  static ProductMasterInfo createProductMasterInfo(List<String> row){
+    return ProductMasterInfo.fromCsvRow(row);
+  }
+
+  static ProductSalesInfo createProductSalesInfo(List<String> row){
+    return ProductSalesInfo.fromCsvRow(row);
+
+  }
+
 
   static Future<void> registerNewProductReturn({@required Batch  batch, @required ReturnRequest existingReturnRequest, @required NewReturn newReturn}) async {
 
@@ -648,12 +704,49 @@ class BusinessServices {
 class ProductMasterInfo{
   String ean;
   String commercialCode;
+  String sku;
   String description;
   String brand;
   String businessUnit;
   String legalEntity; //Persona jurídica
 
   ProductMasterInfo({ @required this.ean, @required this.commercialCode,
-              @required this.description, @required this.brand,
+    @required this.sku,@required this.description, @required this.brand,
     @required this.businessUnit, @required this.legalEntity});
+
+  ProductMasterInfo.fromCsvRow(List<String> row) : this(
+    ean: row[0],
+    commercialCode: row[1],
+    sku: row[2],
+    description: row[3],
+    brand: row[6],
+    businessUnit: row[8],
+    legalEntity: row[5]
+  );
+}
+
+class ProductSalesInfo{
+  String sku;
+  DateTime lastSellDate;
+  double price;
+  String retailAccount;
+
+  ProductSalesInfo({ @required this.sku, @required this.lastSellDate, @required this.price, @required this.retailAccount});
+
+  ProductSalesInfo.fromCsvRow(List<String> row) : this(
+      sku: row[5],
+      lastSellDate: _parseDate(row[0]),
+      price: double.parse(row[14].replaceFirst(',', '.')) ,
+      retailAccount: row[8],
+  );
+
+  static DateTime _parseDate(String dateString){
+    final rx = RegExp(r'(\d+)/(\d+)\/(\d+)');
+    final match = rx.firstMatch(dateString);
+    if(match != null) { //Formato dd/mm/yyyy
+      dateString = '${match.group(3)}-${match.group(2)}-${match.group(1)}';
+    }
+
+    return DateTime.parse(dateString);
+  }
 }

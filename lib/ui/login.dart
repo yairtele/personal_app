@@ -33,6 +33,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:navigation_app/services/user_services.dart';
+import 'package:navigation_app/ui/screen_data.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -40,6 +41,8 @@ import '../app_state.dart';
 import '../router/ui_pages.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:dio/dio.dart';
+
 //import 'package:keycloak_flutter/keycloak_flutter.dart';
 
 class Login extends StatefulWidget {
@@ -51,150 +54,240 @@ class _LoginState extends State<Login> {
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  Future<bool> _localData;
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
-    updateLocalFiles();
+    _localData = updateLocalFiles();
+    //updateLocalFiles();
   }
 
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    passwordTextController.text =  appState.password;
+    passwordTextController.text = appState.password;
     emailTextController.text = appState.emailAddress;
 
     emailTextController.text = 'adrian.scotto.newsan';
-    passwordTextController.text =  r'N$ju7ilo9#4791AS';
-
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.grey,
-        title: Image.asset('assets/images/logo_blanco.png',height:120 ,width:160,),
-      ),
-      body: SafeArea(
-        child:  LayoutBuilder(builder: (context, constraints){
-          return Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [ // Children
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                                decoration: const InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    hintText: 'Email'),
-                                onChanged: (email) => appState.emailAddress = email,
-                                controller: emailTextController),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                                enableSuggestions: false,
-                                autocorrect: false,
-                                obscureText: true,
-                                decoration: const InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    hintText: 'Password'),
-                                onChanged: (password) => appState.password = password,
-                                controller: passwordTextController),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Expanded(
-                          child: ElevatedButton(
-                            child: const Text('Login', style: TextStyle(color: Colors.black),),
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.grey,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              side: const BorderSide(color: Colors.black),
-                            ),
-                            onPressed: () async {
-                              try{
-                                appState.emailAddress = emailTextController.text;
-                                appState.password = passwordTextController.text;
-                                await appState.login();
-                              }
-                              on InvalidLoginException catch(e){
-                                _showSnackBar(e.message);
-
-                              }
-                              on Exception {
-                                _showSnackBar('Ha ocurrido un error inesperado autenticando al usuario.');
-                              }
-                            },
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+    passwordTextController.text = r'N$ju7ilo9#4791AS';
+    return FutureBuilder<bool>(
+        future: _localData,
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          Widget widget;
+          if (snapshot.hasData) {
+            widget = Scaffold(
+              appBar: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.grey,
+                title: Image.asset(
+                  'assets/images/logo_blanco.png', height: 120, width: 160,),
               ),
-            )
-          );
-        })
-      ),
+              body: SafeArea(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return Center(
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [ // Children
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                            decoration: const InputDecoration(
+                                                border: UnderlineInputBorder(),
+                                                hintText: 'Email'),
+                                            onChanged: (email) =>
+                                            appState.emailAddress = email,
+                                            controller: emailTextController),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                            enableSuggestions: false,
+                                            autocorrect: false,
+                                            obscureText: true,
+                                            decoration: const InputDecoration(
+                                                border: UnderlineInputBorder(),
+                                                hintText: 'Password'),
+                                            onChanged: (password) =>
+                                            appState.password = password,
+                                            controller: passwordTextController),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceEvenly,
+                                  children: [
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        child: const Text('Login',
+                                          style: TextStyle(
+                                              color: Colors.black),),
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.grey,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                4.0),
+                                          ),
+                                          side: const BorderSide(
+                                              color: Colors.black),
+                                        ),
+                                        onPressed: () async {
+                                          try {
+                                            appState.emailAddress =
+                                                emailTextController.text;
+                                            appState.password =
+                                                passwordTextController.text;
+                                            await appState.login();
+                                          }
+                                          on InvalidLoginException catch (e) {
+                                            _showSnackBar(e.message);
+                                          }
+                                          on Exception {
+                                            _showSnackBar(
+                                                'Ha ocurrido un error inesperado autenticando al usuario.');
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                    );
+                  })
+              ),
+            );
+          } else if (snapshot.hasError) {
+            widget = Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Text('Error: ${snapshot.error}'),
+                  )
+                ],
+              ),
+            );
+          } else {
+            widget = Center(
+                child: Stack(
+                    children: <Widget>[
+                      const Opacity(
+                        opacity: 1,
+                        child: CircularProgressIndicator(
+                            backgroundColor: Colors.grey),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text('Cargando...', style: TextStyle(
+                            color: Colors.grey, height: 4, fontSize: 9)),
+                      )
+                    ]
+                )
+            );
+          }
+          return widget;
+        }
+
     );
   }
 
-  void _showSnackBar(String message){
+  void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Usuario o clave inválida' )),
+      SnackBar(content: Text(message)),
     );
   }
 
-  Future<void> updateLocalFiles() async {
+  Future<bool> updateLocalFiles() async {
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
     final productsFolderPath = Directory('$localFolderPath/products');
 
+    const filesFolderURL = 'https://socialpath.com.ar/bandeja/newsan';
     // Check if the product files folder exists in the local app folder. If not, create it
-    if(!productsFolderPath.existsSync()){
+    if (!productsFolderPath.existsSync()) {
       await productsFolderPath.create();
     }
 
     // Check if the product file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
-    final productsFile = File('${productsFolderPath.path}/products_db_small.csv');
-    if(!productsFile.existsSync()){
+    const productsFileName = 'products_db.csv';
+    final productsFile = File('${productsFolderPath.path}/$productsFileName');
+    if (!productsFile.existsSync()) {
       //TODO: For now, copy the file from assets
       // Read file contents
-      final productsFileContents = await rootBundle.loadString('assets/products/products_db_small.csv');
-      
+      //final productsFileContents = await rootBundle.loadString('assets/products/$productsFileName');
+
       // Write file to local folder
-      productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+      const productsFileURL = '$filesFolderURL/$productsFileName';
+
+      final response = await Dio().download(productsFileURL, productsFile.path,
+          onReceiveProgress: (value1, value2) {
+            //  setState(() {
+            final progress = value1 / value2;
+            //  });
+          }
+      );
+      //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
     }
 
+    // Check if the sales file exists in the local app products folder. If not, retrieve it
+    //TODO: check if file needs update
 
+    const salesFileName = 'sales_db.csv';
+    final salesFile = File('${productsFolderPath.path}/$salesFileName');
+    if (!salesFile.existsSync()) {
+      //TODO: For now, copy the file from assets
+      // Read file contents
+      //final salesFileContents = await rootBundle.loadString('assets/products/$salesFileName');
+
+      // Write file to local folder
+      const salesFileURL = '$filesFolderURL/$salesFileName';
+
+      final response = await Dio().download(salesFileURL, salesFile.path,
+          onReceiveProgress: (value1, value2) {
+            //  setState(() {
+            final progress = value1 / value2;
+            //  });
+          }
+      );
+      //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+    }
+
+    return true;
   }
 }
+
 /*
 Future authenticate() async {
 
