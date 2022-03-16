@@ -312,13 +312,12 @@ class SpAthentoServices {
   }
 
 
-  Future<BinaryFileInfo> getContentAsBytes ({ @required ConfigProvider configProvider, @required String documentUUID}) async {
+  static Future<BinaryFileInfo> getContentAsBytes ({ @required ConfigProvider configProvider, @required String documentUUID}) async {
 
     final headers = configProvider.getHttpHeaders();
 
     //Invocar a Athento para obtener el archivo
     final url = configProvider.getEndpointUrl('getContentAsBytes').replaceFirst('{file_uuid}', documentUUID);
-
 
     final response = await SpWS.get(url,parameters: {}, headers: headers);
 
