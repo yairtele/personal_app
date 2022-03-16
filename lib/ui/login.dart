@@ -54,12 +54,12 @@ class _LoginState extends State<Login> {
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  Future<ScreenData<void,void>> _localData;
+  Future<bool> _localData;
 
   @override
   void initState() {
     super.initState();
-    _localData = ScreenData<void,void>(dataGetter: updateLocalFiles).getScreenData();
+    _localData = updateLocalFiles();
     //updateLocalFiles();
   }
 
@@ -72,13 +72,12 @@ class _LoginState extends State<Login> {
 
     emailTextController.text = 'adrian.scotto.newsan';
     passwordTextController.text = r'N$ju7ilo9#4791AS';
-    return FutureBuilder<ScreenData<void,void>>(
+    return FutureBuilder<bool>(
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           Widget widget;
-
           if (snapshot.hasData) {
-            Scaffold(
+            widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.grey,
@@ -230,7 +229,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future<void> updateLocalFiles(something) async {
+  Future<bool> updateLocalFiles() async {
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
     final productsFolderPath = Directory('$localFolderPath/products');
 
@@ -280,11 +279,12 @@ class _LoginState extends State<Login> {
             //  setState(() {
             final progress = value1 / value2;
             //  });
-            return progress;
           }
       );
       //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
     }
+
+    return true;
   }
 }
 
