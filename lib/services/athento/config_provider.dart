@@ -20,16 +20,16 @@ abstract class ConfigProvider {
 
   String get serviceBaseUrl => _serviceBaseUrl;
 
-  Map<String, String> _fieldNameInferenceConfig;
+  Map<String, String>? _fieldNameInferenceConfig;
 
-  Map<String, String> get fieldNameInferenceConfig {
+  Map<String, String>? get fieldNameInferenceConfig {
     return _fieldNameInferenceConfig;
   }
 
 
-  ConfigProvider(String serviceBaseUrl, [Map<String, String> fieldNameInferenceConfig]) {
+  ConfigProvider(String serviceBaseUrl, [Map<String, String>? fieldNameInferenceConfig]) {
     _serviceBaseUrl = serviceBaseUrl + (serviceBaseUrl.endsWith('/') ? '' : '/');
-    _fieldNameInferenceConfig = fieldNameInferenceConfig;
+    _fieldNameInferenceConfig = fieldNameInferenceConfig ;
   }
 
   Map<String, dynamic> parseResponse(String responseBody) {
@@ -37,14 +37,17 @@ abstract class ConfigProvider {
   }
 
 
-  String getEndpointUrl(key) {
-    return _serviceBaseUrl +  _defaultEndpointConfig[key];
+  String getEndpointUrl(String key) {
+    if(_defaultEndpointConfig[key] == null){
+      throw Exception('No endpoint URL was found for key "$key"');
+    }
+    return _serviceBaseUrl +  _defaultEndpointConfig[key]!;
   }
 
 
   String getAuthorizationHeader();
 
-  Map<String, String> getHttpHeaders([Map<String, String> addOrOverrideHeaders]) {
+  Map<String, String> getHttpHeaders([Map<String, String>? addOrOverrideHeaders]) {
     final basicHeaders = {
       'Accept': 'application/json+nxentity, */*',
       'Accept-Encoding': 'gzip, deflate',
@@ -66,7 +69,7 @@ abstract class ConfigProvider {
   }
 
   Map<String, dynamic> getFieldValues(
-      [String title, Map<String, dynamic>fieldValues]) {
+      [String? title, Map<String, dynamic>? fieldValues]) {
     //console.log("BasicAuthConfigProvider.getFieldValues - entry")
 
     //console.log("inside renameFieldNames()");
@@ -86,14 +89,14 @@ abstract class ConfigProvider {
     if (fieldNameInferenceConfig != null) {
       final fieldMap = Map<String, Map<String, dynamic>>();
       //Search fieldNameInferenceConfig's placeholders in fieldValues and add matches with the corresponding field prefix in fieldMap.
-      for (final prefixEntry in fieldNameInferenceConfig.keys) {
+      for (final prefixEntry in fieldNameInferenceConfig!.keys) {
         //print("Recorrer fieldNameInferenceConfig");
         if (prefixEntry != 'defaultPrefix') {
           for (final fieldName in fieldValues.keys) {
             if (fieldName.indexOf(prefixEntry, 0) == 0) {
               final renamedFieldValuePair = Map<String, dynamic>();
               final renamedFieldName = fieldName.replaceFirst(
-                  prefixEntry, fieldNameInferenceConfig[prefixEntry]);
+                  prefixEntry, fieldNameInferenceConfig![prefixEntry]!);
               renamedFieldValuePair[renamedFieldName] = fieldValues[fieldName];
               //console.log("fieldName: " + fieldName);
               //console.log("renamedFieldValuePair: " + JSON.stringify(renamedFieldValuePair));
@@ -104,8 +107,7 @@ abstract class ConfigProvider {
       }
 
       //Iterate through fieldValues, and for fields not previously renamed (i.e, not found in fieldMap), add them with the default field prefix (fieldNameInferenceConfig.defaultPrefix) in fieldMap
-      final defaultPrefix = !fieldNameInferenceConfig.containsKey(
-          'defaultPrefix') ? '' : fieldNameInferenceConfig['defaultPrefix'];
+      final defaultPrefix = fieldNameInferenceConfig!['defaultPrefix'] ?? '';
 
       //console.log("500")
 
@@ -174,10 +176,21 @@ abstract class ConfigProvider {
   Map<String, dynamic> renameResultItemFields(Map<String, dynamic> item) {
     final renamedItem =  Map<String, dynamic>();
     item.forEach((fieldName, value) {
-      final prefixInfo = _fieldNameInferenceConfig.entries.firstWhere(
-        (fieldPrefixInfo) => fieldName.startsWith('metadata.${fieldPrefixInfo.value}'),
-          orElse:() => null,
-      );
+
+      MapEntry<String, String>? prefixInfo;
+
+      if(_fieldNameInferenceConfig != null){
+        final foundPrefixInfos = _fieldNameInferenceConfig!.entries.where(
+                (fieldPrefixInfo) => fieldName.startsWith('metadata.${fieldPrefixInfo.value}')
+        );
+        if (foundPrefixInfos.length > 1){
+          throw Exception('There are ${foundPrefixInfos.length} entries in the field name inference configuration that match the field "$fieldName" included in the result item. There should be either zero or one match');
+        }
+        prefixInfo = foundPrefixInfos.length == 1 ? foundPrefixInfos.first : null;
+      }
+      else {
+        prefixInfo = null;
+      }
 
       if (prefixInfo != null) {
         // Renamed

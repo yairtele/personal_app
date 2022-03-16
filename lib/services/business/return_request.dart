@@ -2,29 +2,29 @@ import 'package:flutter/foundation.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 
 class ReturnRequest{
-  String uuid;
+  String? uuid;
   String title;
-  String requestNumber;
+  String? requestNumber;
   String batchNumber;
   String EAN;
   String commercialCode;
   String description;
   String retailReference;
   bool isAuditable;
-  int quantity;
+  int? quantity;
   //Map<String, XFile> photos;
 
   ReturnRequest({
     this.uuid,
-    @required this.title,
+    required this.title,
     this.requestNumber,
-    @required this.batchNumber,
-    @required this.EAN,
-    @required this.commercialCode,
-    @required this.description,
-    @required this.retailReference,
-    @required this.isAuditable,
-    @required this.quantity,
+    required this.batchNumber,
+    required this.EAN,
+    required this.commercialCode,
+    required this.description,
+    required this.retailReference,
+    required this.isAuditable,
+    required this.quantity,
     //@required this.photos
   });
 
@@ -43,18 +43,18 @@ class ReturnRequest{
     };
   }
 
-  ReturnRequest.fromJSON(Map<String, dynamic> json){
-    uuid = json[AthentoFieldName.uuid];
-    title = json[AthentoFieldName.title];
-    requestNumber = json[ReturnRequestAthentoFieldName.requestNumber];
-    batchNumber = json[ReturnRequestAthentoFieldName.batchNumber];
-    EAN = json[ReturnRequestAthentoFieldName.EAN];
-    commercialCode = json[ReturnRequestAthentoFieldName.commercialCode];
-    retailReference = json[ReturnRequestAthentoFieldName.retailReference];
-    description = json[ReturnRequestAthentoFieldName.description];
-    isAuditable = json[ReturnRequestAthentoFieldName.isAuditable] == 'true';
+  ReturnRequest.fromJSON(Map<String, dynamic> json):
+    uuid = json[AthentoFieldName.uuid],
+    title = json[AthentoFieldName.title],
+    requestNumber = json[ReturnRequestAthentoFieldName.requestNumber],
+    batchNumber = json[ReturnRequestAthentoFieldName.batchNumber],
+    EAN = json[ReturnRequestAthentoFieldName.EAN],
+    commercialCode = json[ReturnRequestAthentoFieldName.commercialCode],
+    retailReference = json[ReturnRequestAthentoFieldName.retailReference],
+    description = json[ReturnRequestAthentoFieldName.description],
+    isAuditable = json[ReturnRequestAthentoFieldName.isAuditable] == 'true',
     quantity =  json[ReturnRequestAthentoFieldName.quantity] == null ? null : int.tryParse(json[ReturnRequestAthentoFieldName.quantity]);
-  }
+
 }
 
 class ReturnRequestAthentoFieldName{

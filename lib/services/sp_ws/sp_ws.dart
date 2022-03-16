@@ -5,12 +5,12 @@ import 'package:http/http.dart';
 import 'package:navigation_app/utils/sp_file_utils.dart';
 
 class SpWS {
-  static Map<String,Map<String, String>> _contentTypeMapByExtension;
-  static Map<String,Map<String, String>> _contentTypeMapByMimeType;
+  static late Map<String,Map<String, String>> _contentTypeMapByExtension;
+  static late Map<String,Map<String, String>> _contentTypeMapByMimeType;
   
   static Future<http.Response> post(String uri,
-      {Map<String, String> headers, Map<String, String> parameters,
-        body, Encoding encoding}) async {
+      {Map<String, String>? headers, Map<String, String>? parameters,
+        body, Encoding? encoding}) async {
     return _request(uri, method: RequestMethod.post,
         headers: headers,
         parameters: parameters,
@@ -19,7 +19,7 @@ class SpWS {
   }
 
   static Future<http.Response> get(String uri,
-      {Map<String, String> headers, Map<String, String> parameters,
+      {Map<String, String>? headers, Map<String, String>? parameters,
       }) async {
     return _request(uri, method: RequestMethod.get,
         headers: headers,
@@ -27,10 +27,11 @@ class SpWS {
   }
 
   static Future<http.Response> _request(String uri,
-      {RequestMethod method, Map<String, String> parameters,
-        Map<String, String> headers, body, Encoding encoding}) async {
+      {required RequestMethod method, Map<String, String>? parameters,
+        Map<String, String>? headers, body, Encoding? encoding}) async {
     try {
       //print("SpWS.put - entry");
+      headers = headers ??  Map<String, String>();
       encoding = encoding ?? Encoding.getByName('UTF8');
 
       parameters = parameters ?? Map<String, String>();
@@ -81,7 +82,7 @@ class SpWS {
     }
   }
 
-  static String addQueryString(String uri, {Map<String, String> parameters}) {
+  static String addQueryString(String uri, {Map<String, String>? parameters}) {
     var fullUri = uri;
 
     if (parameters != null) {
@@ -103,7 +104,7 @@ class SpWS {
       throw Exception('No content type value was found for file extension "$fileExtension".');
     }
 
-    return contentTypeInfo['mimeType'];
+    return contentTypeInfo['mimeType']!;
   }
 
   static Map<String,Map<String, String>> _getContentTypeMapByExtension(){
@@ -818,7 +819,7 @@ class SpWS {
       throw Exception('No se ha encontrado la extensión para el mime type "$mimeType" del binario devuelto por Athento');
     }
 
-    return extension['fileExtension'];
+    return extension['fileExtension']!;
   }
 
   static Map<String,Map<String, String>> _getContentTypeMapByMimeType() {

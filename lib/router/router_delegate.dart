@@ -49,7 +49,7 @@ import 'ui_pages.dart';
 class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<PageConfiguration> {
   final List<Page> _pages = [];
-  ShoppingBackButtonDispatcher backButtonDispatcher;
+  late ShoppingBackButtonDispatcher backButtonDispatcher;
 
   @override
   final GlobalKey<NavigatorState> navigatorKey;

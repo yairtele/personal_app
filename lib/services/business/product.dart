@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 
 class Product {
-  String uuid;
+  String? uuid;
   String title;
   String EAN;
   String commercialCode;
@@ -13,12 +13,12 @@ class Product {
   // TODO: hacer requeridos los parámetros necesarios
   Product({
     this.uuid,
-    @required this.title,
-    @required this.EAN,
-    @required this.commercialCode,
-    @required this.retailReference,
-    @required this.requestNumber,
-    @required this.description,
+    required this.title,
+    required this.EAN,
+    required this.commercialCode,
+    required this.retailReference,
+    required this.requestNumber,
+    required this.description,
   });
   Map<String, dynamic> toJSON() {
     return {
@@ -32,15 +32,14 @@ class Product {
     };
   }
 
-  Product.fromJSON(Map<String, dynamic> json){
-    uuid = json[AthentoFieldName.uuid];
-    title = json[AthentoFieldName.title];
-    EAN = json[ProductAthentoFieldName.EAN];
-    commercialCode = json[ProductAthentoFieldName.commercialCode];
-    retailReference = json[ProductAthentoFieldName.retailReference];
-    description = json[ProductAthentoFieldName.description];
+  Product.fromJSON(Map<String, dynamic> json):
+    uuid = json[AthentoFieldName.uuid],
+    title = json[AthentoFieldName.title],
+    EAN = json[ProductAthentoFieldName.EAN],
+    commercialCode = json[ProductAthentoFieldName.commercialCode],
+    retailReference = json[ProductAthentoFieldName.retailReference],
+    description = json[ProductAthentoFieldName.description],
     requestNumber = json[ProductAthentoFieldName.requestNumber];
-  }
 }
 
 class ProductAthentoFieldName{

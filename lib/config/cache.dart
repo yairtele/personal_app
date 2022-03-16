@@ -23,7 +23,7 @@ class Cache{
     prefs.setBool(_LOGGEDIN_KEY, loggedIn);
   }
 
-  static Future<bool> getLoggedInState() async {
+  static Future<bool?> getLoggedInState() async {
     final prefs = await _getRepo();
     return  prefs.getBool(_LOGGEDIN_KEY);
   }
@@ -33,7 +33,7 @@ class Cache{
     prefs.setString(_TOKENINFO_KEY, tokenInfo.toJSONString());
   }
 
-  static Future<TokenInfo> getTokenInfo() async {
+  static Future<TokenInfo?> getTokenInfo() async {
     final prefs = await _getRepo();
     final tokenInfoJsonString = prefs.getString(_TOKENINFO_KEY);
     return  tokenInfoJsonString != null ? TokenInfo.fromJSONString(tokenInfoJsonString) : null;
@@ -44,7 +44,7 @@ class Cache{
     prefs.setString(_USERINFO_KEY, userInfo.toJSONString());
   }
 
-  static Future<UserInfo> getUserInfo() async{
+  static Future<UserInfo?> getUserInfo() async{
     final prefs = await _getRepo();
     final userInfoJsonString = prefs.getString(_USERINFO_KEY);
     return userInfoJsonString != null ? UserInfo.fromJSONString(userInfoJsonString) : null;
@@ -55,7 +55,7 @@ class Cache{
     prefs.setString(_USERNAME_KEY, userName);
   }
 
-  static Future<String> getUserName() async{
+  static Future<String?> getUserName() async{
     final prefs = await _getRepo();
     return  prefs.getString(_USERNAME_KEY);
   }
@@ -66,7 +66,7 @@ class Cache{
     prefs.setString(_USERPWD_KEY, password);
   }
 
-  static Future<String> getUserPassword() async{
+  static Future<String?> getUserPassword() async{
     final prefs = await _getRepo();
     return  prefs.getString(_USERPWD_KEY);
   }
@@ -77,7 +77,7 @@ class Cache{
     prefs.setString(_COMPANYNAME_KEY, companyName);
   }
 
-  static Future<String> getCompanyName() async{
+  static Future<String?> getCompanyName() async{
     final prefs = await _getRepo();
     return  prefs.getString(_COMPANYNAME_KEY);
   }

@@ -81,7 +81,7 @@ class BusinessServices {
     return batches.toList();
   }
 
-  static Future<List<ReturnRequest>> getReturnRequestsByBatchNumber({@required String batchNumber}) async {
+  static Future<List<ReturnRequest>> getReturnRequestsByBatchNumber({required String batchNumber}) async {
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
     final batchFieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
@@ -257,9 +257,9 @@ class BusinessServices {
 
   }
 
-  static Future<TRowObject> getRowAsObjectFromFile<TRowObject>({@required String fileName, @required int chunkSize,
-        @required String lineSeparator, @required String columnSeparator, @required bool Function(List<String> row)  equals,
-        @required TRowObject objectBuilder(List<String> row)}) async {
+  static Future<TRowObject?> getRowAsObjectFromFile<TRowObject>({required String fileName, required int chunkSize,
+        required String lineSeparator, required String columnSeparator, required bool Function(List<String> row)  equals,
+        required TRowObject objectBuilder(List<String> row)}) async {
 
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
     final productsFolderPath = Directory('$localFolderPath/products');
@@ -272,9 +272,9 @@ class BusinessServices {
     const start = 0;
 
     int bytesRead;
-    final utf8Decoder = Utf8Decoder(allowMalformed: true);
+    const utf8Decoder = Utf8Decoder(allowMalformed: true);
     do {
-      final readBuffer = List<int>.filled(chunkSize, null);
+      final readBuffer = List<int>.filled(chunkSize, 0);
 
       bytesRead = productsRndFile.readIntoSync(readBuffer, start);
       //accumulatedReads += utf8.decoder.convert(readBuffer, 0, bytesRead);
@@ -310,7 +310,7 @@ class BusinessServices {
   }
 
 
-  static Future<void> registerNewProductReturn({@required Batch  batch, @required ReturnRequest existingReturnRequest, @required NewReturn newReturn}) async {
+  static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest existingReturnRequest, required NewReturn newReturn}) async {
 
     final returnRequestTitle = '${newReturn.EAN}-${newReturn
         .retailReference}'; //TODO: ver qué datos corresponde usar
@@ -428,15 +428,15 @@ class BusinessServices {
       }
       // Tomar valores de la solicitud preexistente
       else {
-        returnRequestUUID = existingReturnRequest.uuid;
-        returnRequestNumber = existingReturnRequest.requestNumber;
+        returnRequestUUID = existingReturnRequest.uuid!;
+        returnRequestNumber = existingReturnRequest.requestNumber!;
 
         // Verificar que no haya otro producto con la misma referencia interna dentro de la misma solicitud
         final productConfigProvider = await  _createConfigProvider(_getProductFieldNameInferenceConfig());
         final productSelectFields = [AthentoFieldName.uuid];
         const requestNumberFieldName = '${_productDocType}_${ProductAthentoFieldName.requestNumber}';
         const retailreferenceFieldName = '${_productDocType}_${ProductAthentoFieldName.retailReference}';
-        final whereExpression = 'WHERE $requestNumberFieldName = $returnRequestNumber';
+        final whereExpression = "WHERE $requestNumberFieldName = '$returnRequestNumber'";
         final foundProducts = await SpAthentoServices.findDocuments(productConfigProvider, _productDocType, productSelectFields, whereExpression);
 
         if (foundProducts.length > 0){
@@ -484,7 +484,7 @@ class BusinessServices {
     // Obtener valores de campos para la nueva solicitud
     final returnRequest = ReturnRequest(
         title: returnRequestTitle,
-        batchNumber: batch.batchNumber,
+        batchNumber: batch.batchNumber!,
         EAN: newReturn.EAN,
         commercialCode: newReturn.commercialCode,
         description: newReturn.description,
@@ -523,7 +523,7 @@ class BusinessServices {
     };
   }
 
-  static Map<String, String> _getFieldNameInferenceConfig({@required String defaultPrefix}) {
+  static Map<String, String> _getFieldNameInferenceConfig({required String defaultPrefix}) {
     return  {
       'defaultPrefix': defaultPrefix,
     };
@@ -534,7 +534,7 @@ class BusinessServices {
   }
 
   static Future<BearerAuthConfigProvider> _createBearerConfigProvider(
-      [Map<String, String> fieldNameInferenceConfig]) async {
+      [Map<String, String>? fieldNameInferenceConfig]) async {
     final tokenInfo = await Cache.getTokenInfo();
     final token = tokenInfo.token;
     final referer = Configuration.athentoAPIBaseURL;
@@ -548,10 +548,10 @@ class BusinessServices {
     return configProvider;
   }
 
-  static Future<ConfigProvider> _createConfigProvider([Map<String, String>fieldNameInferenceConfig]) async {
+  static Future<ConfigProvider> _createConfigProvider([Map<String, String>?fieldNameInferenceConfig]) async {
     final authenticationType = Configuration.authenticationType;
 
-    ConfigProvider configProvider = null;
+    ConfigProvider configProvider;
     switch(authenticationType){
       case 'basic':
         final userName = await Cache.getUserName();
@@ -580,7 +580,7 @@ class BusinessServices {
     return _getFieldNameInferenceConfig(defaultPrefix: 'foto_oxc_');
   }
 
-  static List<int> _getImageByteArray({@required String path}) {
+  static List<int> _getImageByteArray({required String path}) {
     final file = File(path);
     return file.readAsBytesSync();
   }
@@ -623,7 +623,8 @@ class BusinessServices {
     SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);
   }
 
-  static Future <void> updateBatch (Batch batch,String batchreference,String batchdescr,String batchobserv) async{
+  //TODO: Los campos batchreference, batchdescr, y batchobserv YA ESTAN en el objeto batch!! NO MEZCLAR INGLES Y ESPAÑOL
+  static Future <void> updateBatch (Batch batch, String batchreference, String batchdescr,String batchobserv) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
       '${BatchAthentoFieldName.retailReference}': '${batchreference}',
@@ -631,21 +632,24 @@ class BusinessServices {
       '${BatchAthentoFieldName.observation}': '${batchobserv}',
     };
     final title = '${batchreference}-${batchdescr}-${batch.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!, title: title, fieldValues: fieldValues);
   }
 
+  //TODO: O el método recibe el estado, o se llama SendBatchForAudit (o algo así)
   static Future <void> updateBatchState (Batch batch) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
-      '${AthentoFieldName.state}': 'Enviado'
+      '${AthentoFieldName.state}': 'Enviado' //TODO: armar una clase o un enum
     };
     final title = '${batch.retailReference}-${batch.description}-${batch.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!, title: title, fieldValues: fieldValues);
   }
   static Future <void> deleteReqReturnByUUID (String ReqReturnUuid) async{
     final configProvider = await  _createConfigProvider();
     SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: ReqReturnUuid);
   }
+  //TODO: no abreviar nombres
+  //TODO: returnreference,String returndescr,String returnunities YA SON PROPIEDADES DE ReturnRequest
   static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
@@ -656,7 +660,7 @@ class BusinessServices {
     };
     //TODO:Armado con orden correcto del titulo para la solicitud.
     final title = '${returnreference}-${returndescr}-${req_return.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid, title: title, fieldValues: fieldValues);
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, title: title, fieldValues: fieldValues);
   }
 }
 
@@ -669,9 +673,9 @@ class ProductMasterInfo{
   String businessUnit;
   String legalEntity; //Persona jurídica
 
-  ProductMasterInfo({ @required this.ean, @required this.commercialCode,
-    @required this.sku,@required this.description, @required this.brand,
-    @required this.businessUnit, @required this.legalEntity});
+  ProductMasterInfo({ required this.ean, required this.commercialCode,
+    required this.sku,required this.description, required this.brand,
+    required this.businessUnit, required this.legalEntity});
 
   ProductMasterInfo.fromCsvRow(List<String> row) : this(
     ean: row[0],
@@ -690,7 +694,7 @@ class ProductSalesInfo{
   double price;
   String retailAccount;
 
-  ProductSalesInfo({ @required this.sku, @required this.lastSellDate, @required this.price, @required this.retailAccount});
+  ProductSalesInfo({ required this.sku, required this.lastSellDate, required this.price, required this.retailAccount});
 
   ProductSalesInfo.fromCsvRow(List<String> row) : this(
       sku: row[5],

@@ -168,14 +168,15 @@ class _NewBatchState extends State<NewBatch> {
   }
 
   Future<void> _createBatch(String retailReference, String description, String observation) async {
-
-    String cuitRetail;
+    final cuitRetail = (await Cache.getUserInfo()).idNumber;
     final retailCompanyName = await Cache.getCompanyName();
     BusinessServices.createBatch(Batch(
+        title: '$retailReference - $description',
         retailReference: retailReference,
         description: description, cuitRetail: cuitRetail,
-        retailCompanyName: retailCompanyName,observation:observation));
-
+        retailCompanyName: retailCompanyName,
+        observation:observation,
+    ));
   }
 
   void _showSnackBar(String message){
