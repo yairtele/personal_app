@@ -228,8 +228,8 @@ class BusinessServices {
       throw BusinessException('No se ha podido encontrar un producto con el código "$productFileSearchKey" en el maestro de productos.');
     }
 
-    const SKU_INDEX = 5;
-    const CUIT_INDEX = 10;
+    const SKU_INDEX = 15;
+    const CUIT_INDEX = 23;
     final retailCUIT = (await Cache.getUserInfo()).idNumber;
     final producSalesInfo = await getRowAsObjectFromFile(
         fileName: 'sales_db.csv' ,
@@ -693,10 +693,10 @@ class ProductSalesInfo{
   ProductSalesInfo({ @required this.sku, @required this.lastSellDate, @required this.price, @required this.retailAccount});
 
   ProductSalesInfo.fromCsvRow(List<String> row) : this(
-      sku: row[5],
+      sku: row[15],
       lastSellDate: _parseDate(row[0]),
-      price: double.parse(row[14].replaceFirst(',', '.')) ,
-      retailAccount: row[8],
+      price: double.parse(row[36].replaceFirst(',', '.')) ,
+      retailAccount: row[21],
   );
 
   static DateTime _parseDate(String dateString){

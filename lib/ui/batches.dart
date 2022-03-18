@@ -152,7 +152,7 @@ class _BatchesState extends State<Batches> {
                           ),
                         ),
                     ),
-                    DataTable(columns: <DataColumn>[
+                    /*DataTable(columns: <DataColumn>[
                       const DataColumn(
                         label: Text('Lotes Enviados',style: TextStyle(fontSize: 18.0,
                             fontWeight: FontWeight.bold,
@@ -261,7 +261,7 @@ class _BatchesState extends State<Batches> {
                           //selected: selected[index],
                         ),
                       ),
-                    ),
+                    ),*/
                  ]
                 ),
               ),

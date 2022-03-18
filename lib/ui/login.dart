@@ -70,8 +70,8 @@ class _LoginState extends State<Login> {
     passwordTextController.text = appState.password;
     emailTextController.text = appState.emailAddress;
 
-    emailTextController.text = 'adrian.scotto.newsan';
-    passwordTextController.text = r'N$ju7ilo9#4791AS';
+    //emailTextController.text = 'adrian.scotto.newsan';
+    //passwordTextController.text = r'N$ju7ilo9#4791AS';
     return FutureBuilder<bool>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
