@@ -61,9 +61,9 @@ class SpAthentoServices {
   }
 
   static Future<Map<String, dynamic>> createDocument({
-    required ConfigProvider configProvider,
-    String? containerUUID, required String docType, required String title,
-    required Map<String,
+    @required ConfigProvider configProvider,
+    @required String containerUUID, @required String docType, @required String title,
+    @required Map<String,
         dynamic> fieldValues, String auditMessage = ''}) async {
     fieldValues.removeWhere((key, value) => key == AthentoFieldName.uuid);
 
@@ -96,11 +96,10 @@ class SpAthentoServices {
 
 
   static Future<Map<String, dynamic>> createDocumentWithContent({
-    required ConfigProvider configProvider,
-    String? containerUUID, required String docType, required String title,
-    required Map<String, dynamic> fieldValues, required List<int> content,
-    required String friendlyFileName, String auditMessage = ''}) async {
-
+    @required ConfigProvider configProvider,
+    @required String containerUUID, @required String docType, @required String title,
+    @required Map<String, dynamic> fieldValues, @required List<
+        int> content, @required String friendlyFileName, String auditMessage = ''}) async {
     if (content == null || content.length == 0) {
       throw Exception(
           '"content" cannot be neitether null nor a zero length byte array');
@@ -114,7 +113,7 @@ class SpAthentoServices {
         title, fieldValues);
 
     final jsonRequestBody = {
-      if (containerUUID !=null) 'input': containerUUID,
+      'input': containerUUID,
       'params': {
         'type': docType,
         'audit': auditMessage,
@@ -209,7 +208,7 @@ class SpAthentoServices {
     if (!whereExpression.startsWith('WHERE')) {
       final whereStartWord = _getFirstWord(whereExpression);
       throw Exception(
-          'the "whereExpresion" argument must start with "WHERE" instead of "$whereStartWord".');
+          'the "whereExpression" argument must start with "WHERE" instead of "$whereStartWord".');
     }
 
     final renamedFieldValues = configProvider.getSelectFields(selectFields);
@@ -257,7 +256,7 @@ class SpAthentoServices {
 
 
   static Future<Map<String, dynamic>> deleteDocument(
-      {required ConfigProvider configProvider, required String documentUUID, String auditMessage = ''}) async {
+      {@required ConfigProvider configProvider, @required String documentUUID, String auditMessage}) async {
     final jsonRequestBody = {
       'input': documentUUID,
       'params': {
@@ -282,15 +281,15 @@ class SpAthentoServices {
     //console.log(JSON.stringify(jsonRequestBody));
   }
 
-  static Future<Map<String, dynamic>> updateDocument({ required ConfigProvider configProvider, required String documentUUID,
-          required String title, required Map<String, dynamic> fieldValues, String auditMessage = ''}) async {
+  static Future<Map<String, dynamic>> updateDocument({ @required ConfigProvider configProvider, @required String documentUUID,
+          @required String title, @required Map<String, dynamic> fieldValues, String auditMessage}) async {
 
     final  renamedFieldValues = configProvider.getFieldValues(title, fieldValues);
 
     final jsonRequestBody = {
       'input': documentUUID,
       'params': {
-        'audit': auditMessage,
+      'audit': auditMessage,
         'properties': renamedFieldValues
       }
     };
@@ -313,18 +312,17 @@ class SpAthentoServices {
   }
 
 
-  Future<BinaryFileInfo> getContentAsBytes ({ required ConfigProvider configProvider, required String documentUUID}) async {
+  static Future<BinaryFileInfo> getContentAsBytes ({ @required ConfigProvider configProvider, @required String documentUUID}) async {
 
     final headers = configProvider.getHttpHeaders();
 
     //Invocar a Athento para obtener el archivo
     final url = configProvider.getEndpointUrl('getContentAsBytes').replaceFirst('{file_uuid}', documentUUID);
 
-
-    final response = await SpWS.get(url, parameters: {}, headers: headers);
+    final response = await SpWS.get(url,parameters: {}, headers: headers);
 
     //Obtener el content type del archivo guardado en Athento.
-    final contentType = response.headers['Content-Type']!;
+    final contentType = response.headers['Content-Type'];
 
     //Obtener la extensión de archivo
     final fileExtension = SpWS.getExtensionFromMimeType(contentType);
@@ -342,21 +340,21 @@ class SpAthentoServices {
 
 
 class FindResults{
-  late bool isNextPageAvailable;
-  late bool hasError;
-  late int pageSize;
-  String? errorMessage;
-  late int resultsCount;
-  late List<dynamic>  entries;
-  late bool isLastPageAvailable;
-  late int currentPageIndex;
-  late int numberOfPages;
-  String? entityType; //entity-type
-  late bool isPreviousPageAvailable;
-  late int currentPageSize;
-  late bool isSortable;
-  late bool isPaginable;
-  late int maxPageSize;
+  bool isNextPageAvailable;
+  bool hasError;
+  int pageSize;
+  String errorMessage;
+  int resultsCount;
+  List<dynamic>  entries;
+  bool isLastPageAvailable;
+  int currentPageIndex;
+  int numberOfPages;
+  String entityType; //entity-type
+  bool isPreviousPageAvailable;
+  int currentPageSize;
+  bool isSortable;
+  bool isPaginable;
+  int maxPageSize;
 
   FindResults.fromJSON(Map<String, dynamic> json){
     isNextPageAvailable = json['isNextPageAvailable'];
@@ -406,23 +404,22 @@ class UserInfo {
   String firstName;
   String lastName;
   String email;
-  //String athentoSpaceUUID;
+  String athentoSpaceUUID;
 
-  UserInfo({required this.uuid, required this.idNumber,
-    required this.userName, required this.firstName,
-    required this.lastName, required this.email,
-  //  required this.athentoSpaceUUID
-  });
+  UserInfo({@required this.uuid, @required this.idNumber,
+    @required this.userName, @required this.firstName,
+    @required this.lastName, @required this.email,
+    @required this.athentoSpaceUUID});
 
-  UserInfo.fromJSON(Map<String, dynamic>json):
-    uuid = json['uuid'],
-    idNumber = json['identification_number'],
-    userName = json['username'],
-    firstName = json['first_name'],
-    lastName = json['last_name'],
+  UserInfo.fromJSON(Map<String, dynamic>json) {
+    uuid = json['uuid'];
+    idNumber = json['identification_number'];
+    userName = json['username'];
+    firstName = json['first_name'];
+    lastName = json['last_name'];
     email = json['email'];
     //athentoSpaceUUID = json['default_serie???']; //TODO: completar esto
-
+  }
 
   UserInfo.fromJSONString(String jsonString) : this.fromJSON(jsonDecode(jsonString));
 

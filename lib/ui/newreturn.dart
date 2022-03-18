@@ -1,5 +1,6 @@
 //import 'dart:html';
 
+import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:navigation_app/services/business/batch.dart';
@@ -18,40 +19,42 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
 
+//T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
-  final ReturnRequest? returnRequest;
+  final ReturnRequest returnRequest;
   final Batch batch;
-  const NewReturnScreen({Key? key, required this.batch, this.returnRequest}) : super(key: key);
+  const NewReturnScreen({Key key, @required this.batch, this.returnRequest}) : super(key: key);
 
   @override
   State<NewReturnScreen> createState() => _NewReturnScreenState();
 }
-
+//K extends State<T>
 class _NewReturnScreenState extends State<NewReturnScreen> {
   final _searchParamTextController = TextEditingController();
   final _retailReferenceTextController = TextEditingController();
   final _quantityTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
 
-  //XFile imageFile;
-  final Map<String, XFile?> _takenPictures = {};
+  XFile imageFile;
+  final Map<String, XFile> _takenPictures = {};
   bool _isAuditableProduct = false;
   var _productSearchBy = ProductSearchBy.EAN;
-  ReturnRequest? _existingReturnRequest = null;
-  late ProductInfo? _product = null;
-  late Future<ScreenData<void, void>> _localData;
-  late final Batch _globalBatch;
+  ReturnRequest _existingReturnRequest = null;
+  ProductInfo _product = null;
+  Future<ScreenData<void, void>> _localData;
+  Batch _globalBatch;
 
   @override
   void initState() {
     super.initState();
-    _globalBatch = widget.batch;
+
     _localData = ScreenData<void, void>().getScreenData();
   }
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
+    //final appState = Provider.of<AppState>(context, listen: false);
+    final newReturnState = this;
 
     return FutureBuilder<ScreenData<void, void>>(
         future: _localData,
@@ -60,6 +63,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
           Widget widget;
           if (snapshot.hasData) {
             final batch = this.widget.batch;
+            _globalBatch = batch;
             widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -92,7 +96,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     value: ProductSearchBy.EAN,
                                     onChanged: (value) {
                                       setState(() {
-                                        _productSearchBy = value!;
+                                        _productSearchBy = value;
                                       });
                                     },
                                   )),
@@ -103,7 +107,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     value: ProductSearchBy.CommercialCode,
                                     onChanged: (value) {
                                       setState(() {
-                                        _productSearchBy = value!;
+                                        _productSearchBy = value;
                                       });
                                     },
                                   )),
@@ -243,7 +247,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               //},
                                             ),
                                           ),
-                                          _buildThumbnailsGridView(photos:  _takenPictures),
+                                          SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures),
                                         ]),
                                   ]),
                               //)
@@ -259,16 +263,16 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
                                     final thumbsWithPhotos = _takenPictures.entries
                                         .where((entry) => entry.value != null)
-                                        .map((e) => MapEntry<String, String>(e.key, e.value!.path));
+                                        .map((e) => MapEntry<String, String>(e.key, e.value.path));
 
                                     final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
-                                    final product = _product!;
+
                                     final newReturn = NewReturn(
-                                      EAN: product.EAN,
+                                      EAN: _product.EAN,
                                       retailReference: _retailReferenceTextController.text,
-                                      commercialCode: product.commercialCode,
-                                      description: product.description,
-                                      quantity: _getQuantity(product),
+                                      commercialCode: _product.commercialCode,
+                                      description: _product.description,
+                                      quantity: _getQuantity(),
                                       isAuditable: _isAuditableProduct,
                                       photos: photosToSave,
                                     );
@@ -364,90 +368,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     );
   }
 
-  Future<XFile?> _getPhotoFromCamera() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.camera,
-      maxWidth: 1800,
-      maxHeight: 1800,
-    );
-    return pickedFile;
-  }
-
-  Widget _buildThumbnailsGridView({ required Map<String, XFile?> photos}) {
-
-    return GridView.count(
-        primary: false,
-        padding: const EdgeInsets.all(20),
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        children: <Widget>[
-          for(final photoName in  photos.keys)
-            _buildPhotoThumbnail(photoName, photos)
-        ]
-    );
-  }
-
-  Widget _buildPhotoThumbnail(String photoName, Map<String, XFile?> photos) {
-    final photo = photos[photoName];
-
-    return Container(
-        padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
-        decoration: BoxDecoration(
-            border: Border.all(
-                color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
-        ),
-        child: Column(
-          children: [
-            Expanded( // Show photo or icon
-                child: ((){
-                  if (photo != null)
-                    return  Image.file(File(photo.path));
-                  else
-                    return const Icon(FontAwesomeIcons.camera);
-                })()
-            ),
-            Row(
-              children: [
-                Expanded(child: Text(photoName, textAlign: TextAlign.center)), // Photo name
-                if(photo != null)
-                  ElevatedButton( // Delete photo
-                    child: const Icon(FontAwesomeIcons.trash),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: const EdgeInsets.all(4),
-                    ),
-                    onPressed: () async {
-                      //TODO: ver si se debe borrar el archivo donde estaba la foto
-                      setState(() {
-                        photos[photoName] = null;
-                      });
-                    },
-                  )
-                else
-                  ElevatedButton( // Take photo
-                    child: const Icon(FontAwesomeIcons.camera),
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: const EdgeInsets.all(4),
-                    ),
-                    onPressed: () async {
-                      final pickedPhoto = await _getPhotoFromCamera();
-                      setState(() {
-                        photos[photoName] = pickedPhoto;
-                      });
-                    },
-                  )
-              ],
-            )
-          ],
-        )
-    );
-  }
-
-  Future<ReturnRequest?> _getExistingReturnRequestInBatch({required batch, required ProductInfo productInfo}) async {
-    ReturnRequest? existingReturnRequest;
+  Future<ReturnRequest> _getExistingReturnRequestInBatch({Batch batch, ProductInfo productInfo}) async {
+    ReturnRequest existingReturnRequest;
     // Buscar todas las solicitudes del batch.
     final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
 
@@ -463,12 +385,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       final returnRequestsWithSameEAN = returnRequests.where((returnRequest) => returnRequest.EAN == productInfo.EAN);
       if(returnRequestsWithSameEAN.length > 1){
         throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
-      }
-      else if(returnRequestsWithSameEAN.length == 1) {
+      } else if (returnRequestsWithSameEAN.length == 1) {
         existingReturnRequest = returnRequestsWithSameEAN.first;
-      }
-      else {
-        existingReturnRequest = null; // Ya estaba en null, pero para que quede claro
+      } else {
+        existingReturnRequest = null;
       }
     }
     else {
@@ -486,10 +406,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _takenPictures.clear();
   }
 
-  int? _getQuantity(ProductInfo productInfo) {
-    int? quantity = null;
+  int _getQuantity() {
+    int quantity = null;
 
-    if(!productInfo.isAuditable) {
+    if(!_product.isAuditable) {
       quantity = int.tryParse(_quantityTextController.text);
       if(quantity == null || quantity <= 0){
         throw BusinessException('Por favor indique la cantidad a devolver. No puede ser cero ni vacía.');
@@ -498,7 +418,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     return quantity;
   }
 
-  void _lookForProduct ([ScanResult? barcode]) async {
+  void _lookForProduct ([ScanResult barcode]) async {
     try {
       // Limpiar campos
       _clearProductFields();
@@ -508,7 +428,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       }
 
       // Buscar info del producto y actualizar el Future del FutureBuilder.
-      final ProductInfo productInfo;
+      ProductInfo productInfo = null;
       if (_productSearchBy == ProductSearchBy.EAN) {
         productInfo = await _getProductInfoByEAN(_searchParamTextController.text);
       } else {
