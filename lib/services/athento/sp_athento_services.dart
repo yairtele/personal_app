@@ -208,7 +208,7 @@ class SpAthentoServices {
     if (!whereExpression.startsWith('WHERE')) {
       final whereStartWord = _getFirstWord(whereExpression);
       throw Exception(
-          'the "whereExpresion" argument must start with "WHERE" instead of "$whereStartWord".');
+          'the "whereExpression" argument must start with "WHERE" instead of "$whereStartWord".');
     }
 
     final renamedFieldValues = configProvider.getSelectFields(selectFields);
@@ -312,15 +312,14 @@ class SpAthentoServices {
   }
 
 
-  Future<BinaryFileInfo> getContentAsBytes ({ @required ConfigProvider configProvider, @required String documentUUID}) async {
+  static Future<BinaryFileInfo> getContentAsBytes ({ @required ConfigProvider configProvider, @required String documentUUID}) async {
 
     final headers = configProvider.getHttpHeaders();
 
     //Invocar a Athento para obtener el archivo
     final url = configProvider.getEndpointUrl('getContentAsBytes').replaceFirst('{file_uuid}', documentUUID);
 
-
-    final response = await SpWS.get(url, parameters: {}, headers: headers);
+    final response = await SpWS.get(url,parameters: {}, headers: headers);
 
     //Obtener el content type del archivo guardado en Athento.
     final contentType = response.headers['Content-Type'];

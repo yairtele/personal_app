@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:navigation_app/services/athento/binary_file_info.dart';
+import 'package:navigation_app/services/athento/sp_athento_services.dart';
+import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/product_photo.dart';
+import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/ui/sp_ui.dart';
+import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
-
-
 
 class  ProductDetails extends StatefulWidget {
   final Product product;
@@ -18,26 +23,28 @@ class  ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  Future<ScreenData<Product, List<ProductPhoto>>> _localData;
+  Future<ScreenData<Product, Map<String, BinaryFileInfo>>> _localData;
+  Map<String, BinaryFileInfo> _takenPictures = {};
 
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<Product, List<ProductPhoto>>(dataGetter: _getProductPhotos).getScreenData(dataGetterParam: widget.product);
+    _localData = ScreenData<Product, Map<String, BinaryFileInfo>>(dataGetter: _getProductPhotos).getScreenData(dataGetterParam: widget.product);
   }
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final product = widget.product;
+    final newProductDetails = this;
 
-    return FutureBuilder<ScreenData<Product, List<ProductPhoto>>>(
+    return FutureBuilder<ScreenData<Product, Map<String, BinaryFileInfo>>>(
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, List<ProductPhoto>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, Map<String, BinaryFileInfo>>> snapshot) {
 
           Widget widget;
           if (snapshot.hasData) {
             final data = snapshot.data;
-            final photos = data.data;
+            _takenPictures = data.data;
             final EAN = product.EAN;
             final _EAN = TextEditingController(text:EAN);
             final descripcion = product.description;
@@ -131,7 +138,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                 Container(
-                    child: GridView.count(
+                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures)
+                  /*GridView.count(
                       primary: false,
                       padding: const EdgeInsets.all(20),
                       crossAxisSpacing: 10,
@@ -161,17 +169,37 @@ class _ProductDetailsState extends State<ProductDetails> {
                           color: Colors.grey[800],
                         ),
                       ],
-                    ),
+                    )*/,
                    ),
-                  Container(
-                    child: ElevatedButton(
-                            onPressed: () => appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig),
-                            child: const Text('Guardar'),
-                            style: ElevatedButton.styleFrom(
-                            primary: Colors.green[400],
-                              )
-                            ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(100,0,100,0),
+                    child: Container(
+                              child: ElevatedButton(
+                                  onPressed: () async {
+                                    try{
+                                      WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
+                                      //TODO: Ver qué le tengo que pasar. Únicamente sirve para guardar fotos, ya que EAN y Descripcion no se pueden modificar
+                                      //await _updateProduct(product);
+                                      //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
+                                      _showSnackBar('Producto actualizado con éxito');
+                                    }
+                                    on BusinessException catch (e){
+                                      _showSnackBar(e.message);
+                                    }
+                                    on Exception catch (e){
+                                      _showSnackBar('Ha ocurrido un error inesperado al actualizar el producto: $e');
+                                    }
+                                    finally{
+                                      WorkingIndicatorDialog().dismiss();
+                                    }
+                                    },
+                                  child: const Text('Guardar'),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.green[400],
+                                  )
+                              ),
                       ),
+                  )
                   ],
                 )
               ),
@@ -215,16 +243,17 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   }
 
-  Future<List<ProductPhoto>> _getProductPhotos(Product product) {
-    final productPhotos = [
-      ProductPhoto(label: 'Frente'),
-      ProductPhoto(label: 'Dorso'),
-      ProductPhoto(label: 'Accesorios'),
-      ProductPhoto(label: 'Embalaje'),
-    ];
+  Future<Map<String, BinaryFileInfo>> _getProductPhotos(Product product) async {
+    final productPhotos = await BusinessServices.getPhotosByProductUUID(product.uuid);
 
     final returnValue = Future.delayed(const Duration(milliseconds: 100), () => productPhotos);
     return returnValue;
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
 

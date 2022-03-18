@@ -3,15 +3,18 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
+import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/athento/config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/product.dart';
+import 'package:navigation_app/services/business/product_photo.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product_info.dart';
@@ -617,6 +620,44 @@ class BusinessServices {
     final returns = entries.map((e) => Product.fromJSON(e));
     return returns.toList();
   }
+
+  static Future<Map<String, BinaryFileInfo>> getPhotosByProductUUID(String productUuid) async{
+    //Obtener diccionario de inferencia de nombres de campo
+    final fieldNameInferenceConfig = _getPhotoFieldNameInferenceConfig();
+    //final returnRequestFieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
+
+    // Obtener config provider para Bearer Token
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
+
+    //Definir campos del SELECT
+    final selectFields = [
+      AthentoFieldName.uuid,
+      AthentoFieldName.title
+    ];
+
+    // Construir WHERE expression
+    final whereExpression = "WHERE ecm:parentId = '$productUuid'";
+
+    // Invocar a Athento
+    final entries = await SpAthentoServices.findDocuments(configProvider, _photoDocType, selectFields, whereExpression);
+
+    //Convertir resultado a objetos ReturnRequest y retornar resultado
+    final returns = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
+
+    final Map<String, BinaryFileInfo> _takenPictures = {};
+
+    if (returns.length == 0){
+      _takenPictures['otra'] = null;
+    } else {
+      returns.forEach((photo) async {
+        var content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
+
+        _takenPictures[photo.label] = content;
+      });
+    }
+    return _takenPictures;
+  }
+
 
   static Future <void> deleteBatchByUUID (String batchUuid) async{
     final configProvider = await  _createConfigProvider();
