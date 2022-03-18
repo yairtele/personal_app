@@ -54,7 +54,7 @@ class _LoginState extends State<Login> {
   TextEditingController emailTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  Future<bool> _localData;
+  late Future<bool> _localData;
 
   @override
   void initState() {

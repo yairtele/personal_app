@@ -230,7 +230,7 @@ class BusinessServices {
 
     const SKU_INDEX = 5;
     const CUIT_INDEX = 10;
-    final retailCUIT = (await Cache.getUserInfo()).idNumber;
+    final retailCUIT = (await Cache.getUserInfo())!.idNumber;
     final producSalesInfo = await getRowAsObjectFromFile(
         fileName: 'sales_db.csv' ,
         chunkSize: chunkSize,
@@ -310,7 +310,7 @@ class BusinessServices {
   }
 
 
-  static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest existingReturnRequest, required NewReturn newReturn}) async {
+  static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest? existingReturnRequest, required NewReturn newReturn}) async {
 
     final returnRequestTitle = '${newReturn.EAN}-${newReturn
         .retailReference}'; //TODO: ver qué datos corresponde usar
@@ -318,7 +318,7 @@ class BusinessServices {
     /// Si el producto no es auditable, crear la solicitud dentro del lote y guardar la foto opcional (si esta existe)
     if (newReturn.isAuditable == false) {
       // Validar cantidad
-      if (newReturn.quantity == null || newReturn.quantity <= 0) {
+      if (newReturn.quantity == null || newReturn.quantity! <= 0) {
         throw BusinessException(
             'Los productos no auditables deben tener una cantidad a devolver mayor a cero en lugar de "${newReturn
                 .quantity}".');
@@ -535,7 +535,7 @@ class BusinessServices {
 
   static Future<BearerAuthConfigProvider> _createBearerConfigProvider(
       [Map<String, String>? fieldNameInferenceConfig]) async {
-    final tokenInfo = await Cache.getTokenInfo();
+    final tokenInfo = (await Cache.getTokenInfo())!;
     final token = tokenInfo.token;
     final referer = Configuration.athentoAPIBaseURL;
 
@@ -554,8 +554,8 @@ class BusinessServices {
     ConfigProvider configProvider;
     switch(authenticationType){
       case 'basic':
-        final userName = await Cache.getUserName();
-        final password = await Cache.getUserPassword();
+        final userName = (await Cache.getUserName())!;
+        final password = (await Cache.getUserPassword())!;
         configProvider = BasicAuthConfigProvider(Configuration.athentoAPIBaseURL, userName , password, fieldNameInferenceConfig);
         break;
       case 'bearer_token':

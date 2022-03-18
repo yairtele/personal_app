@@ -44,14 +44,14 @@ import 'return_request_details.dart';
 
 class BatchDetails extends StatefulWidget {
   final Batch batch;
-  const BatchDetails({Key key, @required this.batch}) : super(key: key);
+  const BatchDetails({Key? key, required this.batch}) : super(key: key);
 
   @override
   _BatchDetailsState createState() =>  _BatchDetailsState();
 
 }
 class _BatchDetailsState extends State<BatchDetails> {
-  Future<ScreenData<Batch, List<ReturnRequest>>> _localData;
+  late Future<ScreenData<Batch, List<ReturnRequest>>> _localData;
 
   @override
   void initState(){
@@ -77,8 +77,8 @@ class _BatchDetailsState extends State<BatchDetails> {
 
           Widget widget;
           if (snapshot.hasData) {
-            final data = snapshot.data;
-            final returns = data.data;
+            final data = snapshot.data!;
+            final returns = data.data!;
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -295,8 +295,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                           returns.length,
                               (int index) {
                             final returnRequest = returns[index];
-                            final title = returnRequest.retailReference ?? returnRequest.description;
-                            final subtitle = returnRequest.quantity != null ? 'Unidades: ${returnRequest.quantity}' : '';
+                            final title = _getReturnTitle(returnRequest);
+                            final subtitle = _getReturnSubTitle(returnRequest);
                             return DataRow(
                               cells: <DataCell>[
                                 DataCell(ListTile(isThreeLine: true,
@@ -364,20 +364,13 @@ class _BatchDetailsState extends State<BatchDetails> {
     );
   }
 
-  String _getBatchTitle(Batch returns) {
-    return returns.retailReference != '' ? returns.retailReference : returns.description;
-  }
-  String _getBatchSubTitle(Batch returns) {
-    return returns.description != '' ? (returns.retailReference == '' ? '(sin referencia)' : returns.description) : '(Sin descripción)';
-  }
-
-  Future<List<ReturnRequest>> _getReturnRequests(Batch batch) async {
-    final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
+  Future<List<ReturnRequest>> _getReturnRequests(Batch? batch) async {
+    final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch!.batchNumber!);
     return returnRequests;
   }
 
   Future<void> _deleteBatch(Batch batch) async {
-    await BusinessServices.deleteBatchByUUID(batch.uuid);
+    await BusinessServices.deleteBatchByUUID(batch.uuid!);
   }
   Future<void> _updateBatch(Batch batch,String reference, String description,String observation) async {
     await BusinessServices.updateBatch(batch,reference,description,observation);
@@ -392,7 +385,15 @@ class _BatchDetailsState extends State<BatchDetails> {
       SnackBar(content: Text(message)),
     );
   }
+  String _getReturnTitle(ReturnRequest  returnRequest) {
+    //return returnRequest.retailReference ?? returnRequest.description
+    final returnRetailReference = returnRequest.retailReference ?? '';
+    return returnRetailReference != '' ? returnRetailReference : (returnRequest.description ?? '(sin descripción)') ;
+  }
 
+  String _getReturnSubTitle(ReturnRequest returnRequest) {
+    return returnRequest.quantity != null ? 'Unidades: ${returnRequest.quantity}' : '';
+  }
 }
 
 

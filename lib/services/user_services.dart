@@ -5,6 +5,10 @@ import 'package:navigation_app/services/athento/sp_athento_services.dart';
 
 class UserServices{
   static Future<void> login(String user, String password) async{
+    // Clear the cached data
+    await Cache.clearAll();
+
+    // Perform Login
     final serviceBaseUrl = Configuration.athentoAPIBaseURL;
     final configProvider = BasicAuthConfigProvider(serviceBaseUrl, user, password);
     if(Configuration.authenticationType == 'bearer_token'){

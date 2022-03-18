@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 
 class ReturnRequest{
@@ -8,8 +7,8 @@ class ReturnRequest{
   String batchNumber;
   String EAN;
   String commercialCode;
-  String description;
-  String retailReference;
+  String? description;
+  String? retailReference;
   bool isAuditable;
   int? quantity;
   //Map<String, XFile> photos;

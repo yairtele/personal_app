@@ -14,7 +14,7 @@ import '../router/ui_pages.dart';
 
 class  ReturnRequestDetails extends StatefulWidget {
   final ReturnRequest returnRequest;
-  const ReturnRequestDetails({Key key, @required this.returnRequest}) : super(key: key);
+  const ReturnRequestDetails({Key? key, required this.returnRequest}) : super(key: key);
 
   @override
   _ReturnRequestDetailsState createState() =>  _ReturnRequestDetailsState();
@@ -22,7 +22,7 @@ class  ReturnRequestDetails extends StatefulWidget {
 
 class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
-  Future<ScreenData<String, List<Product>>> _localData;
+  late Future<ScreenData<String, List<Product>>> _localData;
 
   @override
   void initState() {
@@ -42,8 +42,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             AsyncSnapshot<ScreenData<String, List<Product>>> snapshot) {
           Widget widget;
           if (snapshot.hasData) {
-            final data = snapshot.data;
-            final products = data.data;
+            final data = snapshot.data!;
+            final products = data.data!;
             final reference = returnRequest.retailReference;
             final _eanTextController = TextEditingController(
                 text: returnRequest.EAN);
@@ -336,15 +336,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     );
   }
 
-  Future<List<Product>> _getProducts(String returnRequestNumber) async {
+  Future<List<Product>> _getProducts(String? returnRequestNumber) async {
     final products = await BusinessServices.getProductsByReturnRequestNumber(
-        returnRequestNumber);
+        returnRequestNumber!);
 
     return products;
   }
 
   Future<void> _deleteReqReturn(ReturnRequest req_return) async {
-    await BusinessServices.deleteReqReturnByUUID(req_return.uuid);
+    await BusinessServices.deleteReqReturnByUUID(req_return.uuid!);
   }
 
   Future<void> _updateReqReturn(ReturnRequest req_return, String EAN,

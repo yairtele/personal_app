@@ -75,12 +75,12 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     print(appState.currentAction.widget);
     if(appState.currentAction.page != null){
       print('if page');
-      print(appState.currentAction.page.path);
-      return appState.currentAction.page;
+      print(appState.currentAction.page!.path);
+      return appState.currentAction.page!;
     }
     if(appState.currentAction.widget != null){
       print('if widget');
-      print(appState.currentAction.widget.key);
+      print(appState.currentAction.widget!.key);
     }
     print((_pages.last.arguments as PageConfiguration).path);
     return _pages.last.arguments as PageConfiguration;
@@ -113,7 +113,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     }
   }
 
-  void _removePage(MaterialPage page) {
+  void _removePage(Page? page) {
     if (page != null) {
       _pages.remove(page);
     }
@@ -188,22 +188,22 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           break;
         case Pages.NewReturn:
           if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction.widget, pageConfig);
+            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
         case Pages.DetailsReturn:
           if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction.widget, pageConfig);
+            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
         case Pages.DetailProduct:
           if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction.widget, pageConfig);
+            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
         case Pages.Details:
           if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction.widget, pageConfig);
+            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
         default:
@@ -256,7 +256,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
   }
 
   void _setPageAction(PageAction action) {
-    switch (action.page.uiPage) {
+    switch (action.page!.uiPage) {
       case Pages.Splash:
         SplashPageConfig.currentPageAction = action;
         break;
@@ -308,25 +308,25 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           break;
         case PageState.addPage:
           _setPageAction(appState.currentAction);
-          addPage(appState.currentAction.page);
+          addPage(appState.currentAction.page!);
           break;
         case PageState.pop:
           pop();
           break;
         case PageState.replace:
           _setPageAction(appState.currentAction);
-          replace(appState.currentAction.page);
+          replace(appState.currentAction.page!);
           break;
         case PageState.replaceAll:
           _setPageAction(appState.currentAction);
-          replaceAll(appState.currentAction.page);
+          replaceAll(appState.currentAction.page!);
           break;
         case PageState.addWidget:
           _setPageAction(appState.currentAction);
-          pushWidget(appState.currentAction.widget, appState.currentAction.page);
+          pushWidget(appState.currentAction.widget!, appState.currentAction.page!);
           break;
         case PageState.addAll:
-          addAll(appState.currentAction.pages);
+          addAll(appState.currentAction.pages!);
           break;
       }
     }
@@ -344,7 +344,8 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     // Handle navapp://deeplinks/details/#
     if (uri.pathSegments.length == 2) {
       if (uri.pathSegments[0] == 'details') {
-        pushWidget(const BatchDetails(batch: null), DetailsPageConfig);
+        //TODO:Arreglar esta y todas las rutas
+        //pushWidget(const BatchDetails(batch: null), DetailsPageConfig);
       }
     } else if (uri.pathSegments.length == 1) {
       final path = uri.pathSegments[0];
@@ -394,7 +395,6 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           //  _createPage(Batches(), ListItemsPageConfig),
           //  _createPage(NewReturnScreen(), NewBatchPageConfig)
           //]);
-          break;
       }
     }
   }

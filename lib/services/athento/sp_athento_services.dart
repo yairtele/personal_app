@@ -345,13 +345,13 @@ class FindResults{
   late bool isNextPageAvailable;
   late bool hasError;
   late int pageSize;
-  late String errorMessage;
+  String? errorMessage;
   late int resultsCount;
   late List<dynamic>  entries;
   late bool isLastPageAvailable;
   late int currentPageIndex;
   late int numberOfPages;
-  late String entityType; //entity-type
+  String? entityType; //entity-type
   late bool isPreviousPageAvailable;
   late int currentPageSize;
   late bool isSortable;

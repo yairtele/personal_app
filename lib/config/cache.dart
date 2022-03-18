@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -80,6 +81,13 @@ class Cache{
   static Future<String?> getCompanyName() async{
     final prefs = await _getRepo();
     return  prefs.getString(_COMPANYNAME_KEY);
+  }
+
+  static Future<void> clearAll() async {
+    final prefs = await _getRepo();
+
+    //TODO: qué hacemos si da false???
+    final result = await prefs.clear();
   }
 
 

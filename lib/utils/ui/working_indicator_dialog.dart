@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/widgets.dart';
 
 class WorkingIndicatorDialog {
-  BuildContext _context;
+  late BuildContext _context;
   static final WorkingIndicatorDialog _singleton = WorkingIndicatorDialog._internal();
 
 

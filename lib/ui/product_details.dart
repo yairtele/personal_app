@@ -11,14 +11,14 @@ import '../router/ui_pages.dart';
 
 class  ProductDetails extends StatefulWidget {
   final Product product;
-  const ProductDetails({Key key, @required this.product}) : super(key: key);
+  const ProductDetails({Key? key, required this.product}) : super(key: key);
 
   @override
   _ProductDetailsState createState() =>  _ProductDetailsState();
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  Future<ScreenData<Product, List<ProductPhoto>>> _localData;
+  late Future<ScreenData<Product, List<ProductPhoto>>> _localData;
 
   @override
   void initState(){
@@ -36,8 +36,8 @@ class _ProductDetailsState extends State<ProductDetails> {
 
           Widget widget;
           if (snapshot.hasData) {
-            final data = snapshot.data;
-            final photos = data.data;
+            final data = snapshot.data!;
+            final photos = data.data!;
             final EAN = product.EAN;
             final _EAN = TextEditingController(text:EAN);
             final descripcion = product.description;
@@ -137,9 +137,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       crossAxisCount: 2,
-                      physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                      physics: const NeverScrollableScrollPhysics(), // to disable GridView's scrolling
                       shrinkWrap: true,
-                      children: <Widget>[
+                      children: <Widget>[ //TODO: el nro de fotos es dinámico!!
                         Container(
                           padding: const EdgeInsets.all(8),
                           child: Text(photos[0].label),
@@ -215,7 +215,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   }
 
-  Future<List<ProductPhoto>> _getProductPhotos(Product product) {
+  Future<List<ProductPhoto>> _getProductPhotos(Product? product) {
     final productPhotos = [
       ProductPhoto(label: 'Frente'),
       ProductPhoto(label: 'Dorso'),

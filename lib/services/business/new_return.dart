@@ -8,7 +8,7 @@ class NewReturn {
   String description;
   String retailReference;
   bool isAuditable;
-  int quantity;
+  int? quantity;
   Map<String, String> photos;
 
   NewReturn({

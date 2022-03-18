@@ -41,7 +41,7 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   bool _initialized = false;
-  AppState appState;
+  late AppState appState;
 
   @override
   Widget build(BuildContext context) {

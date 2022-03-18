@@ -41,7 +41,7 @@ import '../app_state.dart';
 import '../router/ui_pages.dart';
 
 class Batches extends StatefulWidget{
-  const Batches({Key key}) : super(key: key);
+  const Batches({Key? key}) : super(key: key);
 
   @override
   _BatchesState createState() => _BatchesState();
@@ -51,11 +51,11 @@ class Batches extends StatefulWidget{
 
 class _BatchesState extends State<Batches> {
 
-  Future<ScreenData<dynamic, List<Batch>>> _localData;
+  late Future<ScreenData<dynamic, List<Batch>>> _localData;
   @override
   void initState(){
     super.initState();
-    _localData =   ScreenData<void, List<Batch>>(dataGetter: _getBatchData).getScreenData();
+    _localData =   ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData();
   }
 
   @override
@@ -67,9 +67,9 @@ class _BatchesState extends State<Batches> {
 
           Widget widget;
           if (snapshot.hasData) {
-            final data = snapshot.data;
+            final data = snapshot.data!;
             final userInfo = data.userInfo;
-            final batches = data.data;
+            final batches = data.data!;
 
             widget = Scaffold(
               appBar: AppBar(
@@ -313,10 +313,18 @@ class _BatchesState extends State<Batches> {
 
 
   String _getBatchTitle(Batch batch) {
-    return batch.retailReference != '' ? batch.retailReference : batch.description;
+
+    final batchRetailReference = (batch.retailReference ?? '').trim();
+    final batchDescription = (batch.description ?? '').trim();
+    if((batchRetailReference + batchDescription).length == 0){
+      return '(sin referencia interna)';
+    }
+    return batchRetailReference != '' ? batchRetailReference : batchDescription;
   }
   String _getBatchSubTitle(Batch batch) {
-    return batch.description != '' ? (batch.retailReference == '' ? '(sin referencia)' : batch.description) : '(Sin descripción)';
+    final batchDescription = (batch.description ?? '' ).trim();
+    final batchRetailReference = (batch.retailReference ?? '').trim();
+    return batchDescription  != '' ? batchDescription : '(sin descripción)';
   }
 }
 
