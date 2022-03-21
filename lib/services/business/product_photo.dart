@@ -7,16 +7,15 @@ class ProductPhoto {
   String title;
 
   ProductPhoto({
-    @required this.label,
-    @required this.uuid,
-    @required this.title
+    required this.label,
+    required this.uuid,
+    required this.title
   });
 
-  ProductPhoto.fromJSON(Map<String, dynamic> json){
-    uuid = json[AthentoFieldName.uuid];
-    title = json[AthentoFieldName.title];
+  ProductPhoto.fromJSON(Map<String, dynamic> json):
+    uuid = json[AthentoFieldName.uuid],
+    title = json[AthentoFieldName.title],
     label = json[ProductPhotoAthentoFieldName.photoType];
-  }
 
 }
 

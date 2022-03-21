@@ -5,8 +5,8 @@ import 'package:http/http.dart';
 import 'package:navigation_app/utils/sp_file_utils.dart';
 
 class SpWS {
-  static late Map<String,Map<String, String>> _contentTypeMapByExtension;
-  static late Map<String,Map<String, String>> _contentTypeMapByMimeType;
+  static Map<String,Map<String, String>>? _contentTypeMapByExtension;
+  static Map<String,Map<String, String>>? _contentTypeMapByMimeType;
   
   static Future<http.Response> post(String uri,
       {Map<String, String>? headers, Map<String, String>? parameters,
@@ -806,7 +806,7 @@ class SpWS {
       };
     }
 
-    return _contentTypeMapByExtension;
+    return _contentTypeMapByExtension!;
   }
 
 
@@ -1521,7 +1521,7 @@ class SpWS {
       };
     }
 
-    return _contentTypeMapByMimeType;
+    return _contentTypeMapByMimeType!;
   }
 }
 

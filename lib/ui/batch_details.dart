@@ -365,7 +365,7 @@ class _BatchDetailsState extends State<BatchDetails> {
   }
 
   Future<List<ReturnRequest>> _getReturnRequests(Batch? batch) async {
-    final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch!.batchNumber!);
+    final returnRequests = await BusinessServices.getReturnRequestsByBatchUUID(batchUUID: batch!.uuid!);
     return returnRequests;
   }
 

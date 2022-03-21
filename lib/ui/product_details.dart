@@ -16,20 +16,20 @@ import '../router/ui_pages.dart';
 
 class  ProductDetails extends StatefulWidget {
   final Product product;
-  const ProductDetails({Key key, @required this.product}) : super(key: key);
+  const ProductDetails({Key? key, required this.product}) : super(key: key);
 
   @override
   _ProductDetailsState createState() =>  _ProductDetailsState();
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  Future<ScreenData<Product, Map<String, BinaryFileInfo>>> _localData;
-  Map<String, BinaryFileInfo> _takenPictures = {};
+  late Future<ScreenData<Product, Map<String, BinaryFileInfo?>>> _localData;
+  Map<String, BinaryFileInfo?> _takenPictures = {};
 
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<Product, Map<String, BinaryFileInfo>>(dataGetter: _getProductPhotos).getScreenData(dataGetterParam: widget.product);
+    _localData = ScreenData<Product, Map<String, BinaryFileInfo?>>(dataGetter: _getProductPhotos).getScreenData(dataGetterParam: widget.product);
   }
   @override
   Widget build(BuildContext context) {
@@ -37,14 +37,14 @@ class _ProductDetailsState extends State<ProductDetails> {
     final product = widget.product;
     final newProductDetails = this;
 
-    return FutureBuilder<ScreenData<Product, Map<String, BinaryFileInfo>>>(
+    return FutureBuilder<ScreenData<Product, Map<String, BinaryFileInfo?>>>(
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, Map<String, BinaryFileInfo>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, Map<String, BinaryFileInfo?>>> snapshot) {
 
           Widget widget;
           if (snapshot.hasData) {
-            final data = snapshot.data;
-            _takenPictures = data.data;
+            final data = snapshot.data!;
+            _takenPictures = data.data!;
             final EAN = product.EAN;
             final _EAN = TextEditingController(text:EAN);
             final descripcion = product.description;
@@ -243,11 +243,13 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   }
 
-  Future<Map<String, BinaryFileInfo>> _getProductPhotos(Product product) async {
-    final productPhotos = await BusinessServices.getPhotosByProductUUID(product.uuid);
+  Future<Map<String, BinaryFileInfo?>> _getProductPhotos(Product? product) async {
+    final productPhotos = await BusinessServices.getPhotosByProductUUID(product!.uuid!);
 
-    final returnValue = Future.delayed(const Duration(milliseconds: 100), () => productPhotos);
-    return returnValue;
+    //final returnValue = Future.delayed(const Duration(milliseconds: 100), () => productPhotos);
+    //return returnValue;
+
+    return productPhotos;
   }
 
   void _showSnackBar(String message){

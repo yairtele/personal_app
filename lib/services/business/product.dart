@@ -6,8 +6,9 @@ class Product {
   String title;
   String EAN;
   String commercialCode;
-  String retailReference;
-  String requestNumber;
+  String? retailReference; //TODO: está bien que pueda ser nulo? Debería ser string vacío en todo caso?
+  String? requestNumber; //TODO: ver cómo asegurarnos que este dato nunca sea nulo. O ver si se elimina.
+                          // Lo mismo para los demás autonuméricos en cada formulario de Athento
   String description;
 
   // TODO: hacer requeridos los parámetros necesarios

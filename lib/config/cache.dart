@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

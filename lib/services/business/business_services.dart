@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
@@ -76,7 +73,7 @@ class BusinessServices {
       BatchAthentoFieldName.observation,
     ];
 
-    var whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
+    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
 
     final entries = await SpAthentoServices.findDocuments(
         configProvider, _batchDocType, selectFields, whereExpression);
@@ -84,7 +81,7 @@ class BusinessServices {
     return batches.toList();
   }
 
-  static Future<List<ReturnRequest>> getReturnRequestsByBatchNumber({@required String batchNumber}) async {
+  static Future<List<ReturnRequest>> getReturnRequestsByBatchNumber({required String batchNumber}) async {
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
     final batchFieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
@@ -118,6 +115,43 @@ class BusinessServices {
     final returns = entries.map((e) => ReturnRequest.fromJSON(e));
     return returns.toList();
   }
+
+  static Future<List<ReturnRequest>> getReturnRequestsByBatchUUID({required String batchUUID}) async {
+    //Obtener diccionario de inferencia de nombres de campo
+    final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
+    final batchFieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
+
+    // Obtener config provider para Bearer Token
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
+
+    //Definir campos del SELECT
+    final selectFields = [
+      AthentoFieldName.uuid,
+      AthentoFieldName.title,
+      ReturnRequestAthentoFieldName.requestNumber,
+      ReturnRequestAthentoFieldName.batchNumber,
+      ReturnRequestAthentoFieldName.EAN,
+      ReturnRequestAthentoFieldName.commercialCode,
+      ReturnRequestAthentoFieldName.description,
+      ReturnRequestAthentoFieldName.retailReference,
+      ReturnRequestAthentoFieldName.quantity,
+      ReturnRequestAthentoFieldName.isAuditable,
+    ];
+
+    // Construir WHERE expression
+    //final parentBatchNumber = ' parent:metadata.${batchFieldNameInferenceConfig['defaultPrefix']}${BatchAthentoFieldName.batchNumber}';
+    //final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $parentBatchNumber = '$batchNumber'";
+    final whereExpression = "WHERE ecm:parentId = '$batchUUID'";
+
+    // Invocar a Athento
+    final entries = await SpAthentoServices.findDocuments(
+        configProvider, _returnRequestDocType, selectFields, whereExpression);
+
+    //Convertir resultado a objetos ReturnRequest y retornar resultado
+    final returns = entries.map((e) => ReturnRequest.fromJSON(e));
+    return returns.toList();
+  }
+
 
   static Future<ProductInfo> getProductInfoByEAN(String eanCode) async {
     //TODO: Consultar Athento o servicio de Newsan
@@ -233,7 +267,7 @@ class BusinessServices {
 
     const SKU_INDEX = 15;
     const CUIT_INDEX = 23;
-    final retailCUIT = (await Cache.getUserInfo()).idNumber;
+    final retailCUIT = (await Cache.getUserInfo())!.idNumber;
     final producSalesInfo = await getRowAsObjectFromFile(
         fileName: 'sales_db.csv' ,
         chunkSize: chunkSize,
@@ -260,9 +294,9 @@ class BusinessServices {
 
   }
 
-  static Future<TRowObject> getRowAsObjectFromFile<TRowObject>({@required String fileName, @required int chunkSize,
-        @required String lineSeparator, @required String columnSeparator, @required bool Function(List<String> row)  equals,
-        @required TRowObject objectBuilder(List<String> row)}) async {
+  static Future<TRowObject?> getRowAsObjectFromFile<TRowObject>({required String fileName, required int chunkSize,
+        required String lineSeparator, required String columnSeparator, required bool Function(List<String> row)  equals,
+        required TRowObject objectBuilder(List<String> row)}) async {
 
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
     final productsFolderPath = Directory('$localFolderPath/products');
@@ -275,9 +309,10 @@ class BusinessServices {
     const start = 0;
 
     int bytesRead;
-    final utf8Decoder = Utf8Decoder(allowMalformed: true);
+    const utf8Decoder = Utf8Decoder(allowMalformed: true);
+
     do {
-      final readBuffer = List<int>.filled(chunkSize, null);
+      final readBuffer = List<int>.filled(chunkSize, 0);
 
       bytesRead = productsRndFile.readIntoSync(readBuffer, start);
       //accumulatedReads += utf8.decoder.convert(readBuffer, 0, bytesRead);
@@ -313,7 +348,7 @@ class BusinessServices {
   }
 
 
-  static Future<void> registerNewProductReturn({@required Batch  batch, @required ReturnRequest existingReturnRequest, @required NewReturn newReturn}) async {
+  static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest? existingReturnRequest, required NewReturn newReturn}) async {
 
     final returnRequestTitle = '${newReturn.EAN}-${newReturn
         .retailReference}'; //TODO: ver qué datos corresponde usar
@@ -321,7 +356,7 @@ class BusinessServices {
     /// Si el producto no es auditable, crear la solicitud dentro del lote y guardar la foto opcional (si esta existe)
     if (newReturn.isAuditable == false) {
       // Validar cantidad
-      if (newReturn.quantity == null || newReturn.quantity <= 0) {
+      if (newReturn.quantity == null || newReturn.quantity! <= 0) {
         throw BusinessException(
             'Los productos no auditables deben tener una cantidad a devolver mayor a cero en lugar de "${newReturn
                 .quantity}".');
@@ -402,7 +437,7 @@ class BusinessServices {
 
       // Si no hay solicitud preexistente, crear la solicitud
       String returnRequestUUID;
-      String returnRequestNumber;
+      String? returnRequestNumber;
       if (existingReturnRequest == null) {
         // Obtener valores de campos para la nueva solicitud
         final fieldValues = _getReturnRequestFieldValues(
@@ -431,15 +466,14 @@ class BusinessServices {
       }
       // Tomar valores de la solicitud preexistente
       else {
-        returnRequestUUID = existingReturnRequest.uuid;
-        returnRequestNumber = existingReturnRequest.requestNumber;
+        returnRequestUUID = existingReturnRequest.uuid!;
+        returnRequestNumber = existingReturnRequest.requestNumber!;
 
         // Verificar que no haya otro producto con la misma referencia interna dentro de la misma solicitud
         final productConfigProvider = await  _createConfigProvider(_getProductFieldNameInferenceConfig());
         final productSelectFields = [AthentoFieldName.uuid];
-        const requestNumberFieldName = '${_productDocType}_${ProductAthentoFieldName.requestNumber}';
         const retailreferenceFieldName = '${_productDocType}_${ProductAthentoFieldName.retailReference}';
-        final whereExpression = 'WHERE $requestNumberFieldName = $returnRequestNumber';
+        final whereExpression = "WHERE ecm:parentId = '$returnRequestUUID' AND $retailreferenceFieldName = '${newReturn.retailReference}'";
         final foundProducts = await SpAthentoServices.findDocuments(productConfigProvider, _productDocType, productSelectFields, whereExpression);
 
         if (foundProducts.length > 0){
@@ -502,7 +536,7 @@ class BusinessServices {
     return fieldValues;
   }
 
-  static Map<String, dynamic> _getProductFieldValues(String productTitle, String requestNumber, NewReturn newReturn) {
+  static Map<String, dynamic> _getProductFieldValues(String productTitle, String? requestNumber, NewReturn newReturn) {
     // Obtener valores de campos para la nueva solicitud
     final product = Product(
         requestNumber: requestNumber,
@@ -526,7 +560,7 @@ class BusinessServices {
     };
   }
 
-  static Map<String, String> _getFieldNameInferenceConfig({@required String defaultPrefix}) {
+  static Map<String, String> _getFieldNameInferenceConfig({required String defaultPrefix}) {
     return  {
       'defaultPrefix': defaultPrefix,
     };
@@ -537,8 +571,8 @@ class BusinessServices {
   }
 
   static Future<BearerAuthConfigProvider> _createBearerConfigProvider(
-      [Map<String, String> fieldNameInferenceConfig]) async {
-    final tokenInfo = await Cache.getTokenInfo();
+      [Map<String, String>? fieldNameInferenceConfig]) async {
+    final tokenInfo = (await Cache.getTokenInfo())!;
     final token = tokenInfo.token;
     final referer = Configuration.athentoAPIBaseURL;
 
@@ -551,14 +585,14 @@ class BusinessServices {
     return configProvider;
   }
 
-  static Future<ConfigProvider> _createConfigProvider([Map<String, String>fieldNameInferenceConfig]) async {
+  static Future<ConfigProvider> _createConfigProvider([Map<String, String>? fieldNameInferenceConfig]) async {
     final authenticationType = Configuration.authenticationType;
 
-    ConfigProvider configProvider = null;
+    ConfigProvider configProvider;
     switch(authenticationType){
       case 'basic':
-        final userName = await Cache.getUserName();
-        final password = await Cache.getUserPassword();
+        final userName = (await Cache.getUserName())!;
+        final password = (await Cache.getUserPassword())!;
         configProvider = BasicAuthConfigProvider(Configuration.athentoAPIBaseURL, userName , password, fieldNameInferenceConfig);
         break;
       case 'bearer_token':
@@ -583,7 +617,7 @@ class BusinessServices {
     return _getFieldNameInferenceConfig(defaultPrefix: 'foto_oxc_');
   }
 
-  static List<int> _getImageByteArray({@required String path}) {
+  static List<int> _getImageByteArray({required String path}) {
     final file = File(path);
     return file.readAsBytesSync();
   }
@@ -621,7 +655,7 @@ class BusinessServices {
     return returns.toList();
   }
 
-  static Future<Map<String, BinaryFileInfo>> getPhotosByProductUUID(String productUuid) async{
+  static Future<Map<String, BinaryFileInfo?>> getPhotosByProductUUID(String productUuid) async{
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getPhotoFieldNameInferenceConfig();
     //final returnRequestFieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
@@ -631,8 +665,9 @@ class BusinessServices {
 
     //Definir campos del SELECT
     final selectFields = [
-      AthentoFieldName.uuid,
-      AthentoFieldName.title
+      ProductPhotoAthentoFieldName.uuid,
+      ProductPhotoAthentoFieldName.title,
+      ProductPhotoAthentoFieldName.photoType
     ];
 
     // Construir WHERE expression
@@ -644,18 +679,18 @@ class BusinessServices {
     //Convertir resultado a objetos ReturnRequest y retornar resultado
     final returns = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
 
-    final Map<String, BinaryFileInfo> _takenPictures = {};
+    final takenPictures = <String, BinaryFileInfo?>{};
 
     if (returns.length == 0){
-      _takenPictures['otra'] = null;
+      takenPictures['otra'] = null;
     } else {
       returns.forEach((photo) async {
-        var content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
+        final content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
 
-        _takenPictures[photo.label] = content;
+        takenPictures[photo.label] = content;
       });
     }
-    return _takenPictures;
+    return takenPictures;
   }
 
 
@@ -672,21 +707,25 @@ class BusinessServices {
       '${BatchAthentoFieldName.observation}': '${batchobserv}',
     };
     final title = '${batchreference}-${batchdescr}-${batch.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!, title: title, fieldValues: fieldValues);
   }
 
+  //TODO: este método es muy genérico Renombrar por sendBatchForAudit
   static Future <void> updateBatchState (Batch batch) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
       '${AthentoFieldName.state}': 'Enviado'
     };
-    final title = '${batch.retailReference}-${batch.description}-${batch.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid, title: title, fieldValues: fieldValues);
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!,  fieldValues: fieldValues);
   }
   static Future <void> deleteReqReturnByUUID (String ReqReturnUuid) async{
     final configProvider = await  _createConfigProvider();
     SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: ReqReturnUuid);
   }
+
+  //TODO: los parámetros String returnEAN,String returnreference,String returndescr,String returnunities ya están en el ReturnRequest
+  //TODO: no abreviar nombres de métodos como este.
+  //TODO: Usar camelCase para los parámetros y variables.
   static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
@@ -696,8 +735,7 @@ class BusinessServices {
       '${ReturnRequestAthentoFieldName.quantity}': '${returnunities}',
     };
     //TODO:Armado con orden correcto del titulo para la solicitud.
-    final title = '${returnreference}-${returndescr}-${req_return.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid, title: title, fieldValues: fieldValues);
+    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
   }
 }
 
@@ -710,9 +748,9 @@ class ProductMasterInfo{
   String businessUnit;
   String legalEntity; //Persona jurídica
 
-  ProductMasterInfo({ @required this.ean, @required this.commercialCode,
-    @required this.sku,@required this.description, @required this.brand,
-    @required this.businessUnit, @required this.legalEntity});
+  ProductMasterInfo({ required this.ean, required this.commercialCode,
+    required this.sku,required this.description, required this.brand,
+    required this.businessUnit, required this.legalEntity});
 
   ProductMasterInfo.fromCsvRow(List<String> row) : this(
     ean: row[0],
@@ -731,15 +769,33 @@ class ProductSalesInfo{
   double price;
   String retailAccount;
 
-  ProductSalesInfo({ @required this.sku, @required this.lastSellDate, @required this.price, @required this.retailAccount});
+  ProductSalesInfo({ required this.sku, required this.lastSellDate, required this.price, required this.retailAccount});
 
   ProductSalesInfo.fromCsvRow(List<String> row) : this(
+
       sku: row[15],
       lastSellDate: _parseDate(row[0]),
-      price: double.parse(row[36].replaceFirst(',', '.')) ,
+      price: _parsePrice(row[36]),
       retailAccount: row[21],
   );
 
+  static double  _parsePrice(String priceString) {
+    var cleanedPriceString = priceString;
+    final decimalSeparatorRx = RegExp(r'([,\.])\d+$');
+    final matches = decimalSeparatorRx.allMatches(priceString);
+    final decimalSeparator = matches.length > 0 ? matches.first.group(1) : null;
+    if(decimalSeparator != null){
+      if(priceString.split(decimalSeparator).length == 2){
+        cleanedPriceString = priceString.replaceAll(RegExp('[^0-9$decimalSeparator]'), '').replaceAll(',', '.');
+      }
+      else {
+        cleanedPriceString = priceString.replaceAll(RegExp('[^0-9]'), '');
+      }
+    }
+
+    return double.parse(cleanedPriceString);
+    //print('$priceString: $cleanedPriceString');
+  }
   static DateTime _parseDate(String dateString){
     final rx = RegExp(r'(\d+)/(\d+)\/(\d+)');
     final match = rx.firstMatch(dateString);

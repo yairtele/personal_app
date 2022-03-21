@@ -55,6 +55,7 @@ class _LoginState extends State<Login> {
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late Future<bool> _localData;
+  var _progressText = 'Cargando...';
 
   @override
   void initState() {
@@ -208,9 +209,9 @@ class _LoginState extends State<Login> {
                         child: CircularProgressIndicator(
                             backgroundColor: Colors.grey),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Cargando...', style: TextStyle(
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text(_progressText, style: const TextStyle(
                             color: Colors.grey, height: 4, fontSize: 9)),
                       )
                     ]
@@ -253,9 +254,9 @@ class _LoginState extends State<Login> {
 
       final response = await Dio().download(productsFileURL, productsFile.path,
           onReceiveProgress: (value1, value2) {
-            //  setState(() {
-            final progress = value1 / value2;
-            //  });
+            setState(() {
+              _progressText = 'Descargando 1/2: ${(value1 / value2).toStringAsFixed(2)}';
+            });
           }
       );
       //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
@@ -276,9 +277,9 @@ class _LoginState extends State<Login> {
 
       final response = await Dio().download(salesFileURL, salesFile.path,
           onReceiveProgress: (value1, value2) {
-            //  setState(() {
-            final progress = value1 / value2;
-            //  });
+            setState(() {
+              _progressText = 'Descargando 2/2: ${(value1 / value2).toStringAsFixed(2)}';
+            });
           }
       );
       //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));

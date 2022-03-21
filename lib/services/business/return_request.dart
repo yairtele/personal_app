@@ -4,7 +4,7 @@ class ReturnRequest{
   String? uuid;
   String title;
   String? requestNumber;
-  String batchNumber;
+  String? batchNumber;
   String EAN;
   String commercialCode;
   String? description;

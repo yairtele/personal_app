@@ -28,14 +28,11 @@
  * THE SOFTWARE.
  */
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/newbatch.dart';
 import '../ui/newbatch.dart';
-import '../ui/newreturn.dart';
 import '../app_state.dart';
-import '../ui/batch_details.dart';
 import '../ui/cart.dart';
 import '../ui/checkout.dart';
 import '../ui/create_account.dart';

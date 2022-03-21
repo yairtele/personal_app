@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'config/cache.dart';
 import 'services/user_services.dart';
 import 'router/ui_pages.dart';
