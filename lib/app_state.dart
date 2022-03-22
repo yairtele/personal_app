@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'config/cache.dart';
 import 'services/user_services.dart';
 import 'router/ui_pages.dart';
@@ -19,27 +17,30 @@ enum PageState {
 
 class PageAction {
   PageState state;
-  PageConfiguration page;
-  List<PageConfiguration> pages;
-  Widget widget;
+  PageConfiguration? page;
+  List<PageConfiguration>? pages;
+  Widget? widget;
 
-  PageAction({this.state = PageState.none, this.page = null, this.pages = null, this.widget = null});
+  PageAction({this.state = PageState.none, this.page = null, this.pages, this.widget});
 }
 class AppState extends ChangeNotifier {
   bool _loggedIn = false;
   bool _splashFinished = false;
 
-  String companyName;
 
   bool get loggedIn  => _loggedIn;
   bool get splashFinished => _splashFinished;
 
   final cartItems = [];
-  String emailAddress;
-  String password;
-  String description;
-  String reference;
-  String observation;
+
+  //TODO: inicializar correctamente con null safety. O mejor, remover del AppState y pasar al Cache
+  String emailAddress = '';
+  String password = '';
+  String description = '';
+  String reference = '';
+  String observation = '';
+  String companyName = '';
+
 
   PageAction _currentAction = PageAction();
   PageAction get currentAction => _currentAction;
@@ -110,10 +111,6 @@ class AppState extends ChangeNotifier {
 
 
   void getLoggedInState() async {
-
-    _loggedIn = await Cache.getLoggedInState();
-    if (_loggedIn == null) {
-      _loggedIn = false;
-    }
+    _loggedIn = (await Cache.getLoggedInState()) ?? false;
   }
 }

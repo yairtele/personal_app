@@ -2,23 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 
 class Product {
-  String uuid;
+  String? uuid;
   String title;
   String EAN;
   String commercialCode;
-  String retailReference;
-  String requestNumber;
+  String? retailReference; //TODO: está bien que pueda ser nulo? Debería ser string vacío en todo caso?
+  String? requestNumber; //TODO: ver cómo asegurarnos que este dato nunca sea nulo. O ver si se elimina.
+                          // Lo mismo para los demás autonuméricos en cada formulario de Athento
   String description;
 
   // TODO: hacer requeridos los parámetros necesarios
   Product({
     this.uuid,
-    @required this.title,
-    @required this.EAN,
-    @required this.commercialCode,
-    @required this.retailReference,
-    @required this.requestNumber,
-    @required this.description,
+    required this.title,
+    required this.EAN,
+    required this.commercialCode,
+    required this.retailReference,
+    required this.requestNumber,
+    required this.description,
   });
   Map<String, dynamic> toJSON() {
     return {
@@ -32,15 +33,14 @@ class Product {
     };
   }
 
-  Product.fromJSON(Map<String, dynamic> json){
-    uuid = json[AthentoFieldName.uuid];
-    title = json[AthentoFieldName.title];
-    EAN = json[ProductAthentoFieldName.EAN];
-    commercialCode = json[ProductAthentoFieldName.commercialCode];
-    retailReference = json[ProductAthentoFieldName.retailReference];
-    description = json[ProductAthentoFieldName.description];
+  Product.fromJSON(Map<String, dynamic> json):
+    uuid = json[AthentoFieldName.uuid],
+    title = json[AthentoFieldName.title],
+    EAN = json[ProductAthentoFieldName.EAN],
+    commercialCode = json[ProductAthentoFieldName.commercialCode],
+    retailReference = json[ProductAthentoFieldName.retailReference],
+    description = json[ProductAthentoFieldName.description],
     requestNumber = json[ProductAthentoFieldName.requestNumber];
-  }
 }
 
 class ProductAthentoFieldName{

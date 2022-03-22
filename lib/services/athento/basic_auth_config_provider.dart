@@ -5,7 +5,7 @@ class BasicAuthConfigProvider extends ConfigProvider{
   final String _user;
   final String _password;
 
-  BasicAuthConfigProvider(String serviceBaseUrl, String user, String password, [Map<String, String> fieldNameInferenceConfig]):
+  BasicAuthConfigProvider(String serviceBaseUrl, String user, String password, [Map<String, String>? fieldNameInferenceConfig]):
         _user = user, _password = password, super(serviceBaseUrl, fieldNameInferenceConfig);
 
   @override

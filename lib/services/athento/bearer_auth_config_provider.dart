@@ -5,7 +5,7 @@ class BearerAuthConfigProvider  extends ConfigProvider {
   final String _referer;
 
   BearerAuthConfigProvider(String serviceBaseUrl, String token, String referer,
-      [Map<String, String> fieldNameInferenceConfig])
+      [Map<String, String>? fieldNameInferenceConfig])
       : _token = token,
         _referer = referer,
         super(serviceBaseUrl, fieldNameInferenceConfig);
@@ -21,7 +21,7 @@ class BearerAuthConfigProvider  extends ConfigProvider {
   }
 
   @override
-  Map<String, String> getHttpHeaders([Map<String, String> addOrOverrideHeaders]) {
+  Map<String, String> getHttpHeaders([Map<String, String>? addOrOverrideHeaders]) {
     // Call parent getHttpHeaders()
     final httpHeaders = super.getHttpHeaders(addOrOverrideHeaders);
 

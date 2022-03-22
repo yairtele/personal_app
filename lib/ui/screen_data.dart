@@ -3,23 +3,25 @@ import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 
 class ScreenData<DataGetterParam, DataGetterReturn>{
-  DataGetterReturn data;
-  UserInfo userInfo;
-  String companyName;
-  Future<DataGetterReturn> Function(DataGetterParam getterParam) _dataGetter;
+  late final DataGetterReturn? data;
+  late final UserInfo userInfo;
+  late final String companyName;
+  Future<DataGetterReturn> Function(DataGetterParam? getterParam)? _dataGetter;
 
-  ScreenData({Future<DataGetterReturn> Function(DataGetterParam getterParam) dataGetter}){
+  ScreenData({Future<DataGetterReturn> Function(DataGetterParam? getterParam)? dataGetter}){
     _dataGetter = dataGetter;
   }
 
+  //ScreenData()
+
   ScreenData._withData(this.userInfo, this.companyName, this.data);
 
-  Future<ScreenData<DataGetterParam, DataGetterReturn>> getScreenData({DataGetterParam dataGetterParam}) async{
+  Future<ScreenData<DataGetterParam, DataGetterReturn>> getScreenData({DataGetterParam? dataGetterParam}) async{
     // Obtener CUIT del usuario (del perfil de Athento)
     var userInfo = await Cache.getUserInfo();
 
     if(userInfo == null) {
-      final userName = await Cache.getUserName();
+      final userName = (await Cache.getUserName())!;
       userInfo = await BusinessServices.getUserInfo(userName);
       Cache.saveUserInfo(userInfo);
     }
@@ -34,7 +36,7 @@ class ScreenData<DataGetterParam, DataGetterReturn>{
     // Obtener lista de lotes Draft (en principio) desde Athento
     var data = null;
     if(_dataGetter != null){
-      data = await _dataGetter(dataGetterParam);
+      data = await _dataGetter!(dataGetterParam);
     }
 
     return ScreenData._withData(userInfo, companyName, data);

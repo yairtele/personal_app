@@ -12,7 +12,7 @@ import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import '../app_state.dart';
 
 class NewBatch extends StatefulWidget {
-  const NewBatch({Key key}) : super(key: key);
+  const NewBatch({Key? key}) : super(key: key);
 
   @override
   State<NewBatch> createState() => _NewBatchState();
@@ -168,14 +168,16 @@ class _NewBatchState extends State<NewBatch> {
   }
 
   Future<void> _createBatch(String retailReference, String description, String observation) async {
-
-    String cuitRetail;
-    final retailCompanyName = await Cache.getCompanyName();
+    final cuitRetail = (await Cache.getUserInfo())!.idNumber;
+    final retailCompanyName = (await Cache.getCompanyName())!;
     BusinessServices.createBatch(Batch(
+        title: '$retailReference - $description',
         retailReference: retailReference,
-        description: description, cuitRetail: cuitRetail,
-        retailCompanyName: retailCompanyName,observation:observation));
-
+        description: description,
+        cuitRetail: cuitRetail,
+        retailCompanyName: retailCompanyName,
+        observation:observation,
+    ));
   }
 
   void _showSnackBar(String message){

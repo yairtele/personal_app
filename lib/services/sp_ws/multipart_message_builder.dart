@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 class MultipartMessageBuilder {
 
   final List<MessagePart> _parts = <MessagePart>[];
-  String  _boundaryString;
+  late String  _boundaryString;
 
   MultipartMessageBuilder(){
     const uuid = Uuid();
@@ -38,7 +38,7 @@ class MultipartMessageBuilder {
     var headersString = '';
     var sep = '';
     for (final propName in headersJson.keys){
-      headersString += sep + propName + ': ' + headersJson[propName];
+      headersString += sep + propName + ': ' + headersJson[propName]!;
       sep = '\n';
     }
     return headersString;
@@ -49,5 +49,5 @@ class MessagePart {
   Map<String, String> headers;
   String content;
 
-  MessagePart({@required this.headers, @required this.content});
+  MessagePart({required this.headers, required this.content});
 }

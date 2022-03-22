@@ -50,11 +50,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final appState = AppState();
-  ShoppingRouterDelegate delegate;
+  late ShoppingRouterDelegate delegate;
   final parser = ShoppingParser();
-  ShoppingBackButtonDispatcher backButtonDispatcher;
+  late ShoppingBackButtonDispatcher backButtonDispatcher;
 
-  StreamSubscription _linkSubscription;
+  late StreamSubscription _linkSubscription;
 
   _MyAppState() {
     delegate = ShoppingRouterDelegate(appState);
@@ -77,10 +77,10 @@ class _MyAppState extends State<MyApp> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     // Attach a listener to the Uri links stream
-    _linkSubscription = getUriLinksStream().listen((Uri uri) {
+    _linkSubscription = getUriLinksStream().listen((Uri? uri) {
       if (!mounted) return;
       setState(() {
-        delegate.parseRoute(uri);
+        delegate.parseRoute(uri!);
       });
     }, onError: (Object err) {
       print('Got error $err');

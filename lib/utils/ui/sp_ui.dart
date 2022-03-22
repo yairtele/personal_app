@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ @required State<T> state, @required Map<String, XFile> photos}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, XFile?> photos}) {
 
     return GridView.count(
         primary: false,
@@ -23,7 +23,7 @@ class SpUI{
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, XFile> photos, State<T> state) {
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, XFile?> photos, State<T> state) {
     final photo = photos[photoName];
 
     return Container(
@@ -82,7 +82,7 @@ class SpUI{
     );
   }
 
-  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ @required State<T> state, @required Map<String, BinaryFileInfo> photos}) {
+  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, BinaryFileInfo?> photos}) {
 
     return GridView.count(
         primary: false,
@@ -98,7 +98,7 @@ class SpUI{
     );
   }
 
-  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, BinaryFileInfo> photos, State<T> state) {
+  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, BinaryFileInfo?> photos, State<T> state) {
     final photo = photos[photoName];
 
     return Container(
@@ -157,7 +157,7 @@ class SpUI{
     );
   }
 
-  static Future<XFile> _getPhotoFromCamera() async {
+  static Future<XFile?> _getPhotoFromCamera() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
       maxWidth: 1800,

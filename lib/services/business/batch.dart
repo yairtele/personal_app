@@ -4,16 +4,16 @@ import 'package:flutter/cupertino.dart';
 import '../athento/athento_field_name.dart';
 
 class Batch {
-  String uuid;
+  String? uuid;
   String title;
-  String batchNumber; // Athento Auto-numbering ID
-  String retailReference;
-  String description;
+  String? batchNumber; // Athento Auto-numbering ID
+  String? retailReference;
+  String? description;
   String cuitRetail;
   String retailCompanyName;
-  String observation;
+  String? observation;
   //TODO: validar uno de this.retailReference o this.description no sean vacíos ni nulos
-  Batch({this.uuid, this.title, this.batchNumber, this.retailReference, this.description, @required this.cuitRetail, @required this.retailCompanyName,this.observation});
+  Batch({this.uuid, required this.title, this.batchNumber, required this.retailReference, this.description = '', required this.cuitRetail, required this.retailCompanyName, this.observation = ''});
 
   Map<String, dynamic> toJSON() {
     return {
@@ -28,16 +28,15 @@ class Batch {
     };
   }
 
-  Batch.fromJSON(Map<String, dynamic> json){
-    uuid = json[AthentoFieldName.uuid];
-    title = json[AthentoFieldName.title];
-    batchNumber = json[BatchAthentoFieldName.batchNumber];
-    retailReference = json[BatchAthentoFieldName.retailReference];
-    description = json[BatchAthentoFieldName.description];
-    cuitRetail = json[BatchAthentoFieldName.cuitRetail];
-    retailCompanyName = json[BatchAthentoFieldName.retailCompanyName];
+  Batch.fromJSON(Map<String, dynamic> json):
+    uuid = json[AthentoFieldName.uuid],
+    title = json[AthentoFieldName.title],
+    batchNumber = json[BatchAthentoFieldName.batchNumber],
+    retailReference = json[BatchAthentoFieldName.retailReference],
+    description = json[BatchAthentoFieldName.description],
+    cuitRetail = json[BatchAthentoFieldName.cuitRetail] ?? 'ERROR: debe tener CUIT', //TODO: sacar el condicional: no puede ser null el CUIT retail
+    retailCompanyName = json[BatchAthentoFieldName.retailCompanyName] ?? 'ERROR: debe tener Razon social', //TODO: sacar el condicional: no puede ser null la razon social
     observation = json[BatchAthentoFieldName.observation];
-  }
 }
 
 class BatchAthentoFieldName{

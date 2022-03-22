@@ -21,9 +21,9 @@ import '../app_state.dart';
 
 //T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
-  final ReturnRequest returnRequest;
+  final ReturnRequest? returnRequest;
   final Batch batch;
-  const NewReturnScreen({Key key, @required this.batch, this.returnRequest}) : super(key: key);
+  const NewReturnScreen({Key? key, required this.batch, this.returnRequest}) : super(key: key);
 
   @override
   State<NewReturnScreen> createState() => _NewReturnScreenState();
@@ -35,19 +35,19 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _quantityTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
 
-  XFile imageFile;
-  final Map<String, XFile> _takenPictures = {};
+  //XFile imageFile;
+  final Map<String, XFile?> _takenPictures = {};
   bool _isAuditableProduct = false;
   var _productSearchBy = ProductSearchBy.EAN;
-  ReturnRequest _existingReturnRequest = null;
-  ProductInfo _product = null;
-  Future<ScreenData<void, void>> _localData;
-  Batch _globalBatch;
+  ReturnRequest? _existingReturnRequest;
+  ProductInfo? _product;
+  Future<ScreenData<void, void>>? _localData;
+  late Batch _globalBatch;
 
   @override
   void initState() {
     super.initState();
-
+    _globalBatch = widget.batch;
     _localData = ScreenData<void, void>().getScreenData();
   }
 
@@ -96,7 +96,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     value: ProductSearchBy.EAN,
                                     onChanged: (value) {
                                       setState(() {
-                                        _productSearchBy = value;
+                                        _productSearchBy = value!;
                                       });
                                     },
                                   )),
@@ -107,7 +107,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     value: ProductSearchBy.CommercialCode,
                                     onChanged: (value) {
                                       setState(() {
-                                        _productSearchBy = value;
+                                        _productSearchBy = value!;
                                       });
                                     },
                                   )),
@@ -263,15 +263,17 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
                                     final thumbsWithPhotos = _takenPictures.entries
                                         .where((entry) => entry.value != null)
-                                        .map((e) => MapEntry<String, String>(e.key, e.value.path));
+                                        .map((e) => MapEntry<String, String>(e.key, e.value!.path));
 
                                     final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
 
+                                    final product = _product!;
+
                                     final newReturn = NewReturn(
-                                      EAN: _product.EAN,
+                                      EAN: product.EAN,
                                       retailReference: _retailReferenceTextController.text,
-                                      commercialCode: _product.commercialCode,
-                                      description: _product.description,
+                                      commercialCode: product.commercialCode,
+                                      description: product.description,
                                       quantity: _getQuantity(),
                                       isAuditable: _isAuditableProduct,
                                       photos: photosToSave,
@@ -286,13 +288,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   on BusinessException catch(e){
                                     _showSnackBar(e.message);
                                   }
-                                  on Exception catch(e){
+                                  catch (e){
                                     //TODO: EN GENRERAL: los errores inesperados se deben loguear o reportar al equipo de soporte atomáticamente
                                     //TODO: EN GENERAL: Detectar si los errores se deben a falta de conexión a internet, y ver como se loguean o reportan estos casos
                                     _showSnackBar('Ha ocurrido un error al guardar la nueva devolución. Error: ${e}');
-                                  }
-                                  catch (e){
-                                    final pepe = e;
                                   }
                                   finally{
                                     WorkingIndicatorDialog().dismiss();
@@ -368,10 +367,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     );
   }
 
-  Future<ReturnRequest> _getExistingReturnRequestInBatch({Batch batch, ProductInfo productInfo}) async {
-    ReturnRequest existingReturnRequest;
+  Future<ReturnRequest?> _getExistingReturnRequestInBatch({required Batch batch, required ProductInfo productInfo}) async {
+    ReturnRequest? existingReturnRequest;
     // Buscar todas las solicitudes del batch.
-    final returnRequests = await BusinessServices.getReturnRequestsByBatchNumber(batchNumber: batch.batchNumber);
+    final returnRequests = await BusinessServices.getReturnRequestsByBatchUUID(batchUUID: batch.uuid!);
 
     // Si no hay ninguna, retornar null
     if(returnRequests.length == 0){
@@ -406,10 +405,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _takenPictures.clear();
   }
 
-  int _getQuantity() {
-    int quantity = null;
+  int? _getQuantity() {
+    int? quantity = null;
 
-    if(!_product.isAuditable) {
+    if(!_product!.isAuditable) {
       quantity = int.tryParse(_quantityTextController.text);
       if(quantity == null || quantity <= 0){
         throw BusinessException('Por favor indique la cantidad a devolver. No puede ser cero ni vacía.');
@@ -418,7 +417,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     return quantity;
   }
 
-  void _lookForProduct ([ScanResult barcode]) async {
+  void _lookForProduct ([ScanResult? barcode]) async {
     try {
       // Limpiar campos
       _clearProductFields();
@@ -428,7 +427,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       }
 
       // Buscar info del producto y actualizar el Future del FutureBuilder.
-      ProductInfo productInfo = null;
+      late ProductInfo productInfo;
       if (_productSearchBy == ProductSearchBy.EAN) {
         productInfo = await _getProductInfoByEAN(_searchParamTextController.text);
       } else {

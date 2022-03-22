@@ -8,16 +8,16 @@ class NewReturn {
   String description;
   String retailReference;
   bool isAuditable;
-  int quantity;
+  int? quantity;
   Map<String, String> photos;
 
   NewReturn({
-    @required this.EAN,
-    @required this.commercialCode,
-    @required this.description,
-    @required this.retailReference,
-    @required this.isAuditable,
-    @required this.quantity,
-    @required this.photos
+    required this.EAN,
+    required this.commercialCode,
+    required this.description,
+    required this.retailReference,
+    required this.isAuditable,
+    required this.quantity,
+    required this.photos
   });
 }
