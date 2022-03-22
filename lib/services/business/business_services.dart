@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
@@ -119,7 +118,6 @@ class BusinessServices {
   static Future<List<ReturnRequest>> getReturnRequestsByBatchUUID({required String batchUUID}) async {
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
-    final batchFieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
 
     // Obtener config provider para Bearer Token
     final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
@@ -410,8 +408,6 @@ class BusinessServices {
           content: _getImageByteArray(path: photoPath),
           friendlyFileName: '$photoName$photoFileExtension',
         );
-
-        var foo = createdPhotoInfo;
       }
     }
     /// Si es producto auditable, crear solicitud (si no existe) y crear el documento de producto unitario y documentos de fotos
@@ -502,7 +498,7 @@ class BusinessServices {
         final fieldValues = _getPhotoFieldValues(photoName);
         final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
 
-        final results = await SpAthentoServices.createDocumentWithContent(
+        final createdPhotoInfo = await SpAthentoServices.createDocumentWithContent(
           configProvider: photoConfigProvider,
           containerUUID: createdProductInfo['uid'],
           docType: _photoDocType,
@@ -511,8 +507,6 @@ class BusinessServices {
           content: _getImageByteArray(path: photoPath),
           friendlyFileName: '$photoName$photoFileExtension',
         );
-
-        final foo = results['uid'];
       });
     }
   }
@@ -658,7 +652,6 @@ class BusinessServices {
   static Future<List<Product>> getProductsByReturnRequestUUID(String returnRequestUUID) async{
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
-    final returnRequestFieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
 
     // Obtener config provider para Bearer Token
     final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);

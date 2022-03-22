@@ -212,7 +212,7 @@ class _LoginState extends State<Login> {
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Text(_progressText, style: const TextStyle(
-                            color: Colors.grey, height: 4, fontSize: 9)),
+                            color: Colors.grey, height: 8, fontSize: 18)),
                       )
                     ]
                 )
@@ -245,17 +245,13 @@ class _LoginState extends State<Login> {
     const productsFileName = 'products_db.csv';
     final productsFile = File('${productsFolderPath.path}/$productsFileName');
     if (!productsFile.existsSync()) {
-      //TODO: For now, copy the file from assets
-      // Read file contents
-      //final productsFileContents = await rootBundle.loadString('assets/products/$productsFileName');
-
       // Write file to local folder
       const productsFileURL = '$filesFolderURL/$productsFileName';
 
       final response = await Dio().download(productsFileURL, productsFile.path,
           onReceiveProgress: (value1, value2) {
             setState(() {
-              _progressText = 'Descargando 1/2: ${(value1 / value2).toStringAsFixed(2)}';
+              _progressText = 'Descargando 1/3: ${(value1 / value2).toStringAsFixed(2)}';
             });
           }
       );
@@ -264,27 +260,39 @@ class _LoginState extends State<Login> {
 
     // Check if the sales file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
-
     const salesFileName = 'sales_db.csv';
     final salesFile = File('${productsFolderPath.path}/$salesFileName');
     if (!salesFile.existsSync()) {
-      //TODO: For now, copy the file from assets
-      // Read file contents
-      //final salesFileContents = await rootBundle.loadString('assets/products/$salesFileName');
-
       // Write file to local folder
       const salesFileURL = '$filesFolderURL/$salesFileName';
 
       final response = await Dio().download(salesFileURL, salesFile.path,
           onReceiveProgress: (value1, value2) {
             setState(() {
-              _progressText = 'Descargando 2/2: ${(value1 / value2).toStringAsFixed(2)}';
+              _progressText = 'Descargando 2/3: ${(value1 / value2).toStringAsFixed(2)}';
             });
           }
       );
       //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
     }
 
+    // Check if the rules file exists in the local app products folder. If not, retrieve it
+    //TODO: check if file needs update
+    const rulesFileName = 'rules_db.csv';
+    final rulesFile = File('${productsFolderPath.path}/$rulesFileName');
+    if (!rulesFile.existsSync()) {
+      // Write file to local folder
+      const rulesFileURL = '$filesFolderURL/$rulesFileName';
+
+      final response = await Dio().download(rulesFileURL, productsFile.path,
+          onReceiveProgress: (value1, value2) {
+            setState(() {
+              _progressText = 'Descargando 3/3: ${(value1 / value2).toStringAsFixed(2)}';
+            });
+          }
+      );
+      //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+    }
     return true;
   }
 }
