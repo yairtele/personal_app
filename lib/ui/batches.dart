@@ -126,33 +126,37 @@ class _BatchesState extends State<Batches> {
               body: SafeArea(
                 child: Column(
                   children:[
-                  DataTable(columns: <DataColumn>[
-                    const DataColumn(
-                    label: Text('Lotes Draft',style: TextStyle(fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black)),
-                    ),
-                    ],
-                    rows: List<DataRow>.generate (
-                      batches.length,
-                           (int index) => DataRow(
-                          cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
-                           leading: const Icon(FontAwesomeIcons.archive,color: Colors.grey),
-                          title: Text('${_getBatchTitle(batches[index])}',
-                          style: const TextStyle(fontSize: 14.0,
-                           fontWeight: FontWeight.bold,
-                           color: Colors.black)),
-                           subtitle: Text('${_getBatchSubTitle(batches[index])}\n\n\n'),
-                          ),onTap: () {
-                          appState.currentAction = PageAction(
-                              state: PageState.addWidget,
-                              widget: BatchDetails(batch: batches[index]),
-                              page: DetailsPageConfig);})],
-                     //selected: selected[index],
+                  ListView(
+                  children: [
+                      DataTable(columns: <DataColumn>[
+                      const DataColumn(
+                      label: Text('Lotes Draft',style: TextStyle(fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
+                      ),
+                      ],
+                      rows: List<DataRow>.generate (
+                        batches.length,
+                             (int index) => DataRow(
+                            cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
+                             leading: const Icon(FontAwesomeIcons.archive,color: Colors.grey),
+                            title: Text('${_getBatchTitle(batches[index])}',
+                            style: const TextStyle(fontSize: 14.0,
+                             fontWeight: FontWeight.bold,
+                             color: Colors.black)),
+                             subtitle: Text('${_getBatchSubTitle(batches[index])}\n\n\n'),
+                            ),onTap: () {
+                            appState.currentAction = PageAction(
+                                state: PageState.addWidget,
+                                widget: BatchDetails(batch: batches[index]),
+                                page: DetailsPageConfig);})],
+                       //selected: selected[index],
+                            ),
                           ),
-                        ),
-                    ),
-                    /*DataTable(columns: <DataColumn>[
+                      ),
+                    ],
+                  ),
+                    DataTable(columns: <DataColumn>[
                       const DataColumn(
                         label: Text('Lotes Enviados',style: TextStyle(fontSize: 18.0,
                             fontWeight: FontWeight.bold,
@@ -261,7 +265,7 @@ class _BatchesState extends State<Batches> {
                           //selected: selected[index],
                         ),
                       ),
-                    ),*/
+                    ),
                  ]
                 ),
               ),
