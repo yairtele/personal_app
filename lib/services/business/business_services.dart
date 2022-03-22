@@ -677,18 +677,18 @@ class BusinessServices {
     final entries = await SpAthentoServices.findDocuments(configProvider, _photoDocType, selectFields, whereExpression);
 
     //Convertir resultado a objetos ReturnRequest y retornar resultado
-    final returns = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
+    final productPhotos = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
 
     final takenPictures = <String, BinaryFileInfo?>{};
 
-    if (returns.length == 0){
+    if (productPhotos.length == 0){
       takenPictures['otra'] = null;
     } else {
-      returns.forEach((photo) async {
+      for (final photo in productPhotos){
         final content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
 
         takenPictures[photo.label] = content;
-      });
+      }
     }
     return takenPictures;
   }

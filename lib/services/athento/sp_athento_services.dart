@@ -12,7 +12,7 @@ import 'config_provider.dart';
 class SpAthentoServices {
   static Future<UserInfo> getUserInfo(ConfigProvider configProvider,
       String user_name_or_uuid) async {
-    final uri = configProvider.getEndpointUrl(AthentoEndpoint.getUserInfo);
+    final uri = configProvider.getEndpointUrl(AthentoEndpoint.getUserInfo).replaceFirst('{user_name}', user_name_or_uuid);
     final headers = configProvider.getHttpHeaders();
 
     final response = await SpWS.get(uri, headers: headers, parameters: {});
