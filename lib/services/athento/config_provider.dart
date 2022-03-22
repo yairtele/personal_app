@@ -12,7 +12,7 @@ abstract class ConfigProvider {
     AthentoEndpoint.updateDocument: 'nuxeo/site/automation/Athento.DocumentUpdate/',
     AthentoEndpoint.updateDocumentContent: 'Blob.Attach/',
     AthentoEndpoint.getAuthToken: 'o/token/',
-    AthentoEndpoint.getUserInfo: 'users/api/user/adrian.scotto.newsan/',
+    AthentoEndpoint.getUserInfo: 'users/api/user/{user_name}/',
 
   };
 

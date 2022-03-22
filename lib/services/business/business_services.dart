@@ -716,8 +716,9 @@ class BusinessServices {
     if (productPhotos.length == 0){
       takenPictures['otra'] = null;
     } else {
-      for(final photo in productPhotos){
+      for (final photo in productPhotos){
         final content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
+
         takenPictures[photo.label] = content;
       }
     }
