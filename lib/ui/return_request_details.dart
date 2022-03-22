@@ -277,7 +277,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     leading: const Icon(Icons.workspaces_filled,
                                       color: Colors.grey,),
                                     title: Text(
-                                        'Ref: ${returnRequest.retailReference ??
+                                        'Ref: ${products[index].retailReference ??
                                             '(sin referencia interna)' }'),
                                     subtitle: const Text(''),
                                   ), onTap: () {
