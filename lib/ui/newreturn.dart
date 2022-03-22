@@ -34,6 +34,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _retailReferenceTextController = TextEditingController();
   final _quantityTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
+  final _brandTextController = TextEditingController();
+  final _legalEntityTextController = TextEditingController();
+  final _dateTextController = TextEditingController();
+  final _eanTextController = TextEditingController();
+  final _commercialCodeTextController = TextEditingController();
 
   //XFile imageFile;
   final Map<String, XFile?> _takenPictures = {};
@@ -186,7 +191,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     Container(
                                       margin:
                                       const EdgeInsets.only(top: 8),
-                                      padding: const EdgeInsets.all(30),
+                                      padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                       child: TextField(
                                         controller: _descriptionTextController,
                                         autofocus: true,
@@ -203,10 +208,116 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         ),
                                       ),
                                     ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          //margin: const EdgeInsets.only(top: 8),
+                                          //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                          child: TextField(
+                                            controller: _eanTextController,
+                                            autofocus: true,
+                                            keyboardType: TextInputType.text,
+                                            textInputAction:
+                                            TextInputAction.send,
+                                            readOnly: true,
+                                            maxLength: 30,
+
+                                            decoration: const InputDecoration(
+                                                labelText: 'EAN',
+                                                border: InputBorder.none,
+                                                counter: Offstage()
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          //margin: const EdgeInsets.only(top: 8),
+                                          //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                          child: TextField(
+                                            controller: _commercialCodeTextController,
+                                            autofocus: true,
+                                            keyboardType: TextInputType.text,
+                                            textInputAction:
+                                            TextInputAction.send,
+                                            readOnly: true,
+                                            maxLength: 30,
+
+                                            decoration: const InputDecoration(
+                                                labelText: 'Código Comercial',
+                                                border: InputBorder.none,
+                                                counter: Offstage()
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                        children: [
+                                          Expanded(
+                                            //margin: const EdgeInsets.only(top: 8),
+                                            //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                            child: TextField(
+                                              controller: _brandTextController,
+                                              autofocus: true,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.send,
+                                              readOnly: true,
+                                              maxLength: 30,
+
+                                              decoration: const InputDecoration(
+                                                  labelText: 'Marca',
+                                                  border: InputBorder.none,
+                                                  counter: Offstage()
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            //margin: const EdgeInsets.only(top: 8),
+                                            //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                            child: TextField(
+                                              controller: _legalEntityTextController,
+                                              autofocus: true,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.send,
+                                              readOnly: true,
+                                              maxLength: 30,
+
+                                              decoration: const InputDecoration(
+                                                  labelText: 'Jurídica',
+                                                  border: InputBorder.none,
+                                                  counter: Offstage()
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+/*                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                    ]),
+ */                                 Container(
+                                      margin: const EdgeInsets.only(top: 8),
+                                      padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                      child: TextField(
+                                        controller: _dateTextController,
+                                        autofocus: true,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction:
+                                        TextInputAction.send,
+                                        readOnly: true,
+                                        maxLength: 30,
+
+                                        decoration: const InputDecoration(
+                                            labelText: 'Fecha Última Compra',
+                                            border: InputBorder.none,
+                                            counter: Offstage()
+                                        ),
+                                      ),
+                                    ),
                                     Container(
                                       margin:
                                       const EdgeInsets.only(top: 8),
-                                      padding: const EdgeInsets.all(30),
+                                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                                       child: TextField(
                                           controller: _retailReferenceTextController,
                                           autofocus: true,
@@ -402,6 +513,12 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _retailReferenceTextController.text = '';
     _quantityTextController.text = '';
     _descriptionTextController.text = '';
+    _dateTextController.text = '';
+    _eanTextController.text = '';
+    _commercialCodeTextController.text = '';
+    _brandTextController.text = '';
+    _legalEntityTextController.text = '';
+
     _takenPictures.clear();
   }
 
@@ -436,7 +553,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
-
+      _dateTextController.text = productInfo.lastSell.toString()!='null'?productInfo.lastSell.toString():'-';
+      _brandTextController.text = productInfo.brand;
+      _legalEntityTextController.text = productInfo.legalEntity;
+      _eanTextController.text = productInfo.EAN;
+      _commercialCodeTextController.text = productInfo.commercialCode;
 
       if (productInfo.photos.length == 0){
         _takenPictures['otra'] = null;

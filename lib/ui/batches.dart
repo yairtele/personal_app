@@ -124,6 +124,7 @@ class _BatchesState extends State<Batches> {
                 ],
               ),
               body: SafeArea(
+                child: SingleChildScrollView(
                 child: Column(
                   children:[
                       DataTable(columns: <DataColumn>[
@@ -181,7 +182,7 @@ class _BatchesState extends State<Batches> {
                     ),
                     ],
                   ),
-
+                ),
               ),
             );
           } else if (snapshot.hasError) {

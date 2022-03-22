@@ -49,6 +49,8 @@ class _ProductDetailsState extends State<ProductDetails> {
             final _EAN = TextEditingController(text:EAN);
             final descripcion = product.description;
             final _descripcion = TextEditingController(text:descripcion);
+            final reference = product.retailReference;
+            final _reference = TextEditingController(text:reference);
 
             widget = Scaffold(
               appBar: AppBar(
@@ -130,6 +132,31 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   WidgetSpan(
                                     child: Text(
                                         'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              )
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.all(15),
+                      child: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        maxLength: 50,
+                        enabled: false,
+                        controller: _reference,
+                        decoration: const InputDecoration(
+                          hintText: '-',
+                          label: Text.rich(
+                              TextSpan(
+                                children: <InlineSpan>[
+                                  WidgetSpan(
+                                    child: Text(
+                                        'Referencia:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               )
