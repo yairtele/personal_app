@@ -655,6 +655,38 @@ class BusinessServices {
     return returns.toList();
   }
 
+  static Future<List<Product>> getProductsByReturnRequestUUID(String returnRequestUUID) async{
+    //Obtener diccionario de inferencia de nombres de campo
+    final fieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
+    final returnRequestFieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
+
+    // Obtener config provider para Bearer Token
+    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
+
+    //Definir campos del SELECT
+    final selectFields = [
+      AthentoFieldName.uuid,
+      AthentoFieldName.title,
+      ProductAthentoFieldName.requestNumber,
+      ProductAthentoFieldName.EAN,
+      ProductAthentoFieldName.commercialCode,
+      ProductAthentoFieldName.description,
+      ProductAthentoFieldName.retailReference,
+    ];
+
+
+    // Construir WHERE expression
+    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND ecm:parentId = '$returnRequestUUID'";
+
+    // Invocar a Athento
+    final entries = await SpAthentoServices.findDocuments(
+        configProvider, _productDocType, selectFields, whereExpression);
+
+    //Convertir resultado a objetos ReturnRequest y retornar resultado
+    final returns = entries.map((e) => Product.fromJSON(e));
+    return returns.toList();
+  }
+
   static Future<Map<String, BinaryFileInfo?>> getPhotosByProductUUID(String productUuid) async{
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getPhotoFieldNameInferenceConfig();
@@ -677,18 +709,17 @@ class BusinessServices {
     final entries = await SpAthentoServices.findDocuments(configProvider, _photoDocType, selectFields, whereExpression);
 
     //Convertir resultado a objetos ReturnRequest y retornar resultado
-    final returns = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
+    final productPhotos = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
 
     final takenPictures = <String, BinaryFileInfo?>{};
 
-    if (returns.length == 0){
+    if (productPhotos.length == 0){
       takenPictures['otra'] = null;
     } else {
-      returns.forEach((photo) async {
+      for(final photo in productPhotos){
         final content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
-
         takenPictures[photo.label] = content;
-      });
+      }
     }
     return takenPictures;
   }
