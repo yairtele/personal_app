@@ -112,7 +112,7 @@ class SpUI{
             Expanded( // Show photo or icon
                 child: ((){
                   if (photo != null)
-                    return  Image.file(File.fromRawPath(photo.bytes));
+                    return  Image.memory(photo.bytes);
                   else
                     return const Icon(FontAwesomeIcons.camera);
                 })()
