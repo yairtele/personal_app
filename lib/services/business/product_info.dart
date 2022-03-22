@@ -6,6 +6,8 @@ class ProductInfo {
   String EAN;
   String commercialCode;
   String description;
+  String brand;
+  String legalEntity;
   String? retailAccount;
   DateTime? lastSell;
   double? lastSellPrice;
@@ -17,6 +19,8 @@ class ProductInfo {
     required this.commercialCode,
     required this.description,
     required this.retailAccount,
+    required this.brand,
+    required this.legalEntity,
     required this.lastSell,
     required this.lastSellPrice,
     required List<String> photos}):
