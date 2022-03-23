@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
+import 'package:intl/intl.dart';
 
 //T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
@@ -48,6 +49,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   ProductInfo? _product;
   Future<ScreenData<void, void>>? _localData;
   late Batch _globalBatch;
+  String _dateWarning = '';
 
   @override
   void initState() {
@@ -291,11 +293,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                             ),
                                           ),
                                         ]),
-/*                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                    ]),
- */                                 Container(
+                                    Container(
                                       margin: const EdgeInsets.only(top: 8),
                                       padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                       child: TextField(
@@ -314,6 +312,13 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         ),
                                       ),
                                     ),
+                                    if(_dateWarning != '')
+                                      Icon(FontAwesomeIcons.exclamationTriangle),
+                                      Text(_dateWarning,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red
+                                        )),
                                     Container(
                                       margin:
                                       const EdgeInsets.only(top: 8),
@@ -553,7 +558,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
-      _dateTextController.text = productInfo.lastSell.toString()!='null'?productInfo.lastSell.toString():'-';
+      final DateFormat formatter = DateFormat('dd/MM/yyyy');
+      _dateTextController.text = productInfo.lastSell != null? formatter.format(productInfo.lastSell!).toString() : '-';
       _brandTextController.text = productInfo.brand;
       _legalEntityTextController.text = productInfo.legalEntity;
       _eanTextController.text = productInfo.EAN;
@@ -571,10 +577,13 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
       final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: _globalBatch, productInfo: productInfo);
 
+      final dateWarning = _dateValidation(productInfo);
+
       setState(() {
         _isAuditableProduct = productInfo.isAuditable;
         _existingReturnRequest = existingReturnRequest;
         _product = productInfo;
+        _dateWarning = dateWarning;
       });
     }
     on BusinessException catch (e) {
@@ -585,6 +594,17 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     on Exception catch (e) {
       _showSnackBar(
           'Ha ocurrido un error inesperado: $e');
+    }
+  }
+
+  String _dateValidation(ProductInfo productInfo){
+
+    final lastSell = productInfo.lastSell;
+
+    if(lastSell != null && DateTime.now().difference(lastSell).inDays > 365){
+      return 'La última compra fue realizada hace más de 365 días. La devolución podría ser rechazada por el auditor.';
+    } else {
+      return '';
     }
   }
 }
