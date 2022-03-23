@@ -559,7 +559,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
-      _dateTextController.text = productInfo.salesInfo  != null ? productInfo.salesInfo!.lastSellDate.toString() : '(No diponible)';
+      _dateTextController.text = productInfo.salesInfo  != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;
       _legalEntityTextController.text = productInfo.legalEntity;
       _eanTextController.text = productInfo.EAN;
@@ -599,10 +599,14 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
   String _dateValidation(ProductInfo productInfo){
 
-    final lastSell = productInfo.lastSell;
+    if(productInfo.salesInfo == null) {
+      return 'No se encontró información sobre la última compra. La devolución podría ser rechazada por el auditor.';
+    }
 
-    if(lastSell != null && DateTime.now().difference(lastSell).inDays > 365){
-      return 'La última compra fue realizada hace más de 365 días. La devolución podría ser rechazada por el auditor.';
+    final lastSell = productInfo.salesInfo!.lastSellDate;
+
+    if(lastSell != null && DateTime.now().difference(lastSell).inDays > productInfo.auditRules.lastSaleMaxAge.inDays){
+      return 'La última compra fue realizada hace más de ${productInfo.auditRules.lastSaleMaxAge.inDays} días. La devolución podría ser rechazada por el auditor.';
     } else {
       return '';
     }
