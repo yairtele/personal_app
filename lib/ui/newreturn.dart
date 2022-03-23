@@ -559,18 +559,18 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
-      _dateTextController.text = productInfo.lastSell != null? formatter.format(productInfo.lastSell!).toString() : '-';
+      _dateTextController.text = productInfo.salesInfo  != null ? productInfo.salesInfo!.lastSellDate.toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;
       _legalEntityTextController.text = productInfo.legalEntity;
       _eanTextController.text = productInfo.EAN;
       _commercialCodeTextController.text = productInfo.commercialCode;
 
-      if (productInfo.photos.length == 0){
+      if (productInfo.auditRules.photos.length == 0){
         _takenPictures['otra'] = null;
       }
       else{
-        productInfo.photos.forEach((photoName) {
-          _takenPictures[photoName] = null;
+        productInfo.auditRules.photos.forEach((photoAuditInfo) {
+          _takenPictures[photoAuditInfo.name] = null;
         });
       }
 
