@@ -73,7 +73,7 @@ class BusinessServices {
       BatchAthentoFieldName.observation,
     ];
 
-    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
+    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' and 'Enviado' and 'Informacion Pendiente	' and 'En proceso'";
 
     final entries = await SpAthentoServices.findDocuments(
         configProvider, _batchDocType, selectFields, whereExpression);

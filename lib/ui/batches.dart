@@ -161,7 +161,8 @@ class _BatchesState extends State<Batches> {
                       ),
                     ],
                       rows: List<DataRow>.generate (
-                        batches.length,
+                        //batches.where((state) => 'Draft').length,
+                        batches.where((s) => s.),
                             (int index) => DataRow(
                           cells: <DataCell>[DataCell(ListTile(isThreeLine: true,
                             leading: const Icon(FontAwesomeIcons.archive,color: Colors.blue),
