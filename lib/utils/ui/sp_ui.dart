@@ -44,7 +44,7 @@ class SpUI{
             ),
             Row(
               children: [
-                Expanded(child: Text(photoName, textAlign: TextAlign.center)), // Photo name
+                Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
                 if(photo != null)
                   ElevatedButton( // Delete photo
                     child: const Icon(FontAwesomeIcons.trash),
@@ -164,6 +164,11 @@ class SpUI{
       maxHeight: 1800,
     );
     return pickedFile;
+  }
+
+  static String _getThumbTitle(String photoName) {
+    final thumbTitle = photoName.substring(0,1 ).toUpperCase() + photoName.substring(1).replaceAll('_', ' ');
+    return thumbTitle;
   }
 }
 

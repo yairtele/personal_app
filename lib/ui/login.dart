@@ -284,7 +284,7 @@ class _LoginState extends State<Login> {
       // Write file to local folder
       const rulesFileURL = '$filesFolderURL/$rulesFileName';
 
-      final response = await Dio().download(rulesFileURL, productsFile.path,
+      final response = await Dio().download(rulesFileURL, rulesFile.path,
           onReceiveProgress: (value1, value2) {
             setState(() {
               _progressText = 'Descargando 3/3: ${(value1 / value2).toStringAsFixed(2)}';

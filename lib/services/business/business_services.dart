@@ -157,46 +157,6 @@ class BusinessServices {
     return getProductInfoByEANfromFile(eanCode);
   }
 
-  static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
-    //TODO: Consultar Athento
-    return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      final products= <String, ProductInfo>{
-        '1234': ProductInfo(
-          EAN: '1234567891012',
-          commercialCode: 'TV-LG-80I',
-          description: 'Televisor LG 80"',
-          brand: 'LG',
-          legalEntity: 'NEW SAN S.A.',
-          retailAccount: '012345',
-          lastSell: DateTime(2022, 1, 1),
-          lastSellPrice: 123455.56,
-          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
-        ),
-        '4321': ProductInfo(
-          EAN: '25698742224',
-          commercialCode: 'AC-BGH-3000',
-          description: 'Aire Acondicionado BGH 3000',
-          brand: 'BGH',
-          legalEntity: 'NEW SAN S.A.',
-          retailAccount: '012345',
-          lastSell: DateTime(2022, 1, 1),
-          lastSellPrice: 12345.56,
-          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
-        ),
-
-      };
-
-      final product = products[eanCode];
-
-      if(product == null){
-        throw BusinessException('No se ha encontrado el EAN "$eanCode".');
-      }
-
-      return product;
-
-    });
-  }
-
   static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
     const EAN_INDEX = 0;
     return getProductInfoByEANorCodefromFile(EAN_INDEX, eanCode);
@@ -208,49 +168,10 @@ class BusinessServices {
     //return getProductInfoByCommercialCodeFromArray(commercialCode);
     return getProductInfoByCommercialCodefromFile(commercialCode);
   }
-  static Future<ProductInfo> getProductInfoByCommercialCodeFromArray(String commercialCode) async {
-    //TODO: Consultar Athento
-    return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      var products= <String, ProductInfo>{
-        'PLANCHA': ProductInfo(
-          EAN: '987654321012',
-          commercialCode: 'PLANCHA',
-          description: 'Plancha 1200 W"',
-          brand: 'GAMA',
-          legalEntity: 'NEW SAN S.A.',
-          retailAccount: '012345',
-          lastSellPrice: 2345.56,
-          lastSell: DateTime(2018, 1, 1),
-          photos: [],
-        ),
-        'AFEITADORA': ProductInfo(
-          EAN: '69415464654',
-          commercialCode: 'AFEITADORA',
-          description: 'Afeitadora Braun Shower',
-          brand: 'Braun',
-          legalEntity: 'NEW SAN S.A.',
-          retailAccount: '012345',
-          lastSellPrice: 1345.56,
-          lastSell: DateTime(2018, 1, 1),
-          photos: [],
-        )
 
-      };
-
-      var product = products[commercialCode];
-
-      if(product == null){
-        throw BusinessException(
-            'No se ha encontrado el código comercial "$commercialCode".');
-      }
-
-      return product;
-    });
-  }
-
-  static Future<ProductInfo> getProductInfoByCommercialCodefromFile(String eanCode) async {
+  static Future<ProductInfo> getProductInfoByCommercialCodefromFile(String commercialCode) async {
     const COMMERCIAL_CODE_INDEX = 1;
-    return getProductInfoByEANorCodefromFile(COMMERCIAL_CODE_INDEX, eanCode);
+    return getProductInfoByEANorCodefromFile(COMMERCIAL_CODE_INDEX, commercialCode);
 
   }
 
@@ -282,20 +203,26 @@ class BusinessServices {
         equals: (List<String> row) => row[SKU_INDEX] == producMasterInfo.sku && row[CUIT_INDEX] == retailCUIT,
         objectBuilder: createProductSalesInfo);
 
-    //if(producSalesInfo == null){
-    //  throw BusinessException('No se ha podido encontrar un producto con el SKU "${producMasterInfo.sku}" en la base de ventas.');
-    //}
+    const BUSINESS_UNIT_INDEX = 0;
+    final productAuditRules = await getRowAsObjectFromFile(
+        fileName: 'rules_db.csv' ,
+        chunkSize: chunkSize,
+        lineSeparator: '\r\n',
+        columnSeparator: '\t',
+        equals: (List<String> row) => row[BUSINESS_UNIT_INDEX] == producMasterInfo.businessUnit,
+        objectBuilder: createProductAuditRules);
+
 
     return ProductInfo(
         EAN: producMasterInfo.ean,
         commercialCode: producMasterInfo.commercialCode,
+        sku: producMasterInfo.sku,
         description: producMasterInfo.description,
         brand: producMasterInfo.brand,
         legalEntity: producMasterInfo.legalEntity,
-        retailAccount: producSalesInfo?.retailAccount,
-        lastSell: producSalesInfo?.lastSellDate,
-        lastSellPrice: producSalesInfo?.price,
-        photos: ['frente', 'dorso', 'accesorios', 'embalaje']);
+        salesInfo: producSalesInfo,
+        auditRules: productAuditRules ?? ProductAuditRules(photos: [PhotoAuditInfo(label: 'Otra', name: 'otra')], lastSaleMaxAge: const Duration(days: 365)),
+    );
 
     //return getProductInfoByEANfromArray(eanCode);
 
@@ -352,8 +279,13 @@ class BusinessServices {
 
   static ProductSalesInfo createProductSalesInfo(List<String> row){
     return ProductSalesInfo.fromCsvRow(row);
-
   }
+
+  static ProductAuditRules createProductAuditRules(List<String> row){
+    return ProductAuditRules.fromCsvRow(row);
+  }
+
+
 
 
   static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest? existingReturnRequest, required NewReturn newReturn}) async {
@@ -772,6 +704,99 @@ class BusinessServices {
     //TODO:Armado con orden correcto del titulo para la solicitud.
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
   }
+
+  /*
+  static Future<ProductInfo> getProductInfoByCommercialCodeFromArray(String commercialCode) async {
+    //TODO: Consultar Athento
+    return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
+      var products= <String, ProductInfo>{
+        'PLANCHA': ProductInfo(
+          EAN: '987654321012',
+          commercialCode: 'PLANCHA',
+          sku: '90PLANCHA',
+          description: 'Plancha 1200 W"',
+          brand: 'GAMA',
+          legalEntity: 'NEW SAN S.A.',
+          salesInfo:  ProductSalesInfo(
+              lastSellDate:  DateTime(2018, 1, 1),
+              retailAccount: '012345',
+              price: 2345.56
+          ),
+          photos: [],
+        ),
+        'AFEITADORA': ProductInfo(
+          EAN: '69415464654',
+          commercialCode: 'AFEITADORA',
+          sku: 'AFEITADORA',
+          description: 'Afeitadora Braun Shower',
+          brand: 'Braun',
+          legalEntity: 'NEW SAN S.A.',
+          salesInfo:  ProductSalesInfo(
+              lastSellDate:  DateTime(2018, 1, 1),
+              retailAccount: '012345',
+              price: 1345.56
+          ),
+          photos: [],
+        )
+
+      };
+
+      var product = products[commercialCode];
+
+      if(product == null){
+        throw BusinessException(
+            'No se ha encontrado el código comercial "$commercialCode".');
+      }
+
+      return product;
+    });
+  }
+  static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
+    //TODO: Consultar Athento
+    return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
+      final products= <String, ProductInfo>{
+        '1234': ProductInfo(
+          EAN: '1234567891012',
+          commercialCode: 'TV-LG-80I',
+          sku: '90TV-LG-80I',
+          description: 'Televisor LG 80"',
+          brand: 'LG',
+          legalEntity: 'NEW SAN S.A.',
+          salesInfo:  ProductSalesInfo(
+              lastSellDate:  DateTime(2022, 1, 1),
+              retailAccount: '012345',
+              price: 222345.56
+          ),
+          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
+        ),
+        '4321': ProductInfo(
+          EAN: '25698742224',
+          commercialCode: 'AC-BGH-3000',
+          sku: '90AC-BGH-3000',
+          description: 'Aire Acondicionado BGH 3000',
+          brand: 'BGH',
+          legalEntity: 'NEW SAN S.A.',
+          salesInfo:  ProductSalesInfo(
+              lastSellDate:  DateTime(2022, 1, 1),
+              retailAccount: '012345',
+              price: 112345.56
+          ),
+          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
+        ),
+
+      };
+
+      final product = products[eanCode];
+
+      if(product == null){
+        throw BusinessException('No se ha encontrado el EAN "$eanCode".');
+      }
+
+      return product;
+
+    });
+  }
+  */
 }
 
 class ProductMasterInfo{
@@ -799,16 +824,13 @@ class ProductMasterInfo{
 }
 
 class ProductSalesInfo{
-  String sku;
   DateTime lastSellDate;
   double price;
   String retailAccount;
 
-  ProductSalesInfo({ required this.sku, required this.lastSellDate, required this.price, required this.retailAccount});
+  ProductSalesInfo({ required this.lastSellDate, required this.price, required this.retailAccount});
 
   ProductSalesInfo.fromCsvRow(List<String> row) : this(
-
-      sku: row[15],
       lastSellDate: _parseDate(row[0]),
       price: _parsePrice(row[36]),
       retailAccount: row[21],
@@ -839,5 +861,33 @@ class ProductSalesInfo{
     }
 
     return DateTime.parse(dateString);
+  }
+}
+
+class ProductAuditRules{
+  List<PhotoAuditInfo> photos;
+  Duration lastSaleMaxAge;
+
+  ProductAuditRules({ required this.photos, required this.lastSaleMaxAge});
+
+  ProductAuditRules.fromCsvRow(List<String> row) : this(
+      photos: _createAuditPhotoInfos(row[3]),
+      lastSaleMaxAge: Duration(days: int.parse(row[4])),
+  );
+  static List<PhotoAuditInfo> _createAuditPhotoInfos(String photoLabelsCSL){
+    final photoLabels = photoLabelsCSL.split(',');
+    return photoLabels.map((photoLabel) => PhotoAuditInfo.fromLabel(photoLabel)).toList(growable: false);
+  }
+}
+
+class PhotoAuditInfo{
+  String label;
+  String name;
+  PhotoAuditInfo({required this.label, required this.name});
+
+  PhotoAuditInfo.fromLabel(String label): this(label: label, name: _sanitize(label));
+
+  static String _sanitize(String label){
+    return label.toLowerCase().replaceAll(' ', '_');
   }
 }
