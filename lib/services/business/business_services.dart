@@ -130,11 +130,16 @@ class BusinessServices {
       ReturnRequestAthentoFieldName.requestNumber,
       ReturnRequestAthentoFieldName.batchNumber,
       ReturnRequestAthentoFieldName.EAN,
+      ReturnRequestAthentoFieldName.sku,
       ReturnRequestAthentoFieldName.commercialCode,
       ReturnRequestAthentoFieldName.description,
       ReturnRequestAthentoFieldName.retailReference,
       ReturnRequestAthentoFieldName.quantity,
       ReturnRequestAthentoFieldName.isAuditable,
+      ReturnRequestAthentoFieldName.legalEntity,
+      ReturnRequestAthentoFieldName.lastSell,
+      ReturnRequestAthentoFieldName.price,
+      ReturnRequestAthentoFieldName.businessUnit
     ];
 
     // Construir WHERE expression
@@ -221,6 +226,7 @@ class BusinessServices {
         description: producMasterInfo.description,
         brand: producMasterInfo.brand,
         legalEntity: producMasterInfo.legalEntity,
+        businessUnit: producMasterInfo.businessUnit,
         salesInfo: producSalesInfo,
         auditRules: productAuditRules ?? ProductAuditRules(photos: [PhotoAuditInfo(label: 'Otra', name: 'otra')], lastSaleMaxAge: const Duration(days: 365)),
     );
@@ -291,28 +297,24 @@ class BusinessServices {
 
   static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest? existingReturnRequest, required NewReturn newReturn}) async {
 
-    final returnRequestTitle = '${newReturn.EAN}-${newReturn
-        .retailReference}'; //TODO: ver qué datos corresponde usar
+    final returnRequestTitle = '${newReturn.EAN}-${newReturn.retailReference}'; //TODO: ver qué datos corresponde usar
 
     /// Si el producto no es auditable, crear la solicitud dentro del lote y guardar la foto opcional (si esta existe)
     if (newReturn.isAuditable == false) {
       // Validar cantidad
       if (newReturn.quantity == null || newReturn.quantity! <= 0) {
         throw BusinessException(
-            'Los productos no auditables deben tener una cantidad a devolver mayor a cero en lugar de "${newReturn
-                .quantity}".');
+            'Los productos no auditables deben tener una cantidad a devolver mayor a cero en lugar de "${newReturn.quantity}".');
       }
 
       // Validar cantidad de fotos
       if (newReturn.photos.length > 1) {
         throw BusinessException(
-            'Los productos no auditables deben tener como máximo una foto en lugar de"${newReturn
-                .photos.length}".');
+            'Los productos no auditables deben tener como máximo una foto en lugar de"${newReturn.photos.length}".');
       }
 
       // Obtener valores de campos para la nueva solicitud
-      final fieldValues = _getReturnRequestFieldValues(
-          returnRequestTitle, batch, newReturn);
+      final fieldValues = _getReturnRequestFieldValues(returnRequestTitle, batch, newReturn);
 
       // Validar retailReference. No debería haber otra con el mismo valor
       // Por ahora no validar esto
@@ -322,8 +324,7 @@ class BusinessServices {
 
       // Crear solicitud con su foto opcional y salir
       // Si no hay fotos
-      final configProvider = await  _createConfigProvider(
-          _getReturnRequestFieldNameInferenceConfig());
+      final configProvider = await  _createConfigProvider(_getReturnRequestFieldNameInferenceConfig());
       // Crear solicitud de devolución
       final createdReturnRequestInfo = await SpAthentoServices.createDocument(
           configProvider: configProvider,
@@ -460,11 +461,16 @@ class BusinessServices {
         title: returnRequestTitle,
         batchNumber: batch.batchNumber,
         EAN: newReturn.EAN,
+        sku: newReturn.sku,
         commercialCode: newReturn.commercialCode,
         description: newReturn.description,
         retailReference: newReturn.retailReference,
         isAuditable: newReturn.isAuditable,
-        quantity: newReturn.quantity
+        quantity: newReturn.quantity,
+        lastSell: newReturn.lastSell,
+        price: newReturn.price,
+        legalEntity: newReturn.legalEntity,
+        businessUnit: newReturn.businessUnit
     );
     final fieldValues = returnRequest.toJSON();
 
