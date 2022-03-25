@@ -38,6 +38,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _brandTextController = TextEditingController();
   final _legalEntityTextController = TextEditingController();
   final _dateTextController = TextEditingController();
+  final _priceTextController = TextEditingController();
   final _eanTextController = TextEditingController();
   final _commercialCodeTextController = TextEditingController();
 
@@ -47,6 +48,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   var _productSearchBy = ProductSearchBy.EAN;
   ReturnRequest? _existingReturnRequest;
   ProductInfo? _product;
+  String? _productLastSell;
+  String? _lastSellPrice;
   Future<ScreenData<void, void>>? _localData;
   late Batch _globalBatch;
   String _dateWarning = '';
@@ -185,8 +188,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                             Container(
                               margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.all(15),
-                              //child: Scaffold(
-                              //body: SafeArea(
                               child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -213,8 +214,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     Row(
                                       children: [
                                         Expanded(
-                                          //margin: const EdgeInsets.only(top: 8),
-                                          //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                                           child: TextField(
                                             controller: _eanTextController,
                                             autofocus: true,
@@ -232,8 +231,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                           ),
                                         ),
                                         Expanded(
-                                          //margin: const EdgeInsets.only(top: 8),
-                                          //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                                           child: TextField(
                                             controller: _commercialCodeTextController,
                                             autofocus: true,
@@ -255,8 +252,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     Row(
                                         children: [
                                           Expanded(
-                                            //margin: const EdgeInsets.only(top: 8),
-                                            //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                                             child: TextField(
                                               controller: _brandTextController,
                                               autofocus: true,
@@ -274,8 +269,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            //margin: const EdgeInsets.only(top: 8),
-                                            //padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                                             child: TextField(
                                               controller: _legalEntityTextController,
                                               autofocus: true,
@@ -293,25 +286,43 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                             ),
                                           ),
                                         ]),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 8),
-                                      padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                                      child: TextField(
-                                        controller: _dateTextController,
-                                        autofocus: true,
-                                        keyboardType: TextInputType.text,
-                                        textInputAction:
-                                        TextInputAction.send,
-                                        readOnly: true,
-                                        maxLength: 30,
+                                    Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _dateTextController,
+                                              autofocus: true,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.send,
+                                              readOnly: true,
+                                              maxLength: 30,
 
-                                        decoration: const InputDecoration(
-                                            labelText: 'Fecha Última Compra',
-                                            border: InputBorder.none,
-                                            counter: Offstage()
-                                        ),
-                                      ),
-                                    ),
+                                              decoration: const InputDecoration(
+                                                  labelText: 'Fecha Última Compra',
+                                                  border: InputBorder.none,
+                                                  counter: Offstage()
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _priceTextController,
+                                              autofocus: true,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.send,
+                                              readOnly: true,
+                                              maxLength: 30,
+
+                                              decoration: const InputDecoration(
+                                                  labelText: 'Precio',
+                                                  border: InputBorder.none,
+                                                  counter: Offstage()
+                                              ),
+                                            ),
+                                          )
+                                        ]),
                                     if(_dateWarning != '')
                                       Icon(FontAwesomeIcons.exclamationTriangle),
                                       Text(_dateWarning,
@@ -384,16 +395,22 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
 
                                     final product = _product!;
-
+                                    //TODO: Falta pasarle el precio (primero crear metadato en Athento
                                     final newReturn = NewReturn(
                                       EAN: product.EAN,
+                                      sku: product.sku,
                                       retailReference: _retailReferenceTextController.text,
                                       commercialCode: product.commercialCode,
                                       description: product.description,
+                                      lastSell: _productLastSell,
+                                      price: _lastSellPrice,
+                                      legalEntity: product.legalEntity,
+                                      businessUnit: product.businessUnit,
                                       quantity: _getQuantity(),
                                       isAuditable: _isAuditableProduct,
                                       photos: photosToSave,
                                     );
+                                    //print('GLOBAL BATCH: ' + batch.batchNumber!);
                                     await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
                                     _showSnackBar('La nueva devolución fue registrada con éxito');
                                     _clearProductFields();
@@ -417,16 +434,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                               ),
                             ),
                           ],
-/*            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: imageFile == null
-                            ? AssetImage('assets/images/logo_blanco.png')
-                            : FileImage(File(imageFile.path)),
-                        fit: BoxFit.cover)),
-              ),
-            ),*/
                         ],
                       ),
                     ),
@@ -519,6 +526,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _quantityTextController.text = '';
     _descriptionTextController.text = '';
     _dateTextController.text = '';
+    _priceTextController.text = '';
     _eanTextController.text = '';
     _commercialCodeTextController.text = '';
     _brandTextController.text = '';
@@ -559,11 +567,14 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
-      _dateTextController.text = productInfo.salesInfo  != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
+      _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
+      _priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;
       _legalEntityTextController.text = productInfo.legalEntity;
       _eanTextController.text = productInfo.EAN;
       _commercialCodeTextController.text = productInfo.commercialCode;
+
+      final dateWarning = _dateValidation(productInfo);
 
       if (productInfo.auditRules.photos.length == 0){
         _takenPictures['otra'] = null;
@@ -576,8 +587,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
       //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
       final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: _globalBatch, productInfo: productInfo);
-
-      final dateWarning = _dateValidation(productInfo);
 
       setState(() {
         _isAuditableProduct = productInfo.isAuditable;
@@ -599,6 +608,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
   String _dateValidation(ProductInfo productInfo){
 
+    _productLastSell = null;
+    _lastSellPrice = null;
+
     if(productInfo.salesInfo == null) {
       return 'No se encontró información sobre la última compra. La devolución podría ser rechazada por el auditor.';
     }
@@ -606,6 +618,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     final lastSell = productInfo.salesInfo!.lastSellDate;
 
     if(lastSell != null && DateTime.now().difference(lastSell).inDays > productInfo.auditRules.lastSaleMaxAge.inDays){
+      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+      _productLastSell = formatter.format(productInfo.salesInfo!.lastSellDate).toString();
+      _lastSellPrice = '\$' +productInfo.salesInfo!.price.toString();
       return 'La última compra fue realizada hace más de ${productInfo.auditRules.lastSaleMaxAge.inDays} días. La devolución podría ser rechazada por el auditor.';
     } else {
       return '';
