@@ -114,7 +114,7 @@ abstract class ConfigProvider {
       for (final fieldName in fieldValues.keys) {
         if (!fieldMap.containsKey(fieldName)) {
           final renamedFieldValuePair = Map<String, dynamic>();
-          final renamedFieldName = !(fieldName == 'dc:title' || fieldName == 'ecm:uuid') ? defaultPrefix +
+          final renamedFieldName = !(fieldName.indexOf('dc:') >= 0 || fieldName.indexOf('ecm:') >= 0) ? defaultPrefix +
               fieldName : fieldName;
           renamedFieldValuePair[renamedFieldName] = fieldValues[fieldName];
 

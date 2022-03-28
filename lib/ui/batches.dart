@@ -71,7 +71,6 @@ class _BatchesState extends State<Batches> {
             final data = snapshot.data!;
             final userInfo = data.userInfo;
             final batches = data.data!;
-            final state = batches[0].state;
             final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
             final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
 
@@ -146,7 +145,7 @@ class _BatchesState extends State<Batches> {
                             DataCell(ListTile(isThreeLine: true,
                               leading: const Icon(
                                   FontAwesomeIcons.archive,
-                                  color: Colors.blue),
+                                  color: Colors.grey),
                               title: Text(
                                   '${_getBatchTitle(draftBatches[index])}',
                                   style: const TextStyle(fontSize: 14.0,
@@ -184,7 +183,7 @@ class _BatchesState extends State<Batches> {
                                   DataCell(ListTile(isThreeLine: true,
                                     leading: const Icon(
                                         FontAwesomeIcons.archive,
-                                        color: Colors.grey),
+                                        color: Colors.blue),
                                     title: Text(
                                         '${_getBatchTitle(auditedBatches[index])}',
                                         style: const TextStyle(fontSize: 14.0,

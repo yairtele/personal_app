@@ -9,6 +9,7 @@ import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/athento/config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/product_photo.dart';
 import 'package:navigation_app/services/business/return_request.dart';
@@ -73,7 +74,7 @@ class BusinessServices {
       BatchAthentoFieldName.observation,
     ];
 
-    const whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft'";
+    final whereExpression = "WHERE ecm:currentLifeCycleState in ('${BatchStates.Draft}','${BatchStates.EnProceso}','${BatchStates.Enviado}','${BatchStates.InfoEnviada}','${BatchStates.InfoPendiente}')";
 
     final entries = await SpAthentoServices.findDocuments(
         configProvider, _batchDocType, selectFields, whereExpression);
