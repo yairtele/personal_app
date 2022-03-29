@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:provider/provider.dart';
@@ -172,6 +173,7 @@ class _NewBatchState extends State<NewBatch> {
     final retailCompanyName = (await Cache.getCompanyName())!;
     BusinessServices.createBatch(Batch(
         title: '$retailReference - $description',
+        state:BatchStates.Draft,
         retailReference: retailReference,
         description: description,
         cuitRetail: cuitRetail,
