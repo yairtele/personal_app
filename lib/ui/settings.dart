@@ -56,7 +56,7 @@ class Settings extends StatelessWidget {
                   primary: Colors.grey, // background
               ),
                onPressed: () async {
-                  appState.logout();
+                  await appState.logout();
                 },
                 child: const Text('Log Out'),
               ),
