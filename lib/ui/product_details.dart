@@ -211,7 +211,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             onPressed: () async {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Eliminando producto...');
-                                //TODO: _deleteProduct(product)
+                                await _deleteProduct(product);
                                 //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
                                 _showSnackBar('Producto eliminado con éxito');
                               }
@@ -309,6 +309,11 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 
   Future<void> _updateProduct(bool referenceModified, String reference, Map<String, BinaryFileInfo> modifiedPhotos, Product product) async {
-    await BusinessServices.updateProduct(referenceModified, reference, modifiedPhotos, product);
+    await BusinessServices.updateProduct(
+        referenceModified, reference, modifiedPhotos, product);
+  }
+
+  Future <void> _deleteProduct(Product product) async {
+    await BusinessServices.deleteProductByUUID(product.uuid!);
   }
 }

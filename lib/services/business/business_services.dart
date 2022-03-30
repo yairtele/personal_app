@@ -717,6 +717,11 @@ class BusinessServices {
 
   }
 
+  static Future <void> deleteProductByUUID (String productUUID) async {
+    final configProvider = await  _createConfigProvider();
+    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: productUUID);
+  }
+
   /*
   static Future<ProductInfo> getProductInfoByCommercialCodeFromArray(String commercialCode) async {
     //TODO: Consultar Athento
