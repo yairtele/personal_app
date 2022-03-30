@@ -32,6 +32,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/services/user_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:path_provider/path_provider.dart';
@@ -68,8 +69,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    passwordTextController.text = appState.password;
-    emailTextController.text = appState.emailAddress;
+
 
     //emailTextController.text = 'adrian.scotto.newsan';
     //passwordTextController.text = r'N$ju7ilo9#4791AS';
@@ -231,6 +231,9 @@ class _LoginState extends State<Login> {
   }
 
   Future<bool> updateLocalFiles() async {
+    emailTextController.text = (await Cache.getUserName()) ?? '';
+    passwordTextController.text = (await Cache.getUserPassword()) ?? '';
+
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
     final productsFolderPath = Directory('$localFolderPath/products');
 

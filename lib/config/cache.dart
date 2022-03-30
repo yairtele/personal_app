@@ -16,7 +16,7 @@ class Cache{
     return SharedPreferences.getInstance();
   }
 
-  static void saveLoginState(bool loggedIn) async {
+  static Future<void> saveLoginState(bool loggedIn) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool(_LOGGEDIN_KEY, loggedIn);
   }

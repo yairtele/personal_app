@@ -75,12 +75,12 @@ class AppState extends ChangeNotifier {
 
   void setSplashFinished() {
     _splashFinished = true;
-    logout();
-    if (_loggedIn || false) {
-      _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
-    } else {
+    //logout();
+    //if (_loggedIn) {
+    //  _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
+    //} else {
       _currentAction = PageAction(state: PageState.replaceAll, page: LoginPageConfig);
-    }
+    //}
     notifyListeners();
   }
 
@@ -101,9 +101,10 @@ class AppState extends ChangeNotifier {
     return _loggedIn;
   }
 
-  void logout() {
+  Future<void> logout() async {
     _loggedIn = false;
-    Cache.saveLoginState(loggedIn); //TODO: usar o no await? En el código original no lo usaba
+    await Cache.clearAll();
+    await Cache.saveLoginState(loggedIn); //TODO: usar o no await? En el código original no lo usaba
     _currentAction = PageAction(state: PageState.replaceAll, page: LoginPageConfig);
     notifyListeners();
   }
