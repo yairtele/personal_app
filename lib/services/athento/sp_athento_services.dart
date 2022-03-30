@@ -175,6 +175,70 @@ class SpAthentoServices {
     return wordList.isNotEmpty ? wordList[0] : '';
   }
 
+
+  static Future<Map<String, dynamic>> updateDocumentContent ({ required ConfigProvider configProvider, required String documentUUID, required List<
+  int> content, required String friendlyFileName, String auditMessage = ''}) async {
+    final documentContentType = SpWS.getContentTypeFromFilePath(
+        friendlyFileName);
+
+    final contentAsBase64 = base64Encode(content);
+
+    final jsonRequestBody = {
+      'params': {
+        'audit': auditMessage,
+        'document': documentUUID
+      }
+    };
+
+    final mb = MultipartMessageBuilder();
+
+    /// Define message parts ///
+    // Document info part: Athento Document container uuid, docType, custom fields, etc
+    final documentInfoPartHeaders = {
+      'Content-Disposition': 'form-data; name="input"'
+    };
+
+    final documentInfoPartContent = jsonEncode(jsonRequestBody).replaceAll(
+        '{', '{\n');
+
+    // Document content part: file to be uploaded in base64 format.
+    final documentContentPartHeaders = {
+      //'Content-Disposition': 'form-data; name="Michelle"; filename="sample.pdf"'
+      'Content-Disposition': 'form-data; name="$friendlyFileName", filename="$friendlyFileName"',
+      'Content-Type': documentContentType,
+      'Content-Transfer-Encoding': 'base64'
+    };
+
+    final documentContentPartContent = contentAsBase64;
+
+    //Add parts to the message builder
+    mb.addPart(documentInfoPartHeaders, documentInfoPartContent);
+    mb.addPart(documentContentPartHeaders, documentContentPartContent);
+    final messageBody = mb.build();
+
+    //console.log("messageBody: " + messageBody);
+    final messageHeaders = configProvider.getHttpHeaders({
+      'Content-Type': 'multipart/form-data; boundary=' + mb.getBoundaryString()
+    });
+
+    //console.log("messageHeaders: " + messageHeaders);
+
+    //fs.write("C:\\Temp\\borrarme\\svcMessageHeaders.txt", getPartHeadersString(messageHeaders));
+    //fs.write("C:\\Temp\\borrarme\\svcMessageHeaders.txt", JSON(messageHeaders));
+    //fs.write("C:\\Temp\\borrarme\\svcMessageBody.txt", messageBody);
+
+    final response = await SpWS.post(
+        configProvider.getEndpointUrl('updateDocumentContent'),parameters:  {},
+        headers: messageHeaders, body: messageBody);
+
+
+    //console.log("Athento Response.status: " + response.statusCode);
+    return configProvider.parseResponse(response.body);
+    //console.log(JSON.stringify(jsonRequestBody));
+  }
+
+
+
   static Future<Map<String, dynamic>> getDocument(ConfigProvider configProvider,
       String docType,
       String documentUUID, List<String> selectFields) async {
