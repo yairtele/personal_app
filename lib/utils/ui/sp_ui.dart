@@ -82,7 +82,7 @@ class SpUI{
     );
   }
 
-  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, BinaryFileInfo?> photos}) {
+  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, BinaryFileInfo?> photos, required BuildContext context}) {
 
     return GridView.count(
         primary: false,
@@ -93,12 +93,12 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildProductPhotoThumbnail(photoName, photos, state)
+            _buildProductPhotoThumbnail(photoName, photos, state, context)
         ]
     );
   }
 
-  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, BinaryFileInfo?> photos, State<T> state) {
+  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, BinaryFileInfo?> photos, State<T> state, BuildContext context) {
     final photo = photos[photoName];
 
     return Container(
@@ -120,37 +120,47 @@ class SpUI{
             Row(
               children: [
                 Expanded(child: Text(photoName, textAlign: TextAlign.center)), // Photo name
-                if(photo != null)
-                  ElevatedButton( // Delete photo
-                    child: const Icon(FontAwesomeIcons.trash),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: const EdgeInsets.all(4),
+                  if(photo != null) ...[
+                    ElevatedButton( //Edit photo
+                      child: const Icon(FontAwesomeIcons.edit),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.all(4),
+                      ),
+                      onPressed: () async {
+                        state.setState(() {
+                          //TODO: tiene que avisarme que la foto se modificó
+                          //photos[photoName] = null;
+                        });
+                      },
                     ),
-                    onPressed: () async {
-                      //TODO: ver si se debe borrar el archivo donde estaba la foto
-                      state.setState(() {
-                        photos[photoName] = null;
-                      });
-                    },
-                  )
-                /*else
-                  ElevatedButton( // Take photo
-                    child: const Icon(FontAwesomeIcons.camera),
-                    minimumSize: Size.zero,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(4),
-                    ),
-                    onPressed: () {
-                      //if(cameraOn) {
-                      /*final pickedPhoto = await _getPhotoFromCamera();
-                      state.setState(() {
+                    ElevatedButton( // Delete photo
+                      child: const Icon(FontAwesomeIcons.trash),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.all(4),
+                      ),
+                      onPressed: () async {
+                        showDeleteAlertDialog(context, state, photos, photoName);
+                      },
+                    )]
+                  else
+                    ElevatedButton( // Take photo
+                      child: const Icon(FontAwesomeIcons.camera),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.all(4),
+                      ),
+                      onPressed: () async {
+/*
+                        final pickedPhoto = await _getPhotoFromCamera();
+                        state.setState(() {
                         photos[photoName] = pickedPhoto;
-                      });*/
-                      //}
-                    },
-                  )*/
-              ],
+                        });
+*/
+                      },
+                   )
+                  ],
             )
           ],
         )
@@ -170,5 +180,37 @@ class SpUI{
     final thumbTitle = photoName.substring(0,1 ).toUpperCase() + photoName.substring(1).replaceAll('_', ' ');
     return thumbTitle;
   }
-}
 
+  static void showDeleteAlertDialog<T extends StatefulWidget>(BuildContext context, State<T> state, Map<String, BinaryFileInfo?> photos, String photoName) {
+    // set up the buttons
+    final cancelButton = TextButton(
+      child: const Text('No'),
+      onPressed:  () {},
+    );
+    final continueButton = TextButton(
+      child: const Text('Si, continuar'),
+      onPressed:  () {
+        //TODO: borrar el archivo donde estaba la foto
+        state.setState(() {
+          photos[photoName] = null;
+        });
+      },
+    );
+    // set up the AlertDialog
+    final alert = AlertDialog(
+      title: const Text('Eliminar imagen'),
+      content: const Text('Está seguro que desea eliminar la imagen seleccionada?'),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+}
