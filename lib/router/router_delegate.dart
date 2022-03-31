@@ -95,7 +95,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     }
     if (canPop()) {
       print('can pop');
-      pop();
+      pop(result);
       print('poped');
       return true;
     } else {
@@ -115,8 +115,14 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     if (canPop()) {
       final pageConfig = _pages.last.arguments as PageConfiguration; //TODO: ver si PageConfiguration se puede tipar con Generics, con el mismo tipo del parámetro 'result'
       _removePage(_pages.last);
-      if(pageConfig.currentPageAction != null && pageConfig.currentPageAction!.returnValueCompleter != null && result != null){
-        pageConfig.currentPageAction!.returnValueCompleter!.complete(result);
+      if(pageConfig.currentPageAction != null && pageConfig.currentPageAction!.returnValueCompleter != null){
+        if(result != null){
+          pageConfig.currentPageAction!.returnValueCompleter!.complete(result);
+        }
+        else {
+          //TODO: Esto es para los casos como la pantalla BatchDetails, que al volver de NewReturn no tiene valor de retorno, pero hay que hacerlo BIEN
+          pageConfig.currentPageAction!.returnValueCompleter!.complete();
+        }
       }
       else {
         notifyListeners();

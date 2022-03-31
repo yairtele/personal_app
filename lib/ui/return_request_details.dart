@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/product.dart';
@@ -11,10 +12,12 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../router/ui_pages.dart';
+import 'newreturn.dart';
 
 class  ReturnRequestDetails extends StatefulWidget {
   final ReturnRequest returnRequest;
-  const ReturnRequestDetails({Key? key, required this.returnRequest}) : super(key: key);
+  final Batch batch;
+  const ReturnRequestDetails({Key? key, required this.batch, required this.returnRequest}) : super(key: key);
 
   @override
   _ReturnRequestDetailsState createState() =>  _ReturnRequestDetailsState();
@@ -28,7 +31,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   void initState() {
     super.initState();
     _localData = ScreenData<String, List<Product>>(dataGetter: _getProducts)
-        .getScreenData(dataGetterParam: widget.returnRequest.requestNumber);
+        .getScreenData(dataGetterParam: widget.returnRequest.uuid);
   }
 
   @override
@@ -74,9 +77,10 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
-                    onPressed: () =>
+                    onPressed: () => //TODO: ver si se debe poder realizar una nueva devolución para los EAN no autitables, o cómo precargar los datos en la pantalla NewReturn
                     appState.currentAction =
                         PageAction(state: PageState.addPage,
+                            widget: NewReturnScreen(batch: this.widget.batch, returnRequest: this.widget.returnRequest),
                             pageConfig: NewReturnPageConfig),
                   ),
                   ElevatedButton.icon(
@@ -336,9 +340,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     );
   }
 
-  Future<List<Product>> _getProducts(String? returnRequestNumber) async {
-    final products = await BusinessServices.getProductsByReturnRequestNumber(
-        returnRequestNumber!);
+  Future<List<Product>> _getProducts(String? returnRequestUUID) async {
+    final products = await BusinessServices.getProductsByReturnRequestUUID(
+        returnRequestUUID!);
 
     return products;
   }

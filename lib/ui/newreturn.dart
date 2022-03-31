@@ -23,7 +23,7 @@ import 'package:intl/intl.dart';
 
 //T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
-  final ReturnRequest? returnRequest;
+  final ReturnRequest? returnRequest; //TODO: Precargar datos si returnRequest no es nulo
   final Batch batch;
   const NewReturnScreen({Key? key, required this.batch, this.returnRequest}) : super(key: key);
 
@@ -416,7 +416,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     _showSnackBar('La nueva devolución fue registrada con éxito');
                                     _clearProductFields();
                                     setState(() {
-                                      // Nada, para que muestre limpie el form
+
                                     });
                                   }
                                   on BusinessException catch(e){
@@ -500,8 +500,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     if(returnRequests.length == 0){
       return null;
     }
-
-
 
     if (productInfo.isAuditable == true){
       // Entre las existentes, buscar las que tienen el mismo EAN que el producto a devolver
