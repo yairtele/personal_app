@@ -168,6 +168,21 @@ class _BatchesState extends State<Batches> {
                                   widget: BatchDetails(
                                       batch: draftBatches[index]),
                                   pageConfig: DetailsPageConfig);
+
+                              appState.waitCurrentAction<bool>(
+                                  PageAction(
+                                      state: PageState.addWidget,
+                                      widget: BatchDetails(
+                                          batch: draftBatches[index]),
+                                      pageConfig: DetailsPageConfig)
+                              ).then((shouldRefresh) {
+                                //if(shouldRefresh!){ //TODO:  Manejar el resultado de la pantalla Batch Details
+                                  setState(() {
+                                    _localData = getScreenData();
+                                  });
+                                //}
+                              });
+
                             })
                           ],
 

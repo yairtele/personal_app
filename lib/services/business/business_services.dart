@@ -671,7 +671,7 @@ class BusinessServices {
 
   static Future <void> deleteBatchByUUID (String batchUuid) async{
     final configProvider = await  _createConfigProvider();
-    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);
+    await SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);
   }
 
   static Future <void> updateBatch (Batch batch,String batchreference,String batchdescr,String batchobserv) async{

@@ -271,24 +271,22 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 showDialog<String>(
                                   context: context,
                                   builder: (BuildContext context) => AlertDialog(
-                                    title: const Text('AlertDialog Title'),
-                                    content: const Text('AlertDialog description'),
+                                    title: const Text('Alerta'),
+                                    content: const Text('¿Seguro quiere eliminar este Lote?'),
                                     actions: <Widget>[
                                       TextButton(
-                                        onPressed: () => appState.currentAction = PageAction(state: PageState.pop),
-                                        child: const Text('Cancel'),
+                                        onPressed: () => appState.returnWith(true),
+                                        child: const Text('Cancelar'),
                                       ),
                                       TextButton(
-                                          child: const Text('OK'),
+                                          child: const Text('Borrar'),
                                           onPressed: () async {
-                                            try{
-                                            WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
-                                            await _deleteBatch(batch);
-                                            appState.currentAction = PageAction(state: PageState.pop);
-                                            showDialog<String>(
-                                                context: context, builder: (BuildContext context) {
-
-                                            });
+                                            try {
+                                              WorkingIndicatorDialog().show(
+                                                  context,
+                                                  text: 'Eliminando lote...');
+                                              await _deleteBatch(batch);
+                                              appState.returnWith(true);
                                             }
                                             on BusinessException catch (e){
                                             _showSnackBar(e.message);
