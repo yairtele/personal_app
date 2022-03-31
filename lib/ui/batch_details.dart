@@ -258,20 +258,42 @@ class _BatchDetailsState extends State<BatchDetails> {
                           ),
                           ElevatedButton(
                               onPressed: () async {
-                                try{
-                                  WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
-                                  await _deleteBatch(batch);
-                                  _showSnackBar('Lote eliminado con éxito');
-                                }
-                                on BusinessException catch (e){
-                                  _showSnackBar(e.message);
-                                }
-                                on Exception catch (e){
-                                  _showSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
-                                }
-                                finally{
-                                  WorkingIndicatorDialog().dismiss();
-                                }
+                                showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) => AlertDialog(
+                                    title: const Text('AlertDialog Title'),
+                                    content: const Text('AlertDialog description'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () => appState.currentAction = PageAction(state: PageState.pop),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                          child: const Text('OK'),
+                                          onPressed: () async {
+                                            try{
+                                            WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
+                                            await _deleteBatch(batch);
+                                            appState.currentAction = PageAction(state: PageState.pop);
+                                            showDialog<String>(
+                                                context: context, builder: (BuildContext context) {
+
+                                            });
+                                            }
+                                            on BusinessException catch (e){
+                                            _showSnackBar(e.message);
+                                            }
+                                            on Exception catch (e){
+                                            _showSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
+                                            }
+                                            finally{
+                                            WorkingIndicatorDialog().dismiss();
+                                            }
+                                          }
+                                      ),
+                                    ],
+                                  ),
+                                );
 
                               },
                               child: const Text('Borrar Lote'),
