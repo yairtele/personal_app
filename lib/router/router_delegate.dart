@@ -28,14 +28,13 @@
  * THE SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:navigation_app/ui/newbatch.dart';
 import '../ui/newbatch.dart';
 import '../app_state.dart';
-import '../ui/cart.dart';
-import '../ui/checkout.dart';
-import '../ui/create_account.dart';
 import '../ui/batches.dart';
 import '../ui/login.dart';
 import '../ui/settings.dart';
@@ -68,17 +67,12 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
   PageConfiguration get currentConfiguration {
     print('currentConfiguration - enter');
     print(appState.currentAction.state);
-    print(appState.currentAction.page);
+    print(appState.currentAction.pageConfig);
     print(appState.currentAction.widget);
-    if(appState.currentAction.page != null){
-      print('if page');
-      print(appState.currentAction.page!.path);
-      return appState.currentAction.page!;
+    if(appState.currentAction.pageConfig != null){
+      return appState.currentAction.pageConfig!;
     }
-    if(appState.currentAction.widget != null){
-      print('if widget');
-      print(appState.currentAction.widget!.key);
-    }
+
     print((_pages.last.arguments as PageConfiguration).path);
     return _pages.last.arguments as PageConfiguration;
   }
@@ -89,7 +83,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     return Navigator(
       key: navigatorKey,
       onPopPage: _onPopPage,
-      pages: buildPages(),
+      pages: buildPages(context),
     );
   }
 
@@ -101,7 +95,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     }
     if (canPop()) {
       print('can pop');
-      pop();
+      pop(result);
       print('poped');
       return true;
     } else {
@@ -116,10 +110,23 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
     }
   }
 
-  void pop() {
+  //TODO: ver si 'result' se puede tipar con Generics
+  void pop([result]) {
     if (canPop()) {
+      final pageConfig = _pages.last.arguments as PageConfiguration; //TODO: ver si PageConfiguration se puede tipar con Generics, con el mismo tipo del parámetro 'result'
       _removePage(_pages.last);
-      notifyListeners();
+      if(pageConfig.currentPageAction != null && pageConfig.currentPageAction!.returnValueCompleter != null){
+        if(result != null){
+          pageConfig.currentPageAction!.returnValueCompleter!.complete(result);
+        }
+        else {
+          //TODO: Esto es para los casos como la pantalla BatchDetails, que al volver de NewReturn no tiene valor de retorno, pero hay que hacerlo BIEN
+          pageConfig.currentPageAction!.returnValueCompleter!.complete();
+        }
+      }
+      else {
+        notifyListeners();
+      }
     }
   }
 
@@ -159,46 +166,38 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
             pageConfig.uiPage;
     if (shouldAddPage) {
       switch (pageConfig.uiPage) {
-        case Pages.Splash:
+        case PageEnum.Splash:
           _addPageData(Splash(), SplashPageConfig);
           break;
-        case Pages.Login:
+        case PageEnum.Login:
           _addPageData(Login(), LoginPageConfig);
           break;
-        case Pages.CreateAccount:
-          _addPageData(CreateAccount(), CreateAccountPageConfig);
+        case PageEnum.Batches:
+          _addPageData(const Batches(), BatchesPageConfig);
           break;
-        case Pages.List:
-          _addPageData(const Batches(), ListItemsPageConfig);
-          break;
-        case Pages.Cart:
-          _addPageData(Cart(), CartPageConfig);
-          break;
-        case Pages.Checkout:
-          _addPageData(Checkout(), CheckoutPageConfig);
-          break;
-        case Pages.Settings:
+        case PageEnum.Settings:
           _addPageData(Settings(), SettingsPageConfig);
           break;
-        case Pages.NewBatch:
+        case PageEnum.NewBatch:
+          //_addPageData(NewBatch(returnValueCompleter: Completer<bool>()), NewBatchPageConfig);
           _addPageData(const NewBatch(), NewBatchPageConfig);
           break;
-        case Pages.NewReturn:
+        case PageEnum.NewReturn:
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
-        case Pages.DetailsReturn:
+        case PageEnum.DetailsReturn:
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
-        case Pages.DetailProduct:
+        case PageEnum.DetailProduct:
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
           break;
-        case Pages.Details:
+        case PageEnum.Details:
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }
@@ -253,50 +252,40 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
   }
 
   void _setPageAction(PageAction action) {
-    switch (action.page!.uiPage) {
-      case Pages.Splash:
+    switch (action.pageConfig!.uiPage) {
+      case PageEnum.Splash:
         SplashPageConfig.currentPageAction = action;
         break;
-      case Pages.Login:
+      case PageEnum.Login:
         LoginPageConfig.currentPageAction = action;
         break;
-      case Pages.CreateAccount:
-        CreateAccountPageConfig.currentPageAction = action;
+      case PageEnum.Batches:
+        BatchesPageConfig.currentPageAction = action;
         break;
-      case Pages.List:
-        ListItemsPageConfig.currentPageAction = action;
-        break;
-      case Pages.Cart:
-        CartPageConfig.currentPageAction = action;
-        break;
-      case Pages.Checkout:
-        CheckoutPageConfig.currentPageAction = action;
-        break;
-      case Pages.Settings:
+      case PageEnum.Settings:
         SettingsPageConfig.currentPageAction = action;
         break;
-      case Pages.Details:
+      case PageEnum.Details:
         DetailsPageConfig.currentPageAction = action;
         break;
-      case Pages.NewBatch:
+      case PageEnum.NewBatch:
         NewBatchPageConfig.currentPageAction = action;
         break;
-      case Pages.NewReturn:
+      case PageEnum.NewReturn:
         NewReturnPageConfig.currentPageAction = action;
         break;
-      case Pages.DetailsReturn:
+      case PageEnum.DetailsReturn:
         DetailsReturnPageConfig.currentPageAction = action;
         break;
-      case Pages.DetailProduct:
+      case PageEnum.DetailProduct:
         DetailProductPageConfig.currentPageAction = action;
         break;
-
       default:
         break;
     }
   }
 
-  List<Page> buildPages() {
+  List<Page> buildPages(BuildContext context) {
     if (!appState.splashFinished) {
       replaceAll(SplashPageConfig);
     } else {
@@ -305,22 +294,22 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           break;
         case PageState.addPage:
           _setPageAction(appState.currentAction);
-          addPage(appState.currentAction.page!);
+          addPage(appState.currentAction.pageConfig!);
           break;
         case PageState.pop:
-          pop();
+          pop(appState.currentAction.returnValue);
           break;
         case PageState.replace:
           _setPageAction(appState.currentAction);
-          replace(appState.currentAction.page!);
+          replace(appState.currentAction.pageConfig!);
           break;
         case PageState.replaceAll:
           _setPageAction(appState.currentAction);
-          replaceAll(appState.currentAction.page!);
+          replaceAll(appState.currentAction.pageConfig!);
           break;
         case PageState.addWidget:
           _setPageAction(appState.currentAction);
-          pushWidget(appState.currentAction.widget!, appState.currentAction.page!);
+          pushWidget(appState.currentAction.widget!, appState.currentAction.pageConfig!);
           break;
         case PageState.addAll:
           addAll(appState.currentAction.pages!);
@@ -353,36 +342,18 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case 'login':
           replaceAll(LoginPageConfig);
           break;
-        case 'createAccount':
-          setPath([
-            _createPage(Login(), LoginPageConfig),
-            _createPage(CreateAccount(), CreateAccountPageConfig)
-          ]);
-          break;
-        case 'listItems':
-          replaceAll(ListItemsPageConfig);
-          break;
-        case 'cart':
-          setPath([
-            _createPage(Batches(), ListItemsPageConfig),
-            _createPage(Cart(), CartPageConfig)
-          ]);
-          break;
-        case 'checkout':
-          setPath([
-            _createPage(Batches(), ListItemsPageConfig),
-            _createPage(Checkout(), CheckoutPageConfig)
-          ]);
+        case 'Batches':
+          replaceAll(BatchesPageConfig);
           break;
         case 'settings':
           setPath([
-            _createPage(Batches(), ListItemsPageConfig),
+            _createPage(Batches(), BatchesPageConfig),
             _createPage(Settings(), SettingsPageConfig)
           ]);
           break;
         case 'newbatch':
           setPath([
-            _createPage(Batches(), ListItemsPageConfig),
+            _createPage(Batches(), BatchesPageConfig),
             _createPage(NewBatch(), NewBatchPageConfig)
           ]);
           break;

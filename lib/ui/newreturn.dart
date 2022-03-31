@@ -23,7 +23,7 @@ import 'package:intl/intl.dart';
 
 //T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
-  final ReturnRequest? returnRequest;
+  final ReturnRequest? returnRequest; //TODO: Precargar datos si returnRequest no es nulo
   final Batch batch;
   const NewReturnScreen({Key? key, required this.batch, this.returnRequest}) : super(key: key);
 
@@ -416,7 +416,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     _showSnackBar('La nueva devolución fue registrada con éxito');
                                     _clearProductFields();
                                     setState(() {
-                                      // Nada, para que muestre limpie el form
+
                                     });
                                   }
                                   on BusinessException catch(e){
@@ -501,13 +501,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       return null;
     }
 
-
-
     if (productInfo.isAuditable == true){
       // Entre las existentes, buscar las que tienen el mismo EAN que el producto a devolver
       final returnRequestsWithSameEAN = returnRequests.where((returnRequest) => returnRequest.EAN == productInfo.EAN);
       if(returnRequestsWithSameEAN.length > 1){
-        throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
+        throw BusinessException('No debería haber más de una solicitud de devolución con el mismo EAN  para productos auditables.');
       } else if (returnRequestsWithSameEAN.length == 1) {
         existingReturnRequest = returnRequestsWithSameEAN.first;
       } else {
@@ -567,7 +565,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
-      final DateFormat formatter = DateFormat('dd/MM/yyyy');
+      final formatter = DateFormat('dd/MM/yyyy');
       _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
       _priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;

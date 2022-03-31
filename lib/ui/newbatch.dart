@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -12,13 +13,30 @@ import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 
 import '../app_state.dart';
 
+
 class NewBatch extends StatefulWidget {
   const NewBatch({Key? key}) : super(key: key);
 
   @override
   State<NewBatch> createState() => _NewBatchState();
+
 }
 
+/*
+class NewBatch extends WaitableStatefulWidget<bool> {
+  const NewBatch({Key? key, required Completer<bool> returnValueCompleter}) : super(key: key, returnValueCompleter: returnValueCompleter);
+
+  @override
+  State<NewBatch> createState() => _NewBatchState();
+
+}
+abstract class WaitableStatefulWidget<TReturnValue> extends StatefulWidget{
+  const WaitableStatefulWidget({ Key? key, required this.returnValueCompleter }) : super(key: key);
+  //Completer<TReturnValue>? _returnValueCompleter;
+  final Completer<TReturnValue> returnValueCompleter;
+
+}
+*/
 class _NewBatchState extends State<NewBatch> {
   TextEditingController referenceTextController = TextEditingController();
   TextEditingController descriptionTextController = TextEditingController();
@@ -134,6 +152,8 @@ class _NewBatchState extends State<NewBatch> {
                       try{
                         WorkingIndicatorDialog().show(context, text: 'Creando nuevo lote...');
                         await _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
+                        appState.returnWith(true);
+
                         _showSnackBar('Nuevo batch creado con éxito');
                       }
                       on BusinessException catch (e){
@@ -171,7 +191,7 @@ class _NewBatchState extends State<NewBatch> {
   Future<void> _createBatch(String retailReference, String description, String observation) async {
     final cuitRetail = (await Cache.getUserInfo())!.idNumber;
     final retailCompanyName = (await Cache.getCompanyName())!;
-    BusinessServices.createBatch(Batch(
+    await BusinessServices.createBatch(Batch(
         title: '$retailReference - $description',
         state:BatchStates.Draft,
         retailReference: retailReference,

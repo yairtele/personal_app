@@ -50,14 +50,17 @@ class BatchDetails extends StatefulWidget {
   _BatchDetailsState createState() =>  _BatchDetailsState();
 
 }
+
 class _BatchDetailsState extends State<BatchDetails> {
   late Future<ScreenData<Batch, List<ReturnRequest>>> _localData;
 
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<Batch, List<ReturnRequest>>(dataGetter: _getReturnRequests).getScreenData(dataGetterParam: widget.batch);
+    _localData = getScreenData();
   }
+
+  Future<ScreenData<Batch, List<ReturnRequest>>> getScreenData() => ScreenData<Batch, List<ReturnRequest>>(dataGetter: _getReturnRequests).getScreenData(dataGetterParam: widget.batch);
 
 
   @override
@@ -97,15 +100,22 @@ class _BatchDetailsState extends State<BatchDetails> {
                     onPressed: () =>
                     appState.currentAction =
                         PageAction(
-                            state: PageState.addPage, page: SettingsPageConfig),
+                            state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
-                    onPressed: () =>
-                    appState.currentAction =
-                        PageAction(state: PageState.addPage,
-                            widget: NewReturnScreen(batch: this.widget.batch),
-                            page: NewReturnPageConfig),
+                    onPressed: () {
+                      appState.waitCurrentAction(PageAction(state: PageState.addPage,
+                              widget: NewReturnScreen(batch: this.widget.batch),
+                              pageConfig: NewReturnPageConfig))
+                      .then((shouldRefresh) {
+                        //if(shouldRefresh!){ //TODO: por ahora es difícil determinar si debe refrescar porque la pantalla newreturn no devuelve valor
+                          setState(() {
+                            _localData = getScreenData();
+                          });
+                        //}
+                      });
+                    }
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
@@ -333,9 +343,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 ), onTap: () {
                                   appState.currentAction = PageAction(
                                       state: PageState.addWidget,
-                                      widget: ReturnRequestDetails(
+                                      widget: ReturnRequestDetails(batch: this.widget.batch,
                                           returnRequest: returns[index]),
-                                      page: DetailsReturnPageConfig);
+                                      pageConfig: DetailsReturnPageConfig);
                                 })
                               ],
                             );

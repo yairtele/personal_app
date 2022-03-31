@@ -73,12 +73,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                   IconButton(
                     icon: const Icon(Icons.settings),
                     onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, page: SettingsPageConfig),
+                        PageAction(state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                        PageAction(state: PageState.addPage, pageConfig: NewReturnPageConfig),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(

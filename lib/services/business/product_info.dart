@@ -10,10 +10,11 @@ class ProductInfo {
   String legalEntity;
   String businessUnit;
   ProductSalesInfo? salesInfo;
-  ProductAuditRules auditRules;
-  final bool _isAuditable;
+  late ProductAuditRules auditRules;
+  late final bool _isAuditable;
 
-  ProductInfo({
+
+  ProductInfo.create({
     required this.EAN,
     required this.commercialCode,
     required this.sku,
@@ -22,8 +23,16 @@ class ProductInfo {
     required this.legalEntity,
     required this.businessUnit,
     required this.salesInfo,
-    required this.auditRules,
-  }): _isAuditable = auditRules.photos.length > 0;
+    required ProductAuditRules? auditRules,
+  }){
+    if (auditRules == null) {
+      _isAuditable = false;
+      this.auditRules = ProductAuditRules(photos: [PhotoAuditInfo(label: 'Otra', name: 'otra')], lastSaleMaxAge: const Duration(days: 365));
+    } else {
+      _isAuditable = auditRules.photos.length > 1;
+    }
+
+  }
 
   bool get isAuditable => _isAuditable;
 }
