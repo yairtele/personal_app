@@ -248,8 +248,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
                                   await _updateBatchState(batch);
-                                  appState.currentAction = PageAction(state: PageState.pop);
+                                  //appState.currentAction = PageAction(state: PageState.pop);
                                   _showSnackBar('Lote enviado con éxito');
+                                  appState.returnWith(true);
                                 }
                                 on BusinessException catch (e){
                                   _showSnackBar(e.message);

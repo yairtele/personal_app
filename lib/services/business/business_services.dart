@@ -691,7 +691,7 @@ class BusinessServices {
     Map<String, dynamic> fieldValues = {
       '${AthentoFieldName.state}': 'Enviado'
     };
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!,  fieldValues: fieldValues);
+    await SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!,  fieldValues: fieldValues);
   }
   static Future <void> deleteReqReturnByUUID (String ReqReturnUuid) async{
     final configProvider = await  _createConfigProvider();
