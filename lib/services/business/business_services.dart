@@ -713,6 +713,15 @@ class BusinessServices {
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
   }
 
+  static Future <void> updateProduct (bool referenceModified, String reference, Map<String, BinaryFileInfo> photos, Product product) async {
+
+  }
+
+  static Future <void> deleteProductByUUID (String productUUID) async {
+    final configProvider = await  _createConfigProvider();
+    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: productUUID);
+  }
+
   /*
   static Future<ProductInfo> getProductInfoByCommercialCodeFromArray(String commercialCode) async {
     //TODO: Consultar Athento

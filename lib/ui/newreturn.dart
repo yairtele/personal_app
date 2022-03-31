@@ -1,5 +1,6 @@
 //import 'dart:html';
 
+import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -476,9 +477,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
         });
   }
 
-  Future<ProductInfo> _getProductInfoByEAN(String eanCode) {
+/*  Future<ProductInfo> _getProductInfoByEAN(String eanCode) {
     return BusinessServices.getProductInfoByEAN(eanCode);
-  }
+  }*/
 
   Future<ProductInfo> _getProductInfoByCommercialCode(String commercialCode) {
     return BusinessServices.getProductInfoByCommercialCode(commercialCode);
@@ -559,7 +560,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       // Buscar info del producto y actualizar el Future del FutureBuilder.
       late ProductInfo productInfo;
       if (_productSearchBy == ProductSearchBy.EAN) {
-        productInfo = await _getProductInfoByEAN(_searchParamTextController.text);
+        productInfo = await SpProductUtils.getProductInfoByEAN(_searchParamTextController.text);
       } else {
         productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
       }

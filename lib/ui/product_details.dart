@@ -4,9 +4,12 @@ import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product.dart';
+import 'package:navigation_app/services/business/product_detail.dart';
+import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/product_photo.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
@@ -23,34 +26,39 @@ class  ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  late Future<ScreenData<Product, Map<String, BinaryFileInfo?>>> _localData;
+  late Future<ScreenData<Product, ProductDetail>> _localData;
+  ProductInfo? _productInfo;
   Map<String, BinaryFileInfo?> _takenPictures = {};
 
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<Product, Map<String, BinaryFileInfo?>>(dataGetter: _getProductPhotos).getScreenData(dataGetterParam: widget.product);
+    _localData = ScreenData<Product, ProductDetail>(dataGetter: _getProductDetail).getScreenData(dataGetterParam: widget.product);
   }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final product = widget.product;
     final newProductDetails = this;
 
-    return FutureBuilder<ScreenData<Product, Map<String, BinaryFileInfo?>>>(
+    return FutureBuilder<ScreenData<Product, ProductDetail>>(
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, Map<String, BinaryFileInfo?>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, ProductDetail>> snapshot) {
 
           Widget widget;
           if (snapshot.hasData) {
             final data = snapshot.data!;
-            _takenPictures = data.data!;
+            _takenPictures = data.data!.productPhotos;
+            _productInfo = data.data!.productInfo;
             final EAN = product.EAN;
             final _EAN = TextEditingController(text:EAN);
             final descripcion = product.description;
             final _descripcion = TextEditingController(text:descripcion);
             final reference = product.retailReference;
             final _reference = TextEditingController(text:reference);
+            var _referenceModified = false;
+            Map<String, BinaryFileInfo> _modifiedPhotos;
 
             widget = Scaffold(
               appBar: AppBar(
@@ -147,8 +155,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.send,
                         maxLength: 50,
-                        enabled: false,
+                        enabled: true,
                         controller: _reference,
+                        onChanged: (_) {
+                          _referenceModified = true;
+                        },
                         decoration: const InputDecoration(
                           hintText: '-',
                           label: Text.rich(
@@ -164,73 +175,65 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ),
                       ),
                     ),
-                Container(
-                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures)
-                  /*GridView.count(
-                      primary: false,
-                      padding: const EdgeInsets.all(20),
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      crossAxisCount: 2,
-                      physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
-                      shrinkWrap: true,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(photos[0].label),
-                          color: Colors.grey[500],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(photos[1].label),
-                          color: Colors.grey[600],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(photos[2].label),
-                          color: Colors.grey[700],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(photos[3].label),
-                          color: Colors.grey[800],
-                        ),
-                      ],
-                    )*/,
+                  Container(
+                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context)
                    ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(100,0,100,0),
-                    child: Container(
-                              child: ElevatedButton(
-                                  onPressed: () async {
-                                    try{
-                                      WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
-                                      //TODO: Ver qué le tengo que pasar. Únicamente sirve para guardar fotos, ya que EAN y Descripcion no se pueden modificar
-                                      //await _updateProduct(product);
-                                      //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
-                                      _showSnackBar('Producto actualizado con éxito');
-                                    }
-                                    on BusinessException catch (e){
-                                      _showSnackBar(e.message);
-                                    }
-                                    on Exception catch (e){
-                                      _showSnackBar('Ha ocurrido un error inesperado al actualizar el producto: $e');
-                                    }
-                                    finally{
-                                      WorkingIndicatorDialog().dismiss();
-                                    }
-                                    },
-                                  child: const Text('Guardar'),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.green[400],
-                                  )
-                              ),
-                      ),
+                   Padding(
+                      padding: EdgeInsets.only(top:16.0),
+                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () async {
+                              try{
+                                WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
+                                //TODO: Ver qué le tengo que pasar. Únicamente sirve para guardar fotos y referencia interna
+                                //await _updateProduct(_referenceModified, _reference.text, _modifiedPhotos, product);
+                                //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
+                                _showSnackBar('Producto actualizado con éxito');
+                              }
+                              on BusinessException catch (e){
+                                _showSnackBar(e.message);
+                              }
+                              on Exception catch (e){
+                                _showSnackBar('Ha ocurrido un error inesperado al actualizar el producto: $e');
+                              }
+                              finally{
+                                WorkingIndicatorDialog().dismiss();
+                              }
+                            },
+                            child: const Text('Guardar'),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.green[400],
+                            )
+                        ),
+                        ElevatedButton(
+                            onPressed: () async {
+                              try{
+                                WorkingIndicatorDialog().show(context, text: 'Eliminando producto...');
+                                await _deleteProduct(product);
+                                //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
+                                _showSnackBar('Producto eliminado con éxito');
+                              }
+                              on BusinessException catch (e){
+                                _showSnackBar(e.message);
+                              }
+                              on Exception catch (e){
+                                _showSnackBar('Ha ocurrido un error inesperado al eliminar el producto: $e');
+                              }
+                              finally{
+                                WorkingIndicatorDialog().dismiss();
+                              }
+                            },
+                            child: const Text('Eliminar'),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red[400],
+                            )
+                          )]
+                    )
                   )
-                  ],
-                )
-              ),
-            );
+                ]
+            )));
           } else if (snapshot.hasError) {
             widget = Center(
               child: Column(
@@ -270,13 +273,13 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   }
 
-  Future<Map<String, BinaryFileInfo?>> _getProductPhotos(Product? product) async {
-    final productPhotos = await BusinessServices.getPhotosByProductUUID(product!.uuid!);
+  Future<ProductDetail> _getProductDetail(Product? product) async {
 
-    //final returnValue = Future.delayed(const Duration(milliseconds: 100), () => productPhotos);
-    //return returnValue;
+    _productInfo = await SpProductUtils.getProductInfoByEAN(product!.EAN);
+    final productExistingPhotos = await BusinessServices.getPhotosByProductUUID(product.uuid!);
+    final productPhotos = await _getFullPhotosInfo(productExistingPhotos);
 
-    return productPhotos;
+    return ProductDetail(productInfo: _productInfo!, productPhotos: productPhotos);
   }
 
   void _showSnackBar(String message){
@@ -284,5 +287,33 @@ class _ProductDetailsState extends State<ProductDetails> {
       SnackBar(content: Text(message)),
     );
   }
-}
 
+  bool _doesNotContainPhoto(Map<String,BinaryFileInfo?> existingPhotos, String photoName){
+    return !existingPhotos.containsKey(photoName);
+  }
+
+  Future<Map<String,BinaryFileInfo?>> _getFullPhotosInfo(Map<String,BinaryFileInfo?> existingPhotos) async {
+
+      if (_productInfo!.auditRules.photos.length == 0){
+        existingPhotos['otra'] = null;
+      }
+      else{
+        final missingPhotos = _productInfo!.auditRules.photos.where((p) => _doesNotContainPhoto(existingPhotos, p.name)).toList();
+
+        for(var photoAuditInfo in missingPhotos){
+          existingPhotos[photoAuditInfo.name] = null;
+        }
+      }
+
+      return existingPhotos;
+  }
+
+  Future<void> _updateProduct(bool referenceModified, String reference, Map<String, BinaryFileInfo> modifiedPhotos, Product product) async {
+    await BusinessServices.updateProduct(
+        referenceModified, reference, modifiedPhotos, product);
+  }
+
+  Future <void> _deleteProduct(Product product) async {
+    await BusinessServices.deleteProductByUUID(product.uuid!);
+  }
+}
