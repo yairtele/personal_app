@@ -121,7 +121,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         }
         else {
           //TODO: Esto es para los casos como la pantalla BatchDetails, que al volver de NewReturn no tiene valor de retorno, pero hay que hacerlo BIEN
-          pageConfig.currentPageAction!.returnValueCompleter!.complete();
+          pageConfig.currentPageAction!.returnValueCompleter!.complete(true);
         }
       }
       else {
