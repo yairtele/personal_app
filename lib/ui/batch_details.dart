@@ -50,6 +50,7 @@ class BatchDetails extends StatefulWidget {
   _BatchDetailsState createState() =>  _BatchDetailsState();
 
 }
+
 class _BatchDetailsState extends State<BatchDetails> {
   late Future<ScreenData<Batch, List<ReturnRequest>>> _localData;
 
@@ -97,7 +98,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                     onPressed: () =>
                     appState.currentAction =
                         PageAction(
-                            state: PageState.addPage, page: SettingsPageConfig),
+                            state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
@@ -105,7 +106,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                     appState.currentAction =
                         PageAction(state: PageState.addPage,
                             widget: NewReturnScreen(batch: this.widget.batch),
-                            page: NewReturnPageConfig),
+                            pageConfig: NewReturnPageConfig),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
@@ -313,7 +314,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                       state: PageState.addWidget,
                                       widget: ReturnRequestDetails(
                                           returnRequest: returns[index]),
-                                      page: DetailsReturnPageConfig);
+                                      pageConfig: DetailsReturnPageConfig);
                                 })
                               ],
                             );

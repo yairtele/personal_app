@@ -220,7 +220,7 @@ class BusinessServices {
         objectBuilder: createProductAuditRules);
 
 
-    return ProductInfo(
+    return ProductInfo.create(
         EAN: producMasterInfo.ean,
         commercialCode: producMasterInfo.commercialCode,
         sku: producMasterInfo.sku,
@@ -229,7 +229,7 @@ class BusinessServices {
         legalEntity: producMasterInfo.legalEntity,
         businessUnit: producMasterInfo.businessUnit,
         salesInfo: producSalesInfo,
-        auditRules: productAuditRules ?? ProductAuditRules(photos: [PhotoAuditInfo(label: 'Otra', name: 'otra')], lastSaleMaxAge: const Duration(days: 365)),
+        auditRules: productAuditRules,
     );
 
     //return getProductInfoByEANfromArray(eanCode);

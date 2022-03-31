@@ -506,7 +506,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       // Entre las existentes, buscar las que tienen el mismo EAN que el producto a devolver
       final returnRequestsWithSameEAN = returnRequests.where((returnRequest) => returnRequest.EAN == productInfo.EAN);
       if(returnRequestsWithSameEAN.length > 1){
-        throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
+        throw BusinessException('No debería haber más de una solicitud de devolución con el mismo EAN  para productos auditables.');
       } else if (returnRequestsWithSameEAN.length == 1) {
         existingReturnRequest = returnRequestsWithSameEAN.first;
       } else {
@@ -566,7 +566,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
-      final DateFormat formatter = DateFormat('dd/MM/yyyy');
+      final formatter = DateFormat('dd/MM/yyyy');
       _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
       _priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;

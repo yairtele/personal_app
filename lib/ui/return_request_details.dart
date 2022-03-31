@@ -70,14 +70,14 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     onPressed: () =>
                     appState.currentAction =
                         PageAction(
-                            state: PageState.addPage, page: SettingsPageConfig),
+                            state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () =>
                     appState.currentAction =
                         PageAction(state: PageState.addPage,
-                            page: NewReturnPageConfig),
+                            pageConfig: NewReturnPageConfig),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
@@ -285,7 +285,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     state: PageState.addWidget,
                                     widget: ProductDetails(
                                         product: products[index]),
-                                    page: DetailProductPageConfig);
+                                    pageConfig: DetailProductPageConfig);
                               })
                               ],
 

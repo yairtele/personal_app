@@ -45,16 +45,10 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
         return SplashPageConfig;
       case LoginPath:
         return LoginPageConfig;
-      case CreateAccountPath:
-        return CreateAccountPageConfig;
-      case ListItemsPath:
-        return ListItemsPageConfig;
+      case BatchesPath:
+        return BatchesPageConfig;
       case DetailsPath:
         return DetailsPageConfig;
-      case CartPath:
-        return CartPageConfig;
-      case CheckoutPath:
-        return CheckoutPageConfig;
       case SettingsPath:
         return SettingsPageConfig;
       case NewBatchPath:
@@ -69,29 +63,23 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
   @override
   RouteInformation restoreRouteInformation(PageConfiguration configuration) {
     switch (configuration.uiPage) {
-      case Pages.Splash:
+      case PageEnum.Splash:
         return const RouteInformation(location: SplashPath);
-      case Pages.Login:
+      case PageEnum.Login:
         return const RouteInformation(location: LoginPath);
-      case Pages.CreateAccount:
-        return const RouteInformation(location: CreateAccountPath);
-      case Pages.List:
-        return const RouteInformation(location: ListItemsPath);
-      case Pages.Details:
+      case PageEnum.Batches:
+        return const RouteInformation(location: BatchesPath);
+      case PageEnum.Details:
         return const RouteInformation(location: DetailsPath);
-      case Pages.Cart:
-        return const RouteInformation(location: CartPath);
-      case Pages.Checkout:
-        return const RouteInformation(location: CheckoutPath);
-      case Pages.Settings:
+      case PageEnum.Settings:
         return const RouteInformation(location: SettingsPath);
-      case Pages.NewBatch:
+      case PageEnum.NewBatch:
         return const RouteInformation(location: NewBatchPath);
-      case Pages.NewReturn:
+      case PageEnum.NewReturn:
         return const RouteInformation(location: NewReturnPath);
-      case Pages.DetailsReturn:
+      case PageEnum.DetailsReturn:
         return const RouteInformation(location: DetailsReturnPath);
-      case Pages.DetailProduct:
+      case PageEnum.DetailProduct:
         return const RouteInformation(location: DetailProductPath);
       default: return const RouteInformation(location: SplashPath);
 

@@ -274,13 +274,13 @@ class SpAthentoServices {
       throw Exception(
           'the "whereExpression" argument must start with "WHERE" instead of "$whereStartWord".');
     }
-
+    //TODO: manejar paginación
     final renamedFieldValues = configProvider.getSelectFields(selectFields);
     final query = "SELECT ${renamedFieldValues.join(
         ', ')} FROM $docType $whereExpression";
     final jsonRequestBody = {
       'params': {
-        'pageSize': 20,
+        'pageSize': 10000,
         'page': 0,
         'query': query
       }
