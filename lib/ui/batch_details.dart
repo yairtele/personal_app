@@ -217,11 +217,14 @@ class _BatchDetailsState extends State<BatchDetails> {
                         ),
                       ),
                     ),
+
                     Padding(
                       padding: EdgeInsets.only(top: 16.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [ ElevatedButton(
+                        children: [
+                          if (batch.state=='Draft')
+                          ElevatedButton(
                             onPressed: () async {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
@@ -243,6 +246,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                               primary: Colors.green[400],
                             )
                         ),
+                          if (batch.state=='Draft')
                           ElevatedButton(
                               onPressed: () async {
                                 try{
@@ -267,6 +271,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 primary: Colors.grey,
                               )
                           ),
+                          if (batch.state=='Draft')
                           ElevatedButton(
                               onPressed: () async {
                                 showDialog<String>(
