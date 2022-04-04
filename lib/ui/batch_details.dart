@@ -65,6 +65,7 @@ class _BatchDetailsState extends State<BatchDetails> {
 
   @override
   Widget build(BuildContext context) {
+    var enabled_value = true;
     final batch = widget.batch;
     final title = batch.retailReference;
     final subTitle = batch.description;
@@ -73,7 +74,9 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
-
+    if (batch.state!='Draft'){
+      enabled_value = false;
+    }
     return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
@@ -140,7 +143,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                       margin: EdgeInsets.only(top: 8),
                       padding: EdgeInsets.all(15),
                       child: TextField(
-                        autofocus: true,
+                        autofocus: false,
+                        enabled: enabled_value,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.send,
                         maxLength: 30,
@@ -167,7 +171,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                       margin: EdgeInsets.only(top: 8),
                       padding: EdgeInsets.all(15),
                       child: TextField(
-                        autofocus: true,
+                        autofocus: false,
+                        enabled: enabled_value,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.send,
                         maxLength: 50,
@@ -194,7 +199,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                       margin: EdgeInsets.only(top: 8),
                       padding: EdgeInsets.all(15),
                       child: TextField(
-                        autofocus: true,
+                        autofocus: false,
+                        enabled: enabled_value,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.send,
                         maxLength: 250,
