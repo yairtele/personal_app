@@ -163,12 +163,6 @@ class _BatchesState extends State<Batches> {
                               subtitle: Text('${_getBatchSubTitle(
                                   draftBatches[index])}\n\n\n'),
                             ), onTap: () {
-                              appState.currentAction = PageAction(
-                                  state: PageState.addWidget,
-                                  widget: BatchDetails(
-                                      batch: draftBatches[index]),
-                                  pageConfig: DetailsPageConfig);
-
                               appState.waitCurrentAction<bool>(
                                   PageAction(
                                       state: PageState.addWidget,
@@ -176,11 +170,11 @@ class _BatchesState extends State<Batches> {
                                           batch: draftBatches[index]),
                                       pageConfig: DetailsPageConfig)
                               ).then((shouldRefresh) {
-                                //if(shouldRefresh!){ //TODO:  Manejar el resultado de la pantalla Batch Details
+                                if(shouldRefresh!){ //TODO:  Manejar el resultado de la pantalla Batch Details
                                   setState(() {
                                     _localData = getScreenData();
                                   });
-                                //}
+                                }
                               });
 
                             })
@@ -216,11 +210,20 @@ class _BatchesState extends State<Batches> {
                                     subtitle: Text('${_getBatchSubTitle(
                                         auditedBatches[index])}\n\n\n'),
                                   ), onTap: () {
-                                    appState.currentAction = PageAction(
-                                        state: PageState.addWidget,
-                                        widget: BatchDetails(
-                                            batch: auditedBatches[index]),
-                                        pageConfig: DetailsPageConfig);
+                                    appState.waitCurrentAction<bool>(
+                                        PageAction(
+                                            state: PageState.addWidget,
+                                            widget: BatchDetails(
+                                                batch: auditedBatches[index]),
+                                            pageConfig: DetailsPageConfig))
+                                    .then((shouldRefresh) {
+                                      if(shouldRefresh! == true){
+                                        setState(() {
+                                          _localData = getScreenData();
+                                        });
+                                      }
+                                    });
+
                                   })
                                 ],
                                 //selected: selected[index],

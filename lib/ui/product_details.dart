@@ -6,10 +6,8 @@ import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/product_detail.dart';
 import 'package:navigation_app/services/business/product_info.dart';
-import 'package:navigation_app/services/business/product_photo.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
-import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
@@ -274,8 +272,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 
   Future<ProductDetail> _getProductDetail(Product? product) async {
-
-    _productInfo = await SpProductUtils.getProductInfoByEAN(product!.EAN);
+    _productInfo = await BusinessServices.getProductInfoByEAN(product!.EAN);
     final productExistingPhotos = await BusinessServices.getPhotosByProductUUID(product.uuid!);
     final productPhotos = await _getFullPhotosInfo(productExistingPhotos);
 
