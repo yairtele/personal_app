@@ -66,6 +66,7 @@ class _BatchDetailsState extends State<BatchDetails> {
 
   @override
   Widget build(BuildContext context) {
+    var enabled_value = true;
     final batch = widget.batch;
     final title = batch.retailReference;
     final subTitle = batch.description;
@@ -74,6 +75,10 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
+
+    if (batch.state!='Draft'){
+      enabled_value = false;
+    }
 
     return WillPopScope(
       onWillPop: () {
@@ -155,6 +160,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           textInputAction: TextInputAction.send,
                           maxLength: 30,
                           controller: _reference,
+                          enabled: enabled_value,
                           decoration: const InputDecoration(
                             hintText: 'Referencia Interna Lote',
                             helperText: 'Ej: LOT-35266',
@@ -182,6 +188,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
                           controller: _description,
+                          enabled: enabled_value,
                           decoration: const InputDecoration(
                             hintText: 'Descripcion',
                             helperText: 'Ej: Lote Fravega 4',
@@ -209,6 +216,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           textInputAction: TextInputAction.send,
                           maxLength: 250,
                           controller: _observation,
+                          enabled: enabled_value,
                           decoration: const InputDecoration(
                             hintText: 'Observacion',
                             helperText: 'Ej: Contiene fallas',
@@ -231,7 +239,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                         padding: EdgeInsets.only(top: 16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [ ElevatedButton(
+                          children: [
+                            if (batch.state!='Draft')
+                            ElevatedButton(
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
@@ -254,6 +264,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 primary: Colors.green[400],
                               )
                           ),
+                            if (batch.state!='Draft')
                             ElevatedButton(
                                 onPressed: () async {
                                   try{
@@ -278,6 +289,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   primary: Colors.grey,
                                 )
                             ),
+                            if (batch.state!='Draft')
                             ElevatedButton(
                                 onPressed: () async {
                                   showDialog<String>(
