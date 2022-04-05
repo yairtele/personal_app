@@ -30,6 +30,7 @@ class ProductInfo {
       this.auditRules = ProductAuditRules(photos: [PhotoAuditInfo(label: 'Otra', name: 'otra')], lastSaleMaxAge: const Duration(days: 365));
     } else {
       _isAuditable = auditRules.photos.length > 1;
+      this.auditRules = auditRules;
     }
 
   }

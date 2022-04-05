@@ -48,142 +48,149 @@ class _NewBatchState extends State<NewBatch> {
     referenceTextController.text= appState.reference;
     descriptionTextController.text = appState.description;
     observationTextController.text = appState.observation;
+    return WillPopScope(
+      onWillPop: () {
+        appState.returnWith(false);
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.grey,
-        title: const Text(
-          'Nuevo Lote',
-          style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+        //we need to return a future
+        return Future.value(false);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.grey,
+          title: const Text(
+            'Nuevo Lote',
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+          ),
         ),
-      ),
-      body: SafeArea(
-         child: Form(
-           key: _formKey,
-          child: ListView(
-            children: [
-              //Text('ID Lote Retail: '),
-              Container(
-                margin: EdgeInsets.only(top: 8),
-                padding: EdgeInsets.all(15),
-                child: TextField(
-                  autofocus: true,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.send,
-                  maxLength: 30,
-                  decoration: const InputDecoration(
-                    hintText: 'Referencia Interna Lote',
-                    helperText: 'Ej: LOT-35266',
-                    label: Text.rich(
-                        TextSpan(
-                          children: <InlineSpan>[
-                            WidgetSpan(
-                              child: Text(
-                                  'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        )
+        body: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                //Text('ID Lote Retail: '),
+                Container(
+                  margin: EdgeInsets.only(top: 8),
+                  padding: EdgeInsets.all(15),
+                  child: TextField(
+                    autofocus: true,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.send,
+                    maxLength: 30,
+                    decoration: const InputDecoration(
+                      hintText: 'Referencia Interna Lote',
+                      helperText: 'Ej: LOT-35266',
+                      label: Text.rich(
+                          TextSpan(
+                            children: <InlineSpan>[
+                              WidgetSpan(
+                                child: Text(
+                                    'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          )
+                      ),
                     ),
+                    onChanged: (reference) => appState.reference = reference,
+                    controller: referenceTextController,
                   ),
-                  onChanged: (reference) => appState.reference = reference,
-                  controller: referenceTextController,
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 8),
-                padding: EdgeInsets.all(15),
-                child: TextField(
+                Container(
+                  margin: EdgeInsets.only(top: 8),
+                  padding: EdgeInsets.all(15),
+                  child: TextField(
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.send,
                     maxLength: 50,
-                  decoration: const InputDecoration(
-                    hintText: 'Descripcion',
-                    helperText: 'Ej: Lote Fravega 4',
-                    label: Text.rich(
-                        TextSpan(
-                          children: <InlineSpan>[
-                            WidgetSpan(
-                              child: Text(
-                                  'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        )
+                    decoration: const InputDecoration(
+                      hintText: 'Descripcion',
+                      helperText: 'Ej: Lote Fravega 4',
+                      label: Text.rich(
+                          TextSpan(
+                            children: <InlineSpan>[
+                              WidgetSpan(
+                                child: Text(
+                                    'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          )
+                      ),
                     ),
-                  ),
                     onChanged: (description) => appState.description = description,
                     controller: descriptionTextController,
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 8),
-                padding: EdgeInsets.all(15),
-                child: TextField(
-                  autofocus: true,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.send,
-                  maxLength: 250,
-                  decoration: const InputDecoration(
-                    hintText: 'Observacion',
-                    helperText: 'Ej: Contiene Fallas',
-                    label: Text.rich(
-                        TextSpan(
-                          children: <InlineSpan>[
-                            WidgetSpan(
-                              child: Text(
-                                  'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        )
-                    ),
                   ),
-                  onChanged: (observation) => appState.observation = observation,
-                  controller: observationTextController,
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 8),
-                padding: EdgeInsets.all(15),
-                child: ElevatedButton(
-                    child: const Text('Crear lote'),
-                    onPressed: () async {
-                      try{
-                        WorkingIndicatorDialog().show(context, text: 'Creando nuevo lote...');
-                        await _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
-                        appState.returnWith(true);
-
-                        _showSnackBar('Nuevo batch creado con éxito');
-                      }
-                      on BusinessException catch (e){
-                        _showSnackBar(e.message);
-                      }
-                      on Exception catch (e){
-                        _showSnackBar('Ha ocurrido un error inesperado guardardo el nuevo lote: $e');
-                      }
-                      finally{
-                        WorkingIndicatorDialog().dismiss();
-                      }
-
-                    //_makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
-                  }
+                Container(
+                  margin: EdgeInsets.only(top: 8),
+                  padding: EdgeInsets.all(15),
+                  child: TextField(
+                    autofocus: true,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.send,
+                    maxLength: 250,
+                    decoration: const InputDecoration(
+                      hintText: 'Observacion',
+                      helperText: 'Ej: Contiene Fallas',
+                      label: Text.rich(
+                          TextSpan(
+                            children: <InlineSpan>[
+                              WidgetSpan(
+                                child: Text(
+                                    'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          )
+                      ),
+                    ),
+                    onChanged: (observation) => appState.observation = observation,
+                    controller: observationTextController,
+                  ),
                 ),
-              ),
-              //TODO: Descomentar accion de Siguiente y realizar bien la navegacion
-              Container(
-                margin: EdgeInsets.only(top: 8),
-                padding: EdgeInsets.all(15),
-                child: ElevatedButton(onPressed: () {  },
-                  //onPressed: () =>
-                  //appState.currentAction = PageAction(state: PageState.addPage, page: NewReturnPageConfig),
+                Container(
+                  margin: EdgeInsets.only(top: 8),
+                  padding: EdgeInsets.all(15),
+                  child: ElevatedButton(
+                      child: const Text('Crear lote'),
+                      onPressed: () async {
+                        try{
+                          WorkingIndicatorDialog().show(context, text: 'Creando nuevo lote...');
+                          await _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
+                          appState.returnWith(true);
+
+                          _showSnackBar('Nuevo batch creado con éxito');
+                        }
+                        on BusinessException catch (e){
+                          _showSnackBar(e.message);
+                        }
+                        on Exception catch (e){
+                          _showSnackBar('Ha ocurrido un error inesperado guardardo el nuevo lote: $e');
+                        }
+                        finally{
+                          WorkingIndicatorDialog().dismiss();
+                        }
+
+                        //_makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
+                      }
+                  ),
+                ),
+                //TODO: Descomentar accion de Siguiente y realizar bien la navegacion
+                Container(
+                  margin: EdgeInsets.only(top: 8),
+                  padding: EdgeInsets.all(15),
+                  child: ElevatedButton(onPressed: () {  },
+                    //onPressed: () =>
+                    //appState.currentAction = PageAction(state: PageState.addPage, page: NewReturnPageConfig),
                     child: const Text('Siguiente'),
                   ),
-              ),
+                ),
 
-            ],
+              ],
+            ),
           ),
-       ),
+        ),
       ),
     );
   }
