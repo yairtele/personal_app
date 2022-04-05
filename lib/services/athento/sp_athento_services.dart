@@ -12,7 +12,8 @@ import 'config_provider.dart';
 class SpAthentoServices {
   static Future<UserInfo> getUserInfo(ConfigProvider configProvider,
       String user_name_or_uuid) async {
-    final uri = configProvider.getEndpointUrl(AthentoEndpoint.getUserInfo).replaceFirst('{user_name}', user_name_or_uuid);
+    final uri = configProvider.getEndpointUrl(AthentoEndpoint.getUserInfo)
+        .replaceFirst('{user_name}', user_name_or_uuid);
     final headers = configProvider.getHttpHeaders();
 
     final response = await SpWS.get(uri, headers: headers, parameters: {});
@@ -176,10 +177,11 @@ class SpAthentoServices {
   }
 
 
-  static Future<Map<String, dynamic>> updateDocumentContent ({ required ConfigProvider configProvider, required String documentUUID, required List<
-  int> content, required String friendlyFileName, String auditMessage = ''}) async {
-    final documentContentType = SpWS.getContentTypeFromFilePath(
-        friendlyFileName);
+  static Future<Map<String, dynamic>> updateDocumentContent(
+      { required ConfigProvider configProvider, required String documentUUID, required List<
+          int> content, required String friendlyFileName, String auditMessage = ''}) async {
+
+    final documentContentType = SpWS.getContentTypeFromFilePath(friendlyFileName);
 
     final contentAsBase64 = base64Encode(content);
 
@@ -228,16 +230,13 @@ class SpAthentoServices {
     //fs.write("C:\\Temp\\borrarme\\svcMessageBody.txt", messageBody);
 
     final response = await SpWS.post(
-        configProvider.getEndpointUrl('updateDocumentContent'),parameters:  {},
+        configProvider.getEndpointUrl('updateDocumentContent'), parameters: {},
         headers: messageHeaders, body: messageBody);
-
 
     //console.log("Athento Response.status: " + response.statusCode);
     return configProvider.parseResponse(response.body);
-    //console.log(JSON.stringify(jsonRequestBody));
-  }
-
-
+//console.log(JSON.stringify(jsonRequestBody));
+}
 
   static Future<Map<String, dynamic>> getDocument(ConfigProvider configProvider,
       String docType,
