@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'config/cache.dart';
 import 'services/user_services.dart';
@@ -15,13 +17,15 @@ enum PageState {
   replaceAll
 }
 
-class PageAction {
+class PageAction<TReturnValue> {
   PageState state;
-  PageConfiguration? page;
+  PageConfiguration? pageConfig;
   List<PageConfiguration>? pages;
   Widget? widget;
+  Completer<TReturnValue>? returnValueCompleter;
+  TReturnValue? returnValue;
 
-  PageAction({this.state = PageState.none, this.page = null, this.pages, this.widget});
+  PageAction({this.state = PageState.none, this.pageConfig = null, this.pages, this.widget});
 }
 class AppState extends ChangeNotifier {
   bool _loggedIn = false;
@@ -50,6 +54,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<TReturnValue?> waitCurrentAction<TReturnValue>(PageAction<TReturnValue> action) async{
+    action.returnValueCompleter = Completer<TReturnValue>();
+    _currentAction = action;
+    notifyListeners();
+    return action.returnValueCompleter!.future;
+  }
+
   AppState() {
     getLoggedInState();
   }
@@ -58,20 +69,6 @@ class AppState extends ChangeNotifier {
     _currentAction = PageAction();
   }
 
-  void addToCart(String item) {
-    cartItems.add(item);
-    notifyListeners();
-  }
-
-  void removeFromCart(String item) {
-    cartItems.add(item);
-    notifyListeners();
-  }
-
-  void clearCart() {
-    cartItems.clear();
-    notifyListeners();
-  }
 
   void setSplashFinished() {
     _splashFinished = true;
@@ -79,7 +76,7 @@ class AppState extends ChangeNotifier {
     //if (_loggedIn) {
     //  _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
     //} else {
-      _currentAction = PageAction(state: PageState.replaceAll, page: LoginPageConfig);
+      _currentAction = PageAction(state: PageState.replaceAll, pageConfig: LoginPageConfig);
     //}
     notifyListeners();
   }
@@ -94,7 +91,7 @@ class AppState extends ChangeNotifier {
     _loggedIn = true;
     Cache.saveLoginState(loggedIn);//TODO: usar o no await? En el código original no lo usaba
     if(_loggedIn){
-      _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
+      _currentAction = PageAction(state: PageState.replaceAll, pageConfig: BatchesPageConfig);
       notifyListeners();
     }
 
@@ -105,7 +102,7 @@ class AppState extends ChangeNotifier {
     _loggedIn = false;
     await Cache.clearAll();
     await Cache.saveLoginState(loggedIn); //TODO: usar o no await? En el código original no lo usaba
-    _currentAction = PageAction(state: PageState.replaceAll, page: LoginPageConfig);
+    _currentAction = PageAction(state: PageState.replaceAll, pageConfig: LoginPageConfig);
     notifyListeners();
   }
 
@@ -113,5 +110,12 @@ class AppState extends ChangeNotifier {
 
   void getLoggedInState() async {
     _loggedIn = (await Cache.getLoggedInState()) ?? false;
+  }
+
+  void returnWith<TReturnValue>(TReturnValue value){
+
+    _currentAction = PageAction<TReturnValue>(state: PageState.pop);
+    _currentAction.returnValue = value;
+    notifyListeners();
   }
 }

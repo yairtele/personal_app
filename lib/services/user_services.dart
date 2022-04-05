@@ -1,5 +1,6 @@
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
+import 'package:navigation_app/exceptions/custom_exception.dart';
 import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 
@@ -18,15 +19,8 @@ class UserServices{
   }
 }
 
-class InvalidLoginException implements Exception{
-  String message;
-
-  InvalidLoginException([String this.message = 'Invalid login']);
-
-  @override
-  String toString() {
-    return message;
-  }
+class InvalidLoginException extends CustomException{
+  InvalidLoginException(String message, {Exception? cause}): super(message, cause: cause);
 }
 
 

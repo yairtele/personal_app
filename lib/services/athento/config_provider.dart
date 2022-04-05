@@ -1,5 +1,7 @@
 
 import 'dart:convert';
+import 'package:http/http.dart';
+
 import 'athento_endpoint.dart';
 
 abstract class ConfigProvider {
@@ -13,7 +15,6 @@ abstract class ConfigProvider {
     AthentoEndpoint.updateDocumentContent: 'nuxeo/site/automation/Blob.Attach/',
     AthentoEndpoint.getAuthToken: 'o/token/',
     AthentoEndpoint.getUserInfo: 'users/api/user/{user_name}/',
-
   };
 
   String _serviceBaseUrl = '';
@@ -26,14 +27,20 @@ abstract class ConfigProvider {
     return _fieldNameInferenceConfig;
   }
 
+  late Converter<List<int>, String> _responseDecoder;
 
-  ConfigProvider(String serviceBaseUrl, [Map<String, String>? fieldNameInferenceConfig]) {
+  ConfigProvider(String serviceBaseUrl, [Map<String, String>? fieldNameInferenceConfig, Converter<List<int>, String> responseDecoder = const Utf8Decoder()]) {
     _serviceBaseUrl = serviceBaseUrl + (serviceBaseUrl.endsWith('/') ? '' : '/');
-    _fieldNameInferenceConfig = fieldNameInferenceConfig ;
+    _fieldNameInferenceConfig = fieldNameInferenceConfig;
+    _responseDecoder = responseDecoder;
   }
 
-  Map<String, dynamic> parseResponse(String responseBody) {
+  Map<String, dynamic> parseResponseBody(String responseBody) {
     return jsonDecode(responseBody);
+  }
+
+  Map<String, dynamic> parseResponse(Response response) {
+    return jsonDecode(_responseDecoder.convert(response.bodyBytes));
   }
 
 

@@ -85,41 +85,6 @@ class BusinessServices {
     return batches.toList();
   }
 
-  static Future<List<ReturnRequest>> getReturnRequestsByBatchNumber({required String batchNumber}) async {
-    //Obtener diccionario de inferencia de nombres de campo
-    final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
-    final batchFieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
-
-    // Obtener config provider para Bearer Token
-    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
-
-    //Definir campos del SELECT
-    final selectFields = [
-      AthentoFieldName.uuid,
-      AthentoFieldName.title,
-      ReturnRequestAthentoFieldName.requestNumber,
-      ReturnRequestAthentoFieldName.batchNumber,
-      ReturnRequestAthentoFieldName.EAN,
-      ReturnRequestAthentoFieldName.commercialCode,
-      ReturnRequestAthentoFieldName.description,
-      ReturnRequestAthentoFieldName.retailReference,
-      ReturnRequestAthentoFieldName.quantity,
-      ReturnRequestAthentoFieldName.isAuditable,
-    ];
-
-    // Construir WHERE expression
-    final parentBatchNumber = ' parent:metadata.${batchFieldNameInferenceConfig['defaultPrefix']}${BatchAthentoFieldName.batchNumber}';
-    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $parentBatchNumber = '$batchNumber'";
-
-    // Invocar a Athento
-    final entries = await SpAthentoServices.findDocuments(
-        configProvider, _returnRequestDocType, selectFields, whereExpression);
-
-    //Convertir resultado a objetos ReturnRequest y retornar resultado
-    final returns = entries.map((e) => ReturnRequest.fromJSON(e));
-    return returns.toList();
-  }
-
   static Future<List<ReturnRequest>> getReturnRequestsByBatchUUID({required String batchUUID}) async {
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
@@ -169,34 +134,34 @@ class BusinessServices {
 
   static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
     const EAN_INDEX = 0;
-    return getProductInfoByEANorCodefromFile(EAN_INDEX, eanCode);
+    return _getProductInfoByEANorCodefromFile(EAN_INDEX, eanCode);
 
   }
 
   static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) async {
     //TODO: Consultar Athento
     //return getProductInfoByCommercialCodeFromArray(commercialCode);
-    return getProductInfoByCommercialCodefromFile(commercialCode);
+    return _getProductInfoByCommercialCodefromFile(commercialCode);
   }
 
-  static Future<ProductInfo> getProductInfoByCommercialCodefromFile(String commercialCode) async {
+  static Future<ProductInfo> _getProductInfoByCommercialCodefromFile(String commercialCode) async {
     const COMMERCIAL_CODE_INDEX = 1;
-    return getProductInfoByEANorCodefromFile(COMMERCIAL_CODE_INDEX, commercialCode);
+    return _getProductInfoByEANorCodefromFile(COMMERCIAL_CODE_INDEX, commercialCode);
 
   }
 
-  static Future<ProductInfo> getProductInfoByEANorCodefromFile(int productFileSearchColumnIndex, String productFileSearchKey) async {
+  static Future<ProductInfo> _getProductInfoByEANorCodefromFile(int productFileSearchColumnIndex, String productFileSearchKey) async {
     //TODO: Consultar Athento
     const chunkSize = 32 * 1024;
 
 
-    final producMasterInfo = await getRowAsObjectFromFile(
+    final producMasterInfo = await _getRowAsObjectFromFile(
         fileName: 'products_db.csv' ,
         chunkSize: chunkSize,
         lineSeparator: '\r\n',
         columnSeparator: '\t',
         equals: (List<String> row) => row[productFileSearchColumnIndex] == productFileSearchKey,
-        objectBuilder: createProductMasterInfo);
+        objectBuilder: _createProductMasterInfo);
 
     if(producMasterInfo == null){
       throw BusinessException('No se ha podido encontrar un producto con el código "$productFileSearchKey" en el maestro de productos.');
@@ -205,25 +170,25 @@ class BusinessServices {
     const SKU_INDEX = 15;
     const CUIT_INDEX = 23;
     final retailCUIT = (await Cache.getUserInfo())!.idNumber;
-    final producSalesInfo = await getRowAsObjectFromFile(
+    final producSalesInfo = await _getRowAsObjectFromFile(
         fileName: 'sales_db.csv' ,
         chunkSize: chunkSize,
         lineSeparator: '\r\n',
         columnSeparator: '\t',
         equals: (List<String> row) => row[SKU_INDEX] == producMasterInfo.sku && row[CUIT_INDEX] == retailCUIT,
-        objectBuilder: createProductSalesInfo);
+        objectBuilder: _createProductSalesInfo);
 
     const BUSINESS_UNIT_INDEX = 0;
-    final productAuditRules = await getRowAsObjectFromFile(
+    final productAuditRules = await _getRowAsObjectFromFile(
         fileName: 'rules_db.csv' ,
         chunkSize: chunkSize,
         lineSeparator: '\r\n',
         columnSeparator: '\t',
         equals: (List<String> row) => row[BUSINESS_UNIT_INDEX] == producMasterInfo.businessUnit,
-        objectBuilder: createProductAuditRules);
+        objectBuilder: _createProductAuditRules);
 
 
-    return ProductInfo(
+    return ProductInfo.create(
         EAN: producMasterInfo.ean,
         commercialCode: producMasterInfo.commercialCode,
         sku: producMasterInfo.sku,
@@ -232,7 +197,7 @@ class BusinessServices {
         legalEntity: producMasterInfo.legalEntity,
         businessUnit: producMasterInfo.businessUnit,
         salesInfo: producSalesInfo,
-        auditRules: productAuditRules ?? ProductAuditRules(photos: [PhotoAuditInfo(label: 'Otra', name: 'otra')], lastSaleMaxAge: const Duration(days: 365)),
+        auditRules: productAuditRules,
     );
 
     //return getProductInfoByEANfromArray(eanCode);
@@ -240,7 +205,7 @@ class BusinessServices {
 
   }
 
-  static Future<TRowObject?> getRowAsObjectFromFile<TRowObject>({required String fileName, required int chunkSize,
+  static Future<TRowObject?> _getRowAsObjectFromFile<TRowObject>({required String fileName, required int chunkSize,
         required String lineSeparator, required String columnSeparator, required bool Function(List<String> row)  equals,
         required TRowObject objectBuilder(List<String> row)}) async {
 
@@ -284,20 +249,17 @@ class BusinessServices {
     return null;
   }
 
-  static ProductMasterInfo createProductMasterInfo(List<String> row){
+  static ProductMasterInfo _createProductMasterInfo(List<String> row){
     return ProductMasterInfo.fromCsvRow(row);
   }
 
-  static ProductSalesInfo createProductSalesInfo(List<String> row){
+  static ProductSalesInfo _createProductSalesInfo(List<String> row){
     return ProductSalesInfo.fromCsvRow(row);
   }
 
-  static ProductAuditRules createProductAuditRules(List<String> row){
+  static ProductAuditRules _createProductAuditRules(List<String> row){
     return ProductAuditRules.fromCsvRow(row);
   }
-
-
-
 
   static Future<void> registerNewProductReturn({required Batch  batch, required ReturnRequest? existingReturnRequest, required NewReturn newReturn}) async {
 
@@ -500,7 +462,6 @@ class BusinessServices {
     return fieldValues;
   }
 
-
   static Map<String, dynamic>  _getPhotoFieldValues(String photoName) {
     return {
       'tipo_de_foto': photoName,
@@ -567,39 +528,6 @@ class BusinessServices {
   static List<int> _getImageByteArray({required String path}) {
     final file = File(path);
     return file.readAsBytesSync();
-  }
-
-  static Future<List<Product>> getProductsByReturnRequestNumber(String returnRequestNumber) async{
-    //Obtener diccionario de inferencia de nombres de campo
-    final fieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
-    final returnRequestFieldNameInferenceConfig = _getReturnRequestFieldNameInferenceConfig();
-
-    // Obtener config provider para Bearer Token
-    final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
-
-    //Definir campos del SELECT
-    final selectFields = [
-      AthentoFieldName.uuid,
-      AthentoFieldName.title,
-      ProductAthentoFieldName.requestNumber,
-      ProductAthentoFieldName.EAN,
-      ProductAthentoFieldName.commercialCode,
-      ProductAthentoFieldName.description,
-      ProductAthentoFieldName.retailReference,
-    ];
-
-
-    // Construir WHERE expression
-    final parentReturnRequestNumber = ' parent:metadata.${returnRequestFieldNameInferenceConfig['defaultPrefix']}${ReturnRequestAthentoFieldName.requestNumber}';
-    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND $parentReturnRequestNumber = '$returnRequestNumber'";
-
-    // Invocar a Athento
-    final entries = await SpAthentoServices.findDocuments(
-        configProvider, _productDocType, selectFields, whereExpression);
-
-    //Convertir resultado a objetos ReturnRequest y retornar resultado
-    final returns = entries.map((e) => Product.fromJSON(e));
-    return returns.toList();
   }
 
   static Future<List<Product>> getProductsByReturnRequestUUID(String returnRequestUUID) async{
@@ -672,12 +600,13 @@ class BusinessServices {
     return takenPictures;
   }
 
-
+  //TODO: analizar la salida de deleteDocument y ver cómo manejarla y qué devolver y si hay que usar await
   static Future <void> deleteBatchByUUID (String batchUuid) async{
     final configProvider = await  _createConfigProvider();
-    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);
+    await SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: batchUuid);
   }
 
+  //TODO: analizar la salida de updateDocument y ver cómo manejarla y qué devolver y si hay que usar await
   static Future <void> updateBatch (Batch batch,String batchreference,String batchdescr,String batchobserv) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
@@ -686,20 +615,27 @@ class BusinessServices {
       '${BatchAthentoFieldName.observation}': '${batchobserv}',
     };
     final title = '${batchreference}-${batchdescr}-${batch.batchNumber}';
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!, title: title, fieldValues: fieldValues);
+    await SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!, title: title, fieldValues: fieldValues);
   }
 
-  //TODO: este método es muy genérico Renombrar por sendBatchForAudit
-  static Future <void> updateBatchState (Batch batch) async{
-    final configProvider = await  _createConfigProvider();
-    Map<String, dynamic> fieldValues = {
-      '${AthentoFieldName.state}': 'Enviado'
-    };
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batch.uuid!,  fieldValues: fieldValues);
+  //TODO: analizar la salida de _updateBatchState y ver cómo manejarla y qué devolver y si hay que usar await
+  static Future <void> sendBatchToAudit (Batch batch) async{
+    await _updateBatchState(batch.uuid!, 'Enviado');
   }
+
+  //TODO: analizar la salida de SpAthentoServices.updateDocument y ver cómo manejarla y qué devolver y si hay que usar await
+  static Future <void> _updateBatchState (String batchUUID, String lifeCycleState) async{
+    final configProvider = await  _createConfigProvider();
+    final fieldValues = {
+      '${AthentoFieldName.state}': lifeCycleState
+    };
+    await SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: batchUUID,  fieldValues: fieldValues);
+  }
+
+  //TODO: analizar la salida de SpAthentoServices.deleteDocument y ver cómo manejarla y qué devolver y si hay que usar await
   static Future <void> deleteReqReturnByUUID (String ReqReturnUuid) async{
     final configProvider = await  _createConfigProvider();
-    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: ReqReturnUuid);
+    await SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: ReqReturnUuid);
   }
 
   //TODO: los parámetros String returnEAN,String returnreference,String returndescr,String returnunities ya están en el ReturnRequest
@@ -773,103 +709,11 @@ class BusinessServices {
     }
   }
 
+  //TODO: analizar la salida de SpAthentoServices.deleteDocument y ver cómo manejarla y qué devolver y si hay que usar await
   static Future <void> deleteProductByUUID (String productUUID) async {
     final configProvider = await  _createConfigProvider();
-    SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: productUUID);
+    await SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: productUUID);
   }
-
-  /*
-  static Future<ProductInfo> getProductInfoByCommercialCodeFromArray(String commercialCode) async {
-    //TODO: Consultar Athento
-    return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      var products= <String, ProductInfo>{
-        'PLANCHA': ProductInfo(
-          EAN: '987654321012',
-          commercialCode: 'PLANCHA',
-          sku: '90PLANCHA',
-          description: 'Plancha 1200 W"',
-          brand: 'GAMA',
-          legalEntity: 'NEW SAN S.A.',
-          salesInfo:  ProductSalesInfo(
-              lastSellDate:  DateTime(2018, 1, 1),
-              retailAccount: '012345',
-              price: 2345.56
-          ),
-          photos: [],
-        ),
-        'AFEITADORA': ProductInfo(
-          EAN: '69415464654',
-          commercialCode: 'AFEITADORA',
-          sku: 'AFEITADORA',
-          description: 'Afeitadora Braun Shower',
-          brand: 'Braun',
-          legalEntity: 'NEW SAN S.A.',
-          salesInfo:  ProductSalesInfo(
-              lastSellDate:  DateTime(2018, 1, 1),
-              retailAccount: '012345',
-              price: 1345.56
-          ),
-          photos: [],
-        )
-
-      };
-
-      var product = products[commercialCode];
-
-      if(product == null){
-        throw BusinessException(
-            'No se ha encontrado el código comercial "$commercialCode".');
-      }
-
-      return product;
-    });
-  }
-  static Future<ProductInfo> getProductInfoByEANfromArray(String eanCode) async {
-    //TODO: Consultar Athento
-    return Future<ProductInfo>.delayed(const Duration(milliseconds: 1), () {
-      final products= <String, ProductInfo>{
-        '1234': ProductInfo(
-          EAN: '1234567891012',
-          commercialCode: 'TV-LG-80I',
-          sku: '90TV-LG-80I',
-          description: 'Televisor LG 80"',
-          brand: 'LG',
-          legalEntity: 'NEW SAN S.A.',
-          salesInfo:  ProductSalesInfo(
-              lastSellDate:  DateTime(2022, 1, 1),
-              retailAccount: '012345',
-              price: 222345.56
-          ),
-          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
-        ),
-        '4321': ProductInfo(
-          EAN: '25698742224',
-          commercialCode: 'AC-BGH-3000',
-          sku: '90AC-BGH-3000',
-          description: 'Aire Acondicionado BGH 3000',
-          brand: 'BGH',
-          legalEntity: 'NEW SAN S.A.',
-          salesInfo:  ProductSalesInfo(
-              lastSellDate:  DateTime(2022, 1, 1),
-              retailAccount: '012345',
-              price: 112345.56
-          ),
-          photos: ['frente', 'dorso', 'accesorios', 'embalaje'],
-        ),
-
-      };
-
-      final product = products[eanCode];
-
-      if(product == null){
-        throw BusinessException('No se ha encontrado el EAN "$eanCode".');
-      }
-
-      return product;
-
-    });
-  }
-  */
 }
 
 class ProductMasterInfo{

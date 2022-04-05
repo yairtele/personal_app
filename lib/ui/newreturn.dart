@@ -1,6 +1,5 @@
 //import 'dart:html';
 
-import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,7 +22,7 @@ import 'package:intl/intl.dart';
 
 //T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
-  final ReturnRequest? returnRequest;
+  final ReturnRequest? returnRequest; //TODO: Precargar datos si returnRequest no es nulo
   final Batch batch;
   const NewReturnScreen({Key? key, required this.batch, this.returnRequest}) : super(key: key);
 
@@ -54,6 +53,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   Future<ScreenData<void, void>>? _localData;
   late Batch _globalBatch;
   String _dateWarning = '';
+  bool _shouldRefreshParent = false;
 
   @override
   void initState() {
@@ -64,93 +64,100 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //final appState = Provider.of<AppState>(context, listen: false);
+    final appState = Provider.of<AppState>(context, listen: false);
     final newReturnState = this;
+    return WillPopScope(
+      onWillPop: () {
 
-    return FutureBuilder<ScreenData<void, void>>(
-        future: _localData,
-        builder: (BuildContext context,
-            AsyncSnapshot<ScreenData<void, void>> snapshot) {
-          Widget widget;
-          if (snapshot.hasData) {
-            final batch = this.widget.batch;
-            _globalBatch = batch;
-            widget = Scaffold(
-                appBar: AppBar(
-                  elevation: 0,
-                  backgroundColor: Colors.grey,
-                  title: const Text(
-                    'Nueva Devolución',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
+        appState.returnWith(_shouldRefreshParent);
+
+        //we need to return a future
+        return Future.value(false);
+      },
+      child: FutureBuilder<ScreenData<void, void>>(
+          future: _localData,
+          builder: (BuildContext context,
+              AsyncSnapshot<ScreenData<void, void>> snapshot) {
+            Widget widget;
+            if (snapshot.hasData) {
+              final batch = this.widget.batch;
+              _globalBatch = batch;
+              widget = Scaffold(
+                  appBar: AppBar(
+                    elevation: 0,
+                    backgroundColor: Colors.grey,
+                    title: const Text(
+                      'Nueva Devolución',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
                   ),
-                ),
-                body: LayoutBuilder(builder:
-                    (BuildContext context, BoxConstraints viewportConstraints) {
-                  return SingleChildScrollView(
-                    //SafeArea(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: viewportConstraints.maxHeight,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: RadioListTile<ProductSearchBy>(
-                                    title: const Text('EAN'),
-                                    groupValue: _productSearchBy,
-                                    value: ProductSearchBy.EAN,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _productSearchBy = value!;
-                                      });
-                                    },
-                                  )),
-                              Expanded(
-                                  child: RadioListTile<ProductSearchBy>(
-                                    title: const Text('Cod. comercial'),
-                                    groupValue: _productSearchBy,
-                                    value: ProductSearchBy.CommercialCode,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _productSearchBy = value!;
-                                      });
-                                    },
-                                  )),
-                            ],
-                          ),
-                          //Text('ID Lote Retail: '),
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.only(top: 8),
-                                    padding: const EdgeInsets.all(15),
-                                    child: TextField(
-                                      autofocus: true,
-                                      controller: _searchParamTextController,
-                                      keyboardType: TextInputType.text,
-                                      textInputAction: TextInputAction.send,
-                                      maxLength: 30,
-                                      decoration: const InputDecoration(
-                                          hintText: 'EAN/MOD',
-                                          helperText: 'Ej: 939482'),
-                                    ),
-                                  )),
-                              Container(
-                                width: 45,
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.only(left: 2, right: 2),
-                                child: ElevatedButton(
-                                  child: const Icon(FontAwesomeIcons.barcode),
-                                  onPressed: () async {
-                                    if (kIsWeb) {
-                                      /*final tmpFile = await getImage(1);
+                  body: LayoutBuilder(builder:
+                      (BuildContext context, BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      //SafeArea(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: viewportConstraints.maxHeight,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: RadioListTile<ProductSearchBy>(
+                                      title: const Text('EAN'),
+                                      groupValue: _productSearchBy,
+                                      value: ProductSearchBy.EAN,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _productSearchBy = value!;
+                                        });
+                                      },
+                                    )),
+                                Expanded(
+                                    child: RadioListTile<ProductSearchBy>(
+                                      title: const Text('Cod. comercial'),
+                                      groupValue: _productSearchBy,
+                                      value: ProductSearchBy.CommercialCode,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _productSearchBy = value!;
+                                        });
+                                      },
+                                    )),
+                              ],
+                            ),
+                            //Text('ID Lote Retail: '),
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                      margin: const EdgeInsets.only(top: 8),
+                                      padding: const EdgeInsets.all(15),
+                                      child: TextField(
+                                        autofocus: true,
+                                        controller: _searchParamTextController,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.send,
+                                        maxLength: 30,
+                                        decoration: const InputDecoration(
+                                            hintText: 'EAN/MOD',
+                                            helperText: 'Ej: 939482'),
+                                      ),
+                                    )),
+                                Container(
+                                  width: 45,
+                                  margin: const EdgeInsets.only(top: 8),
+                                  padding: const EdgeInsets.only(left: 2, right: 2),
+                                  child: ElevatedButton(
+                                    child: const Icon(FontAwesomeIcons.barcode),
+                                    onPressed: () async {
+                                      if (kIsWeb) {
+                                        /*final tmpFile = await getImage(1);
                                     setState(() async {
                                       imageFile = tmpFile;
                                       var fileBytes = await imageFile.readAsBytes();
@@ -160,101 +167,63 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       print('Barcode: ' + results[0].toString());
                                       _controller.text = results[0].toString();
                                     });*/
-                                    } else {
-                                      if (Platform.isAndroid ||
-                                          Platform.isIOS) {
-                                        final barcode = await BarcodeScanner.scan();
-                                        //setState((){
+                                      } else {
+                                        if (Platform.isAndroid ||
+                                            Platform.isIOS) {
+                                          final barcode = await BarcodeScanner.scan();
+                                          //setState((){
                                           _lookForProduct(barcode);
-                                        //});
+                                          //});
+                                        }
                                       }
-                                    }
-                                  },
+                                    },
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                  width: 45,
+                                  margin: const EdgeInsets.only(top: 8),
+                                  padding: const EdgeInsets.only(left: 2, right: 2),
+                                  child: ElevatedButton(
+                                    child: const Icon(// Botón Buscar
+                                        FontAwesomeIcons.search),
+                                    onPressed: _lookForProduct,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            if (_product != null) ...[
                               Container(
-                                width: 45,
                                 margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.only(left: 2, right: 2),
-                                child: ElevatedButton(
-                                  child: const Icon(// Botón Buscar
-                                      FontAwesomeIcons.search),
-                                  onPressed: _lookForProduct,
-                                ),
-                              ),
-                            ],
-                          ),
+                                padding: const EdgeInsets.all(15),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        margin:
+                                        const EdgeInsets.only(top: 8),
+                                        padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                        child: TextField(
+                                          controller: _descriptionTextController,
+                                          autofocus: true,
+                                          keyboardType: TextInputType.text,
+                                          textInputAction:
+                                          TextInputAction.send,
+                                          readOnly: true,
+                                          maxLength: 30,
 
-                          if (_product != null) ...[
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              padding: const EdgeInsets.all(15),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      margin:
-                                      const EdgeInsets.only(top: 8),
-                                      padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                                      child: TextField(
-                                        controller: _descriptionTextController,
-                                        autofocus: true,
-                                        keyboardType: TextInputType.text,
-                                        textInputAction:
-                                        TextInputAction.send,
-                                        readOnly: true,
-                                        maxLength: 30,
-
-                                        decoration: const InputDecoration(
-                                            labelText: 'Descripción',
-                                            border: InputBorder.none,
-                                            counter: Offstage()
+                                          decoration: const InputDecoration(
+                                              labelText: 'Descripción',
+                                              border: InputBorder.none,
+                                              counter: Offstage()
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextField(
-                                            controller: _eanTextController,
-                                            autofocus: true,
-                                            keyboardType: TextInputType.text,
-                                            textInputAction:
-                                            TextInputAction.send,
-                                            readOnly: true,
-                                            maxLength: 30,
-
-                                            decoration: const InputDecoration(
-                                                labelText: 'EAN',
-                                                border: InputBorder.none,
-                                                counter: Offstage()
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: TextField(
-                                            controller: _commercialCodeTextController,
-                                            autofocus: true,
-                                            keyboardType: TextInputType.text,
-                                            textInputAction:
-                                            TextInputAction.send,
-                                            readOnly: true,
-                                            maxLength: 30,
-
-                                            decoration: const InputDecoration(
-                                                labelText: 'Código Comercial',
-                                                border: InputBorder.none,
-                                                counter: Offstage()
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Row(
+                                      Row(
                                         children: [
                                           Expanded(
                                             child: TextField(
-                                              controller: _brandTextController,
+                                              controller: _eanTextController,
                                               autofocus: true,
                                               keyboardType: TextInputType.text,
                                               textInputAction:
@@ -263,7 +232,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               maxLength: 30,
 
                                               decoration: const InputDecoration(
-                                                  labelText: 'Marca',
+                                                  labelText: 'EAN',
                                                   border: InputBorder.none,
                                                   counter: Offstage()
                                               ),
@@ -271,7 +240,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                           ),
                                           Expanded(
                                             child: TextField(
-                                              controller: _legalEntityTextController,
+                                              controller: _commercialCodeTextController,
                                               autofocus: true,
                                               keyboardType: TextInputType.text,
                                               textInputAction:
@@ -280,62 +249,100 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               maxLength: 30,
 
                                               decoration: const InputDecoration(
-                                                  labelText: 'Jurídica',
-                                                  border: InputBorder.none,
-                                                  counter: Offstage()
-                                              ),
-                                            ),
-                                          ),
-                                        ]),
-                                    Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _dateTextController,
-                                              autofocus: true,
-                                              keyboardType: TextInputType.text,
-                                              textInputAction:
-                                              TextInputAction.send,
-                                              readOnly: true,
-                                              maxLength: 30,
-
-                                              decoration: const InputDecoration(
-                                                  labelText: 'Fecha Última Compra',
-                                                  border: InputBorder.none,
-                                                  counter: Offstage()
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _priceTextController,
-                                              autofocus: true,
-                                              keyboardType: TextInputType.text,
-                                              textInputAction:
-                                              TextInputAction.send,
-                                              readOnly: true,
-                                              maxLength: 30,
-
-                                              decoration: const InputDecoration(
-                                                  labelText: 'Precio',
+                                                  labelText: 'Código Comercial',
                                                   border: InputBorder.none,
                                                   counter: Offstage()
                                               ),
                                             ),
                                           )
-                                        ]),
-                                    if(_dateWarning != '')
-                                      Icon(FontAwesomeIcons.exclamationTriangle),
+                                        ],
+                                      ),
+                                      Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _brandTextController,
+                                                autofocus: true,
+                                                keyboardType: TextInputType.text,
+                                                textInputAction:
+                                                TextInputAction.send,
+                                                readOnly: true,
+                                                maxLength: 30,
+
+                                                decoration: const InputDecoration(
+                                                    labelText: 'Marca',
+                                                    border: InputBorder.none,
+                                                    counter: Offstage()
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _legalEntityTextController,
+                                                autofocus: true,
+                                                keyboardType: TextInputType.text,
+                                                textInputAction:
+                                                TextInputAction.send,
+                                                readOnly: true,
+                                                maxLength: 30,
+
+                                                decoration: const InputDecoration(
+                                                    labelText: 'Jurídica',
+                                                    border: InputBorder.none,
+                                                    counter: Offstage()
+                                                ),
+                                              ),
+                                            ),
+                                          ]),
+                                      Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _dateTextController,
+                                                autofocus: true,
+                                                keyboardType: TextInputType.text,
+                                                textInputAction:
+                                                TextInputAction.send,
+                                                readOnly: true,
+                                                maxLength: 30,
+
+                                                decoration: const InputDecoration(
+                                                    labelText: 'Fecha Última Compra',
+                                                    border: InputBorder.none,
+                                                    counter: Offstage()
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _priceTextController,
+                                                autofocus: true,
+                                                keyboardType: TextInputType.text,
+                                                textInputAction:
+                                                TextInputAction.send,
+                                                readOnly: true,
+                                                maxLength: 30,
+
+                                                decoration: const InputDecoration(
+                                                    labelText: 'Precio',
+                                                    border: InputBorder.none,
+                                                    counter: Offstage()
+                                                ),
+                                              ),
+                                            )
+                                          ]),
+                                      if(_dateWarning != '')
+                                        Icon(FontAwesomeIcons.exclamationTriangle),
                                       Text(_dateWarning,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.red
-                                        )),
-                                    Container(
-                                      margin:
-                                      const EdgeInsets.only(top: 8),
-                                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                                      child: TextField(
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red
+                                          )),
+                                      Container(
+                                        margin:
+                                        const EdgeInsets.only(top: 8),
+                                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                        child: TextField(
                                           controller: _retailReferenceTextController,
                                           autofocus: true,
                                           keyboardType:
@@ -348,133 +355,137 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               'Referencia interna',
                                               helperText:'Ej: AEF54216CV'
                                           ),
+                                        ),
                                       ),
-                                    ),
-                                    Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          if (!_isAuditableProduct)
-                                            Container(
-                                            margin: const EdgeInsets.only(top: 8),
-                                            padding: const EdgeInsets.all(30),
-                                            child: TextField(
-                                                controller: _quantityTextController,
-                                                autofocus: true,
-                                                keyboardType:
-                                                TextInputType.text,
-                                                textInputAction:
-                                                TextInputAction.send,
-                                                maxLength: 10,
-                                                decoration:
-                                                const InputDecoration(
-                                                    labelText:
-                                                    'Cantidad devuelta',
-                                                    helperText:
-                                                    'Ej: 12'),
-                                              //},
-                                            ),
-                                          ),
-                                          SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures),
-                                        ]),
-                                  ]),
-                              //)
-                              //)
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              padding: const EdgeInsets.all(15),
-                              child: ElevatedButton( // Botón Registrar
-                                child: const Text('Registrar'),
-                                onPressed: () async {
-                                  try{
-                                    WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
-                                    final thumbsWithPhotos = _takenPictures.entries
-                                        .where((entry) => entry.value != null)
-                                        .map((e) => MapEntry<String, String>(e.key, e.value!.path));
-
-                                    final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
-
-                                    final product = _product!;
-                                    //TODO: Falta pasarle el precio (primero crear metadato en Athento
-                                    final newReturn = NewReturn(
-                                      EAN: product.EAN,
-                                      sku: product.sku,
-                                      retailReference: _retailReferenceTextController.text,
-                                      commercialCode: product.commercialCode,
-                                      description: product.description,
-                                      lastSell: _productLastSell,
-                                      price: _lastSellPrice,
-                                      legalEntity: product.legalEntity,
-                                      businessUnit: product.businessUnit,
-                                      quantity: _getQuantity(),
-                                      isAuditable: _isAuditableProduct,
-                                      photos: photosToSave,
-                                    );
-                                    //print('GLOBAL BATCH: ' + batch.batchNumber!);
-                                    await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
-                                    _showSnackBar('La nueva devolución fue registrada con éxito');
-                                    _clearProductFields();
-                                    setState(() {
-                                      // Nada, para que muestre limpie el form
-                                    });
-                                  }
-                                  on BusinessException catch(e){
-                                    _showSnackBar(e.message);
-                                  }
-                                  catch (e){
-                                    //TODO: EN GENRERAL: los errores inesperados se deben loguear o reportar al equipo de soporte atomáticamente
-                                    //TODO: EN GENERAL: Detectar si los errores se deben a falta de conexión a internet, y ver como se loguean o reportan estos casos
-                                    _showSnackBar('Ha ocurrido un error al guardar la nueva devolución. Error: ${e}');
-                                  }
-                                  finally{
-                                    WorkingIndicatorDialog().dismiss();
-                                  }
-                                },
-
+                                      Column(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                          children: [
+                                            if (!_isAuditableProduct)
+                                              Container(
+                                                margin: const EdgeInsets.only(top: 8),
+                                                padding: const EdgeInsets.all(30),
+                                                child: TextField(
+                                                  controller: _quantityTextController,
+                                                  autofocus: true,
+                                                  keyboardType:
+                                                  TextInputType.text,
+                                                  textInputAction:
+                                                  TextInputAction.send,
+                                                  maxLength: 10,
+                                                  decoration:
+                                                  const InputDecoration(
+                                                      labelText:
+                                                      'Cantidad devuelta',
+                                                      helperText:
+                                                      'Ej: 12'),
+                                                  //},
+                                                ),
+                                              ),
+                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures),
+                                          ]),
+                                    ]),
+                                //)
+                                //)
                               ),
-                            ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.all(15),
+                                child: ElevatedButton( // Botón Registrar
+                                  child: const Text('Registrar'),
+                                  onPressed: () async {
+                                    try{
+                                      WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
+                                      final thumbsWithPhotos = _takenPictures.entries
+                                          .where((entry) => entry.value != null)
+                                          .map((e) => MapEntry<String, String>(e.key, e.value!.path));
+
+                                      final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
+
+                                      final product = _product!;
+                                      //TODO: Falta pasarle el precio (primero crear metadato en Athento
+                                      final newReturn = NewReturn(
+                                        EAN: product.EAN,
+                                        sku: product.sku,
+                                        retailReference: _retailReferenceTextController.text,
+                                        commercialCode: product.commercialCode,
+                                        description: product.description,
+                                        lastSell: _productLastSell,
+                                        price: _lastSellPrice,
+                                        legalEntity: product.legalEntity,
+                                        businessUnit: product.businessUnit,
+                                        quantity: _getQuantity(),
+                                        isAuditable: _isAuditableProduct,
+                                        photos: photosToSave,
+                                      );
+                                      //print('GLOBAL BATCH: ' + batch.batchNumber!);
+                                      await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
+
+                                      _shouldRefreshParent = true;
+                                      _showSnackBar('La nueva devolución fue registrada con éxito');
+                                      _clearProductFields();
+                                      setState(() {
+
+                                      });
+                                    }
+                                    on BusinessException catch(e){
+                                      _showSnackBar(e.message);
+                                    }
+                                    catch (e){
+                                      //TODO: EN GENRERAL: los errores inesperados se deben loguear o reportar al equipo de soporte atomáticamente
+                                      //TODO: EN GENERAL: Detectar si los errores se deben a falta de conexión a internet, y ver como se loguean o reportan estos casos
+                                      _showSnackBar('Ha ocurrido un error al guardar la nueva devolución. Error: ${e}');
+                                    }
+                                    finally{
+                                      WorkingIndicatorDialog().dismiss();
+                                    }
+                                  },
+
+                                ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                }));
-          } else if (snapshot.hasError) {
-            widget = Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
-                  )
-                ],
-              ),
-            );
-          } else {
-            widget = Center(
+                    );
+                  }));
+            } else if (snapshot.hasError) {
+              widget = Center(
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Aguarde un momento por favor...'),
-                      )
-                    ]));
-          }
-          return widget;
-        });
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Error: ${snapshot.error}'),
+                    )
+                  ],
+                ),
+              );
+            } else {
+              widget = Center(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: CircularProgressIndicator(),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 16),
+                          child: Text('Aguarde un momento por favor...'),
+                        )
+                      ]));
+            }
+            return widget;
+          }),
+    );
+
   }
 
 /*  Future<ProductInfo> _getProductInfoByEAN(String eanCode) {
@@ -501,13 +512,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       return null;
     }
 
-
-
     if (productInfo.isAuditable == true){
       // Entre las existentes, buscar las que tienen el mismo EAN que el producto a devolver
       final returnRequestsWithSameEAN = returnRequests.where((returnRequest) => returnRequest.EAN == productInfo.EAN);
       if(returnRequestsWithSameEAN.length > 1){
-        throw BusinessException('No debería haber más de una solilicitud de devolución con el mismo EAN  para productos auditables.');
+        throw BusinessException('No debería haber más de una solicitud de devolución con el mismo EAN  para productos auditables.');
       } else if (returnRequestsWithSameEAN.length == 1) {
         existingReturnRequest = returnRequestsWithSameEAN.first;
       } else {
@@ -560,14 +569,14 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       // Buscar info del producto y actualizar el Future del FutureBuilder.
       late ProductInfo productInfo;
       if (_productSearchBy == ProductSearchBy.EAN) {
-        productInfo = await SpProductUtils.getProductInfoByEAN(_searchParamTextController.text);
+        productInfo = await BusinessServices.getProductInfoByEAN(_searchParamTextController.text);
       } else {
         productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
       }
 
       // Cargar datos del producto
       _descriptionTextController.text = productInfo.description;
-      final DateFormat formatter = DateFormat('dd/MM/yyyy');
+      final formatter = DateFormat('dd/MM/yyyy');
       _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
       _priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;

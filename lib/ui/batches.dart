@@ -56,18 +56,21 @@ class _BatchesState extends State<Batches> {
   @override
   void initState(){
     super.initState();
-    _localData =   ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData();
+    _localData =  getScreenData();
   }
+
+  Future<ScreenData<dynamic, List<Batch>>> getScreenData() => ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData();
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
+
     return FutureBuilder<ScreenData<void, List<Batch>>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
 
           Widget widget;
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
             final data = snapshot.data!;
             final userInfo = data.userInfo;
             final batches = data.data!;
@@ -100,14 +103,20 @@ class _BatchesState extends State<Batches> {
                     onPressed: () =>
                     appState.currentAction =
                         PageAction(
-                            state: PageState.addPage, page: SettingsPageConfig),
+                            state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () =>
-                    appState.currentAction =
-                        PageAction(
-                            state: PageState.addPage, page: NewBatchPageConfig),
+                    appState.waitCurrentAction<bool>(
+                        PageAction(state: PageState.addPage, pageConfig: NewBatchPageConfig)
+                    ).then((shouldRefresh) {
+                      if(shouldRefresh!){
+                        setState(() {
+                          _localData = getScreenData();
+                        });
+                      }
+                    })
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
@@ -154,11 +163,20 @@ class _BatchesState extends State<Batches> {
                               subtitle: Text('${_getBatchSubTitle(
                                   draftBatches[index])}\n\n\n'),
                             ), onTap: () {
-                              appState.currentAction = PageAction(
-                                  state: PageState.addWidget,
-                                  widget: BatchDetails(
-                                      batch: draftBatches[index]),
-                                  page: DetailsPageConfig);
+                              appState.waitCurrentAction<bool>(
+                                  PageAction(
+                                      state: PageState.addWidget,
+                                      widget: BatchDetails(
+                                          batch: draftBatches[index]),
+                                      pageConfig: DetailsPageConfig)
+                              ).then((shouldRefresh) {
+                                if(shouldRefresh!){ //TODO:  Manejar el resultado de la pantalla Batch Details
+                                  setState(() {
+                                    _localData = getScreenData();
+                                  });
+                                }
+                              });
+
                             })
                           ],
 
@@ -192,11 +210,20 @@ class _BatchesState extends State<Batches> {
                                     subtitle: Text('${_getBatchSubTitle(
                                         auditedBatches[index])}\n\n\n'),
                                   ), onTap: () {
-                                    appState.currentAction = PageAction(
-                                        state: PageState.addWidget,
-                                        widget: BatchDetails(
-                                            batch: auditedBatches[index]),
-                                        page: DetailsPageConfig);
+                                    appState.waitCurrentAction<bool>(
+                                        PageAction(
+                                            state: PageState.addWidget,
+                                            widget: BatchDetails(
+                                                batch: auditedBatches[index]),
+                                            pageConfig: DetailsPageConfig))
+                                    .then((shouldRefresh) {
+                                      if(shouldRefresh! == true){
+                                        setState(() {
+                                          _localData = getScreenData();
+                                        });
+                                      }
+                                    });
+
                                   })
                                 ],
                                 //selected: selected[index],
@@ -250,7 +277,7 @@ class _BatchesState extends State<Batches> {
 
   Future<List<Batch>> _getBatchData(something) async{
     // Obtener lista de lotes Draft (en principio) desde Athento
-    final batches = await BusinessServices.getRetailActiveBatches();
+    final batches =  BusinessServices.getRetailActiveBatches();
     return batches;
   }
 

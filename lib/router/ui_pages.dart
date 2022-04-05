@@ -34,21 +34,18 @@ import '../app_state.dart';
 
 const String SplashPath = '/splash';
 const String LoginPath = '/login';
-const String CreateAccountPath = '/createAccount';
-const String ListItemsPath = '/listItems';
+const String BatchesPath = '/batches';
 const String DetailsPath = '/details';
-const String CartPath = '/cart';
-const String CheckoutPath = '/checkout';
 const String SettingsPath = '/settings';
 const String NewBatchPath = '/newbatch';
 const String NewReturnPath = '/newreturn';
 const String DetailsReturnPath = '/detailsreturn';
 const String DetailProductPath = '/detailproduct';
-enum Pages {
+enum PageEnum {
   Splash,
   Login,
   CreateAccount,
-  List,
+  Batches,
   Details,
   Cart,
   Checkout,
@@ -62,7 +59,7 @@ enum Pages {
 class PageConfiguration {
   final String key;
   final String path;
-  final Pages uiPage;
+  final PageEnum uiPage;
   PageAction? currentPageAction;
 
   PageConfiguration(
@@ -70,27 +67,21 @@ class PageConfiguration {
 }
 
 PageConfiguration SplashPageConfig =
-    PageConfiguration(key: 'Splash', path: SplashPath, uiPage: Pages.Splash, currentPageAction: null);
+    PageConfiguration(key: 'Splash', path: SplashPath, uiPage: PageEnum.Splash, currentPageAction: null);
 PageConfiguration LoginPageConfig =
-    PageConfiguration(key: 'Login', path: LoginPath, uiPage: Pages.Login, currentPageAction: null);
-PageConfiguration CreateAccountPageConfig = PageConfiguration(
-    key: 'CreateAccount', path: CreateAccountPath, uiPage: Pages.CreateAccount, currentPageAction: null);
-PageConfiguration ListItemsPageConfig = PageConfiguration(
-    key: 'ListItems', path: ListItemsPath, uiPage: Pages.List);
+    PageConfiguration(key: 'Login', path: LoginPath, uiPage: PageEnum.Login, currentPageAction: null);
+PageConfiguration BatchesPageConfig = PageConfiguration(
+    key: 'Batches', path: BatchesPath, uiPage: PageEnum.Batches);
 PageConfiguration DetailsPageConfig =
-    PageConfiguration(key: 'Details', path: DetailsPath, uiPage: Pages.Details, currentPageAction: null);
-PageConfiguration CartPageConfig =
-    PageConfiguration(key: 'Cart', path: CartPath, uiPage: Pages.Cart, currentPageAction: null);
-PageConfiguration CheckoutPageConfig = PageConfiguration(
-    key: 'Checkout', path: CheckoutPath, uiPage: Pages.Checkout, currentPageAction: null);
+    PageConfiguration(key: 'Details', path: DetailsPath, uiPage: PageEnum.Details, currentPageAction: null);
 PageConfiguration SettingsPageConfig = PageConfiguration(
-    key: 'Settings', path: SettingsPath, uiPage: Pages.Settings, currentPageAction: null);
+    key: 'Settings', path: SettingsPath, uiPage: PageEnum.Settings, currentPageAction: null);
 PageConfiguration NewBatchPageConfig = PageConfiguration(
-    key: 'NewBatch', path: NewBatchPath, uiPage: Pages.NewBatch, currentPageAction: null);
+    key: 'NewBatch', path: NewBatchPath, uiPage: PageEnum.NewBatch, currentPageAction: null);
 PageConfiguration NewReturnPageConfig = PageConfiguration(
-    key: 'NewReturn', path: NewReturnPath, uiPage: Pages.NewReturn, currentPageAction: null);
+    key: 'NewReturn', path: NewReturnPath, uiPage: PageEnum.NewReturn, currentPageAction: null);
 PageConfiguration DetailsReturnPageConfig = PageConfiguration(
-    key: 'DetailsReturn', path: DetailsReturnPath, uiPage: Pages.DetailsReturn, currentPageAction: null);
+    key: 'DetailsReturn', path: DetailsReturnPath, uiPage: PageEnum.DetailsReturn, currentPageAction: null);
 PageConfiguration DetailProductPageConfig = PageConfiguration(
-    key: 'DetailProduct', path: DetailProductPath, uiPage: Pages.DetailProduct, currentPageAction: null);
+    key: 'DetailProduct', path: DetailProductPath, uiPage: PageEnum.DetailProduct, currentPageAction: null);
 

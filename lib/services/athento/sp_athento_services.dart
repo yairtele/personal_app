@@ -1,11 +1,13 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_endpoint.dart';
 import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 import 'package:navigation_app/services/sp_ws/multipart_message_builder.dart';
 import 'package:navigation_app/services/sp_ws/sp_ws.dart';
+import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
+import 'package:navigation_app/services/user_services.dart';
 import 'binary_file_info.dart';
 import 'config_provider.dart';
 
@@ -18,7 +20,7 @@ class SpAthentoServices {
 
     final response = await SpWS.get(uri, headers: headers, parameters: {});
 
-    final userInfo = UserInfo.fromJSON(jsonDecode(response.body));
+    final userInfo = UserInfo.fromJSON(_jsonDecodeResponseUTF8(response));
     if (userInfo.idNumber == '') {
       throw Exception(
           'El usuario $user_name_or_uuid no tiene el CUIT de retailer cargado en su perfil de Athento');
@@ -27,38 +29,62 @@ class SpAthentoServices {
     return userInfo;
   }
 
+  static Map<String, dynamic> _jsonDecodeResponseUTF8(Response response){
+    return jsonDecode(const Utf8Decoder().convert(response.bodyBytes));
+  }
   static Future<TokenInfo> getAuthenticationToken(
       BasicAuthConfigProvider configProvider, String userName,
       String password) async {
-    //TODO: usar SpWS en lugar de http directo.
+    try{
+      //TODO: usar SpWS en lugar de http directo.
 
-    final requestBody = {
-      'grant_type': 'password',
-      'username': userName,
-      'password': password,
-      'client_id': Configuration.athentoClientId,
-      'client_secret': Configuration.athentoClientSecret,
-      'scope': 'write',
-    };
+      final requestBody = {
+        'grant_type': 'password',
+        'username': userName,
+        'password': password,
+        'client_id': Configuration.athentoClientId,
+        'client_secret': Configuration.athentoClientSecret,
+        'scope': 'write',
+      };
 
 
-    final parameters = Map<String, String>();
+      final parameters = Map<String, String>();
 
-    final headers = configProvider.getHttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded'
-    });
+      final headers = configProvider.getHttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded'
+      });
 
-    headers.remove('Authorization');
+      headers.remove('Authorization');
 
-    final response = await SpWS.post(
-        configProvider.getEndpointUrl(AthentoEndpoint.getAuthToken),
-        parameters: parameters,
-        headers: headers,
-        body: requestBody
-    );
+      final response = await SpWS.post(
+          configProvider.getEndpointUrl(AthentoEndpoint.getAuthToken),
+          parameters: parameters,
+          headers: headers,
+          body: requestBody
+      );
 
-    final jsonResponse = jsonDecode(response.body);
-    return TokenInfo.fromJSON(jsonResponse);
+      final jsonResponse = _jsonDecodeResponseUTF8(response);
+      return TokenInfo.fromJSON(jsonResponse);
+    }
+    on WebServiceException catch(e){
+      if (e.response != null) {
+        final response = e.response!;
+        if(response.statusCode == 400){
+          final jsonResponse = _jsonDecodeResponseUTF8(response);
+          if(jsonResponse['error_description'] != null
+              && jsonResponse['error_description'] == 'Invalid credentials given.'){
+            throw InvalidLoginException('Usuario o clave inválidos', cause: e);
+          }
+        }
+      }
+      throw e;
+    }
+    on Exception catch (e){
+      throw e;
+    }
+    on Error catch (e){
+      throw e;
+    }
   }
 
   static Future<Map<String, dynamic>> createDocument({
@@ -92,7 +118,7 @@ class SpAthentoServices {
     //console.log("response.status: " + response.statusCode);
     //console.log("response.body: " + response.body);
 
-    return configProvider.parseResponse(response.body);
+    return configProvider.parseResponse(response);
   }
 
 
@@ -101,9 +127,9 @@ class SpAthentoServices {
     required String containerUUID, required String docType, required String title,
     required Map<String, dynamic> fieldValues, required List<
         int> content, required String friendlyFileName, String auditMessage = ''}) async {
-    if (content == null || content.length == 0) {
+    if (content.length == 0) {
       throw Exception(
-          '"content" cannot be neitether null nor a zero length byte array');
+          '"content" cannot be neither null nor a zero length byte array');
     }
 
     final documentContentType = SpWS.getContentTypeFromFilePath(
@@ -166,7 +192,7 @@ class SpAthentoServices {
         body: messageBody);
 
     //console.log("Athento Response.status: " + response.statusCode);
-    return configProvider.parseResponse(response.body);
+    return configProvider.parseResponse(response);
     //console.log(JSON.stringify(jsonRequestBody));
 
   }
@@ -233,9 +259,7 @@ class SpAthentoServices {
         configProvider.getEndpointUrl('updateDocumentContent'), parameters: {},
         headers: messageHeaders, body: messageBody);
 
-    //console.log("Athento Response.status: " + response.statusCode);
-    return configProvider.parseResponse(response.body);
-//console.log(JSON.stringify(jsonRequestBody));
+    return configProvider.parseResponse(response);
 }
 
   static Future<Map<String, dynamic>> getDocument(ConfigProvider configProvider,
@@ -273,13 +297,13 @@ class SpAthentoServices {
       throw Exception(
           'the "whereExpression" argument must start with "WHERE" instead of "$whereStartWord".');
     }
-
+    //TODO: manejar paginación
     final renamedFieldValues = configProvider.getSelectFields(selectFields);
     final query = "SELECT ${renamedFieldValues.join(
         ', ')} FROM $docType $whereExpression";
     final jsonRequestBody = {
       'params': {
-        'pageSize': 20,
+        'pageSize': 10000,
         'page': 0,
         'query': query
       }
@@ -299,7 +323,7 @@ class SpAthentoServices {
     //console.log("response.status: " + response.statusCode);
     //console.log("response body: " + responseBody);
 
-    final jsonBody = configProvider.parseResponse(response.body);
+    final jsonBody = configProvider.parseResponse(response);
 
     final results = FindResults.fromJSON(jsonBody);
     // Validar si el response no trajo errores
@@ -338,7 +362,7 @@ class SpAthentoServices {
     //console.log("response.status: " + response.statusCode);
     //console.log("response.body: " + response.body);
 
-    return configProvider.parseResponse(response.body);
+    return configProvider.parseResponse(response);
 
 
     //console.log(JSON.stringify(jsonRequestBody));
@@ -363,15 +387,7 @@ class SpAthentoServices {
     final response = await SpWS.post(configProvider.getEndpointUrl(AthentoEndpoint.updateDocument), parameters:  {}, headers:  headers,
         body: jsonRequestBody);
 
-    //console.log("response.status: " + response.statusCode);
-    //console.log("response.body: " + response.body);
-
-    return configProvider.parseResponse(response.body);
-
-
-    //console.log(JSON.stringify(jsonRequestBody));
-
-
+    return configProvider.parseResponse(response);
   }
 
 

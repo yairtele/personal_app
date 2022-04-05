@@ -50,14 +50,18 @@ class BatchDetails extends StatefulWidget {
   _BatchDetailsState createState() =>  _BatchDetailsState();
 
 }
+
 class _BatchDetailsState extends State<BatchDetails> {
   late Future<ScreenData<Batch, List<ReturnRequest>>> _localData;
+  bool _shouldRefreshParent = false;
 
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<Batch, List<ReturnRequest>>(dataGetter: _getReturnRequests).getScreenData(dataGetterParam: widget.batch);
+    _localData = getScreenData();
   }
+
+  Future<ScreenData<Batch, List<ReturnRequest>>> getScreenData() => ScreenData<Batch, List<ReturnRequest>>(dataGetter: _getReturnRequests).getScreenData(dataGetterParam: widget.batch);
 
 
   @override
@@ -71,297 +75,345 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
 
-    return FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
-        future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
+    return WillPopScope(
+      onWillPop: () {
 
-          Widget widget;
-          if (snapshot.hasData) {
-            final data = snapshot.data!;
-            final returns = data.data!;
-            widget = Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                backgroundColor: Colors.grey,
-                title: Text(
-                  '$title',
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white),
-                ),
-                actions: [
+        appState.returnWith(_shouldRefreshParent);
+        _shouldRefreshParent = false;
 
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () =>
-                    appState.currentAction =
-                        PageAction(
-                            state: PageState.addPage, page: SettingsPageConfig),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () =>
-                    appState.currentAction =
-                        PageAction(state: PageState.addPage,
-                            widget: NewReturnScreen(batch: this.widget.batch),
-                            page: NewReturnPageConfig),
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.grey,
-                    ),
-                    onPressed: () {
-                      launch(
-                          'https://newsan.athento.com/accounts/login/?next=/dashboard/');
-                    }
-                    , icon: Image.asset(
-                    'assets/images/boton_athento.png',
-                    height: 40.0, width: 40.0,),
-                    label: Text(''),
-                  ),
-                ],
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      padding: EdgeInsets.all(15),
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.send,
-                        maxLength: 30,
-                        controller: _reference,
-                        decoration: const InputDecoration(
-                          hintText: 'Referencia Interna Lote',
-                          helperText: 'Ej: LOT-35266',
-                          label: Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  WidgetSpan(
-                                    child: Text(
-                                        'Referencia Interna Lote:',
-                                        style: const TextStyle(fontSize: 18.0,
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              )
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      padding: EdgeInsets.all(15),
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.send,
-                        maxLength: 50,
-                        controller: _description,
-                        decoration: const InputDecoration(
-                          hintText: 'Descripcion',
-                          helperText: 'Ej: Lote Fravega 4',
-                          label: Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  WidgetSpan(
-                                    child: Text(
-                                        'Descripcion:', style: const TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              )
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      padding: EdgeInsets.all(15),
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.send,
-                        maxLength: 250,
-                        controller: _observation,
-                        decoration: const InputDecoration(
-                          hintText: 'Observacion',
-                          helperText: 'Ej: Contiene fallas',
-                          label: Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  WidgetSpan(
-                                    child: Text(
-                                        'Observacion:', style: const TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              )
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [ ElevatedButton(
-                            onPressed: () async {
-                              try{
-                                WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
-                                await _updateBatch(batch,_reference.text,_description.text,_observation.text);
-                                _showSnackBar('Lote actualizado con éxito');
-                              }
-                              on BusinessException catch (e){
-                                _showSnackBar(e.message);
-                              }
-                              on Exception catch (e){
-                                _showSnackBar('Ha ocurrido un error inesperado al actualizar el lote: $e');
-                              }
-                              finally{
-                                WorkingIndicatorDialog().dismiss();
-                              }
-                            },
-                            child: const Text('Guardar'),
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.green[400],
-                            )
-                        ),
-                          ElevatedButton(
-                              onPressed: () async {
-                                try{
-                                  WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
-                                  await _updateBatchState(batch);
-                                  appState.currentAction = PageAction(state: PageState.pop);
-                                  _showSnackBar('Lote enviado con éxito');
-                                }
-                                on BusinessException catch (e){
-                                  _showSnackBar(e.message);
-                                }
-                                on Exception catch (e){
-                                  _showSnackBar('Ha ocurrido un error inesperado al enviar el lote: $e');
-                                }
-                                finally{
-                                  WorkingIndicatorDialog().dismiss();
-                                }
-                              },
-                              child: const Text('Enviar Lote'),
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.grey,
-                              )
-                          ),
-                          ElevatedButton(
-                              onPressed: () async {
-                                try{
-                                  WorkingIndicatorDialog().show(context, text: 'Eliminando lote...');
-                                  await _deleteBatch(batch);
-                                  _showSnackBar('Lote eliminado con éxito');
-                                }
-                                on BusinessException catch (e){
-                                  _showSnackBar(e.message);
-                                }
-                                on Exception catch (e){
-                                  _showSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
-                                }
-                                finally{
-                                  WorkingIndicatorDialog().dismiss();
-                                }
+        //we need to return a future
+        return Future.value(false);
+      },
+      child: FutureBuilder<ScreenData<Batch, List<ReturnRequest>>>(
+          future: _localData,
+          builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
 
-                              },
-                              child: const Text('Borrar Lote'),
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                              )
-                          ),
-                        ],
-                      ),
+            Widget widget;
+            if (snapshot.hasData) {
+              final data = snapshot.data!;
+              final returns = data.data!;
+              widget = Scaffold(
+                appBar: AppBar(
+                  elevation: 0,
+                  backgroundColor: Colors.grey,
+                  title: Text(
+                    '$title',
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                  actions: [
+
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () =>
+                      appState.currentAction =
+                          PageAction(
+                              state: PageState.addPage, pageConfig: SettingsPageConfig),
                     ),
-                    Container(
-                      height: 500.0, // Change as you wish
-                      width: 500.0, // Change as you wish
-                      child: DataTable(
-                        columns: const <DataColumn>[
-                          DataColumn(
-                            label: Text('Solicitudes'),
-                          ),
-                        ],
-                        rows: List<DataRow>.generate(
-                          returns.length,
-                              (int index) {
-                            final returnRequest = returns[index];
-                            final title = _getReturnTitle(returnRequest);
-                            final subtitle = _getReturnSubTitle(returnRequest);
-                            return DataRow(
-                              cells: <DataCell>[
-                                DataCell(ListTile(isThreeLine: true,
-                                  leading: const Icon(
-                                    Icons.art_track_sharp, color: Colors.grey,),
-                                  title: Text(
-                                      title,
-                                      style: const TextStyle(fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black)),
-                                  subtitle: Text(subtitle),
-                                ), onTap: () {
-                                  appState.currentAction = PageAction(
-                                      state: PageState.addWidget,
-                                      widget: ReturnRequestDetails(
-                                          returnRequest: returns[index]),
-                                      page: DetailsReturnPageConfig);
-                                })
-                              ],
-                            );
-                          },
-                        ),
-                        //onTap: () {
+                    IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          appState.waitCurrentAction(PageAction(state: PageState.addPage,
+                              widget: NewReturnScreen(batch: this.widget.batch),
+                              pageConfig: NewReturnPageConfig))
+                              .then((shouldRefresh) {
+                            if(shouldRefresh!) {
+                              setState(() {
+                                _localData = getScreenData();
+                              });
+                            }
+                          });
+                        }
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.grey,
                       ),
+                      onPressed: () {
+                        launch(
+                            'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                      }
+                      , icon: Image.asset(
+                      'assets/images/boton_athento.png',
+                      height: 40.0, width: 40.0,),
+                      label: Text(''),
                     ),
                   ],
                 ),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            widget = Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
-                  )
-                ],
-              ),
-            );
-          } else {
-            widget = Center(
-                child: Stack(
-                    children: <Widget>[
-                      Opacity(
-                        opacity: 1,
-                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 30,
+                          controller: _reference,
+                          decoration: const InputDecoration(
+                            hintText: 'Referencia Interna Lote',
+                            helperText: 'Ej: LOT-35266',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Referencia Interna Lote:',
+                                          style: const TextStyle(fontSize: 18.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _description,
+                          decoration: const InputDecoration(
+                            hintText: 'Descripcion',
+                            helperText: 'Ej: Lote Fravega 4',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Descripcion:', style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 250,
+                          controller: _observation,
+                          decoration: const InputDecoration(
+                            hintText: 'Observacion',
+                            helperText: 'Ej: Contiene fallas',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Observacion:', style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
-                      )
-                    ]
-                )
-            );
+                        padding: EdgeInsets.only(top: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [ ElevatedButton(
+                              onPressed: () async {
+                                try{
+                                  WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
+                                  await _updateBatch(batch,_reference.text,_description.text,_observation.text);
+                                  _shouldRefreshParent = true;
+                                  _showSnackBar('Lote actualizado con éxito');
+                                }
+                                on BusinessException catch (e){
+                                  _showSnackBar(e.message);
+                                }
+                                on Exception catch (e){
+                                  _showSnackBar('Ha ocurrido un error inesperado al actualizar el lote: $e');
+                                }
+                                finally{
+                                  WorkingIndicatorDialog().dismiss();
+                                }
+                              },
+                              child: const Text('Guardar'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.green[400],
+                              )
+                          ),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  try{
+                                    WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
+                                    await _updateBatchState(batch);
+                                    //appState.currentAction = PageAction(state: PageState.pop);
+                                    _showSnackBar('Lote enviado con éxito');
+                                    appState.returnWith(true);
+                                  }
+                                  on BusinessException catch (e){
+                                    _showSnackBar(e.message);
+                                  }
+                                  on Exception catch (e){
+                                    _showSnackBar('Ha ocurrido un error inesperado al enviar el lote: $e');
+                                  }
+                                  finally{
+                                    WorkingIndicatorDialog().dismiss();
+                                  }
+                                },
+                                child: const Text('Enviar Lote'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.grey,
+                                )
+                            ),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) => AlertDialog(
+                                      title: const Text('Alerta'),
+                                      content: const Text('¿Seguro quiere eliminar este Lote?'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () => { Navigator.of(context).pop() },
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        TextButton(
+                                            child: const Text('Borrar'),
+                                            onPressed: () async {
+                                              try {
+                                                WorkingIndicatorDialog().show(
+                                                    context,
+                                                    text: 'Eliminando lote...');
+                                                await _deleteBatch(batch);
+                                                _showSnackBar('El lote ha sido eliminado exitosamente');
+                                                appState.returnWith(true);
+                                              }
+                                              on BusinessException catch (e){
+                                                _showSnackBar(e.message);
+                                              }
+                                              on Exception catch (e){
+                                                _showSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
+                                              }
+                                              finally{
+                                                WorkingIndicatorDialog().dismiss();
+                                              }
+                                            }
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                },
+                                child: const Text('Borrar Lote'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                )
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 500.0, // Change as you wish
+                        width: 500.0, // Change as you wish
+                        child: DataTable(// Lista de solicitudes del lote
+                          columns: const <DataColumn>[
+                            DataColumn(
+                              label: Text('Solicitudes'),
+                            ),
+                          ],
+                          rows: List<DataRow>.generate(
+                            returns.length,
+                                (int index) {
+                              final returnRequest = returns[index];
+                              final title = _getReturnTitle(returnRequest);
+                              final subtitle = _getReturnSubTitle(returnRequest);
+                              return DataRow(
+                                cells: <DataCell>[
+                                  DataCell(ListTile(isThreeLine: true,
+                                    leading: const Icon(
+                                      Icons.art_track_sharp, color: Colors.grey,),
+                                    title: Text(
+                                        title,
+                                        style: const TextStyle(fontSize: 14.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black)),
+                                    subtitle: Text(subtitle),
+                                  ), onTap: () {
+                                    appState.waitCurrentAction<bool>(PageAction(
+                                        state: PageState.addWidget,
+                                        widget: ReturnRequestDetails(batch: this.widget.batch,
+                                            returnRequest: returns[index]),
+                                        pageConfig: DetailsReturnPageConfig))
+                                    .then((shouldRefresh) {
+                                      if(shouldRefresh!){
+                                        setState(() {
+                                          _localData = getScreenData();
+                                        });
+                                      }
+                                    });
+                                  })
+                                ],
+                              );
+                            },
+                          ),
+                          //onTap: () {
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              widget = Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Error: ${snapshot.error}'),
+                    )
+                  ],
+                ),
+              );
+            } else {
+              widget = Center(
+                  child: Stack(
+                      children: <Widget>[
+                        Opacity(
+                          opacity: 1,
+                          child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 16),
+                          child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+                        )
+                      ]
+                  )
+              );
+            }
+            return widget;
           }
-          return widget;
-        }
+      ),
     );
+
   }
 
   Future<List<ReturnRequest>> _getReturnRequests(Batch? batch) async {
@@ -377,7 +429,7 @@ class _BatchDetailsState extends State<BatchDetails> {
   }
 
   Future<void> _updateBatchState(Batch batch) async {
-    await BusinessServices.updateBatchState(batch);
+    await BusinessServices.sendBatchToAudit(batch);
   }
 
   void _showSnackBar(String message){
