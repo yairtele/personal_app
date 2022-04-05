@@ -4,7 +4,6 @@ import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
-import 'package:navigation_app/ui/batch_details.dart';
 import 'package:navigation_app/ui/product_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
