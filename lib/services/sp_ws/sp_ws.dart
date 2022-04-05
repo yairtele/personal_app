@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
 import 'package:navigation_app/utils/sp_file_utils.dart';
 
 class SpWS {
@@ -31,8 +32,8 @@ class SpWS {
         Map<String, String>? headers, body, Encoding? encoding}) async {
     try {
       //print("SpWS.put - entry");
-      headers = headers ??  Map<String, String>();
-      encoding = encoding ?? Encoding.getByName('UTF8');
+      headers = headers ?? Map<String, String>();
+      encoding = encoding ?? Encoding.getByName('UTF-8');
 
       parameters = parameters ?? Map<String, String>();
       final fullUri = SpWS.addQueryString(uri, parameters: parameters);
@@ -40,13 +41,14 @@ class SpWS {
       // print(fullUrl);
 
 
-    if (body is Map<String, String> && headers.containsValue('application/x-www-form-urlencoded')){
-      //Do nothing but prevent body to fall throwgh the 'else' statement
-    }
-    else if (body is Map<String, dynamic>) {
-    //console.log("Consideré esto un PlainObject: " + body)
-      body = jsonEncode(body);
-    }
+      if (body is Map<String, String> &&
+          headers.containsValue('application/x-www-form-urlencoded')) {
+        //Do nothing but prevent body to fall throwgh the 'else' statement
+      }
+      else if (body is Map<String, dynamic>) {
+        //console.log("Consideré esto un PlainObject: " + body)
+        body = jsonEncode(body);
+      }
 
 
       //console.log("antes de http.post");
@@ -73,12 +75,22 @@ class SpWS {
         return response;
       }
       else {
-
-        throw Exception('Error al postear el request a la uri "$uri". Status Code: ${response.statusCode}. Error message: ${response.reasonPhrase}');
+        throw WebServiceException(
+          'Unexpected error submitting the request to "$uri". Status Code: ${response
+                .statusCode}. Error message: ${response.reasonPhrase}',
+          response: response
+        );
       }
     }
-    on Exception catch (e) {
+    on WebServiceException catch(e) {
       throw e;
+    }
+    on Exception catch (e) {
+      throw WebServiceException(
+        'Unexpected error submitting the request to "$uri". Error message: ${e}',
+        response: null,
+        cause: e
+      );
     }
   }
 
