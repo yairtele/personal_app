@@ -403,7 +403,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
 
                                       final product = _product!;
-                                      //TODO: Falta pasarle el precio (primero crear metadato en Athento
                                       final newReturn = NewReturn(
                                         EAN: product.EAN,
                                         sku: product.sku,
@@ -512,6 +511,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       return null;
     }
 
+
     if (productInfo.isAuditable == true){
       // Entre las existentes, buscar las que tienen el mismo EAN que el producto a devolver
       final returnRequestsWithSameEAN = returnRequests.where((returnRequest) => returnRequest.EAN == productInfo.EAN);
@@ -532,6 +532,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   }
 
   void _clearProductFields() {
+    _product = null;
     _retailReferenceTextController.text = '';
     _quantityTextController.text = '';
     _descriptionTextController.text = '';

@@ -320,10 +320,9 @@ class BusinessServices {
     /// Si es producto auditable, crear solicitud (si no existe) y crear el documento de producto unitario y documentos de fotos
     else {
       // Validar retail reference.
-      // Por ahora no validar esto
-      //if(newReturn.retailReference == null || newReturn.retailReference.trim() == ''){
-      //  throw BusinessException('La referencia interna no puede ser nula ni blancos.');
-      //}
+      if(newReturn.retailReference.trim() == ''){
+        throw BusinessException('La referencia interna no puede ser nula ni blancos.');
+      }
 
       // Validar cantidad
       if (newReturn.quantity != null) {
@@ -376,11 +375,11 @@ class BusinessServices {
         final productConfigProvider = await  _createConfigProvider(_getProductFieldNameInferenceConfig());
         final productSelectFields = [AthentoFieldName.uuid];
         const retailreferenceFieldName = '${_productDocType}_${ProductAthentoFieldName.retailReference}';
-        final whereExpression = "WHERE ecm:parentId = '$returnRequestUUID' AND $retailreferenceFieldName = '${newReturn.retailReference}'";
+        final whereExpression = "WHERE ecm:parentId = '$returnRequestUUID' AND $retailreferenceFieldName = '${newReturn.retailReference.trim()}'";
         final foundProducts = await SpAthentoServices.findDocuments(productConfigProvider, _productDocType, productSelectFields, whereExpression);
 
         if (foundProducts.length > 0){
-          throw BusinessException('Ya existe un producto con la misma referencia interna "${newReturn.retailReference}" con este mismo EAN.');
+          throw BusinessException('Ya existe un producto con la misma referencia interna "${newReturn.retailReference}" para este mismo EAN.');
         }
 
       }
@@ -447,10 +446,10 @@ class BusinessServices {
     final product = Product(
         requestNumber: requestNumber,
         title: productTitle,
-        EAN: newReturn.EAN,
-        commercialCode: newReturn.commercialCode,
-        description: newReturn.description,
-        retailReference: newReturn.retailReference,
+        EAN: newReturn.EAN.trim(),
+        commercialCode: newReturn.commercialCode.trim(),
+        description: newReturn.description.trim(),
+        retailReference: newReturn.retailReference.trim(),
     );
     final fieldValues = product.toJSON();
 
