@@ -124,7 +124,7 @@ class SpUI{
             ),
             Row(
               children: [
-                Expanded(child: Text(photoName, textAlign: TextAlign.center)), // Photo name
+                Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
                   if(photo != null) ...[
                     ElevatedButton( //Edit photo
                       child: const Icon(FontAwesomeIcons.edit),

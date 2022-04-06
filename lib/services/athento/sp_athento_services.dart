@@ -226,8 +226,7 @@ class SpAthentoServices {
       'Content-Disposition': 'form-data; name="input"'
     };
 
-    final documentInfoPartContent = jsonEncode(jsonRequestBody).replaceAll(
-        '{', '{\n');
+    final documentInfoPartContent = jsonEncode(jsonRequestBody);//.replaceAll('{', '{\n');
 
     // Document content part: file to be uploaded in base64 format.
     final documentContentPartHeaders = {
