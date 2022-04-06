@@ -3,11 +3,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
+import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/product_detail.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +28,9 @@ class  ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   late Future<ScreenData<Product, ProductDetail>> _localData;
   ProductInfo? _productInfo;
-  Map<String, BinaryFileInfo?> _takenPictures = {};
+  Map<String, PhotoDetail> _takenPictures = {};
+  var _referenceModified = false;
+  var _modifiedPhotos = ProductPhotos([]);
 
   @override
   void initState(){
@@ -55,8 +59,8 @@ class _ProductDetailsState extends State<ProductDetails> {
             final _descripcion = TextEditingController(text:descripcion);
             final reference = product.retailReference;
             final _reference = TextEditingController(text:reference);
-            var _referenceModified = false;
-            Map<String, BinaryFileInfo> _modifiedPhotos;
+
+            //List<String> _modifiedPhotos = [];
 
             widget = Scaffold(
               appBar: AppBar(
@@ -174,7 +178,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                   Container(
-                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context)
+                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos)
                    ),
                    Padding(
                       padding: EdgeInsets.only(top:16.0),
@@ -185,9 +189,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             onPressed: () async {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
-                                //TODO: Ver qué le tengo que pasar. Únicamente sirve para guardar fotos y referencia interna
-                                //await _updateProduct(_referenceModified, _reference.text, _modifiedPhotos, product);
-                                //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
+                                await _updateProduct(_referenceModified, _reference.text, _modifiedPhotos, _takenPictures, product);
                                 _showSnackBar('Producto actualizado con éxito');
                               }
                               on BusinessException catch (e){
@@ -210,7 +212,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Eliminando producto...');
                                 await _deleteProduct(product);
-                                //appState.currentAction = PageAction(state: PageState.addPage, page: DetailsPageConfig);
                                 _showSnackBar('Producto eliminado con éxito');
                               }
                               on BusinessException catch (e){
@@ -285,29 +286,40 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 
-  bool _doesNotContainPhoto(Map<String,BinaryFileInfo?> existingPhotos, String photoName){
+  bool _doesNotContainPhoto(Map<String,PhotoDetail> existingPhotos, String photoName){
     return !existingPhotos.containsKey(photoName);
   }
 
-  Future<Map<String,BinaryFileInfo?>> _getFullPhotosInfo(Map<String,BinaryFileInfo?> existingPhotos) async {
+  Future<Map<String,PhotoDetail>> _getFullPhotosInfo(Map<String, PhotoDetail> existingPhotoDetails) async {
 
-      if (_productInfo!.auditRules.photos.length == 0){
-        existingPhotos['otra'] = null;
+      //var existingPhotos = _getPhotoContents(existingPhotoDetails);
+
+      if (_productInfo!.auditRules.photos.length == 0 && !existingPhotoDetails.containsKey('otra')){
+        existingPhotoDetails['otra'] = PhotoDetail(uuid: null, content: null);
       }
       else{
-        final missingPhotos = _productInfo!.auditRules.photos.where((p) => _doesNotContainPhoto(existingPhotos, p.name)).toList();
+        final missingPhotos = _productInfo!.auditRules.photos.where((p) => _doesNotContainPhoto(existingPhotoDetails, p.name)).toList();
 
         for(var photoAuditInfo in missingPhotos){
-          existingPhotos[photoAuditInfo.name] = null;
+          existingPhotoDetails[photoAuditInfo.name] = PhotoDetail(uuid: null, content: null);
         }
       }
 
-      return existingPhotos;
+      return existingPhotoDetails;
   }
 
-  Future<void> _updateProduct(bool referenceModified, String reference, Map<String, BinaryFileInfo> modifiedPhotos, Product product) async {
-    await BusinessServices.updateProduct(
-        referenceModified, reference, modifiedPhotos, product);
+  Map<String, XFile?> _getPhotoContents(Map<String, PhotoDetail> photoDetails) {
+    var photos = <String, XFile?>{};
+
+    for (var key in photoDetails.keys){
+      photos[key] = photoDetails[key]!.content;
+    }
+
+    return photos;
+  }
+
+  Future<void> _updateProduct(bool referenceModified, String reference, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos, Product product) async {
+    await BusinessServices.updateProduct(referenceModified, reference, modifiedPhotos, photos, product);
   }
 
   Future <void> _deleteProduct(Product product) async {

@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
+import 'package:navigation_app/services/business/photo_detail.dart';
+import 'package:navigation_app/utils/sp_product_utils.dart';
+
+import '../sp_file_utils.dart';
 
 class SpUI{
   static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, XFile?> photos}) {
@@ -82,7 +86,7 @@ class SpUI{
     );
   }
 
-  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, BinaryFileInfo?> photos, required BuildContext context}) {
+  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos}) {
 
     return GridView.count(
         primary: false,
@@ -93,13 +97,14 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildProductPhotoThumbnail(photoName, photos, state, context)
+            _buildProductPhotoThumbnail(photoName, photos, state, context, modifiedPhotos)
         ]
     );
   }
 
-  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, BinaryFileInfo?> photos, State<T> state, BuildContext context) {
-    final photo = photos[photoName];
+  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, PhotoDetail> photos, State<T> state, BuildContext context, ProductPhotos modifiedPhotos) {
+    final photo = photos[photoName]!.content;
+    final photoUUID = photos[photoName]!.uuid;
 
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
@@ -112,7 +117,7 @@ class SpUI{
             Expanded( // Show photo or icon
                 child: ((){
                   if (photo != null)
-                    return  Image.memory(photo.bytes);
+                    return Image.file(File(photos[photoName]!.content!.path)); //para obtener bytes de un BinaryFileInfo es Image.memory(photo.bytes);
                   else
                     return const Icon(FontAwesomeIcons.camera);
                 })()
@@ -128,9 +133,12 @@ class SpUI{
                         padding: const EdgeInsets.all(4),
                       ),
                       onPressed: () async {
+
+                        final pickedPhoto = await _getPhotoFromCamera();
+
                         state.setState(() {
-                          //TODO: tiene que avisarme que la foto se modificó
-                          //photos[photoName] = null;
+                          modifiedPhotos.modifiedPhotos.add(photoName);
+                          photos[photoName] = PhotoDetail(uuid: photoUUID, content: pickedPhoto);
                         });
                       },
                     ),
@@ -141,7 +149,11 @@ class SpUI{
                         padding: const EdgeInsets.all(4),
                       ),
                       onPressed: () async {
-                        showDeleteAlertDialog(context, state, photos, photoName);
+                        //showDeleteAlertDialog(context, state, photos, photoName);
+                        state.setState(() {
+                          modifiedPhotos.modifiedPhotos.add(photoName);
+                          photos[photoName] = PhotoDetail(uuid: photoUUID, content: null);
+                        });
                       },
                     )]
                   else
@@ -152,12 +164,13 @@ class SpUI{
                         padding: const EdgeInsets.all(4),
                       ),
                       onPressed: () async {
-/*
+
                         final pickedPhoto = await _getPhotoFromCamera();
+
                         state.setState(() {
-                        photos[photoName] = pickedPhoto;
+                          modifiedPhotos.modifiedPhotos.add(photoName);
+                          photos[photoName] = PhotoDetail(uuid: photoUUID, content: pickedPhoto);
                         });
-*/
                       },
                    )
                   ],
@@ -174,6 +187,14 @@ class SpUI{
       maxHeight: 1800,
     );
     return pickedFile;
+  }
+
+  static Future<BinaryFileInfo> _xFile2BinaryInfo(XFile? xFile) async {
+    final _mimeType = xFile!.mimeType!;
+    final _fileExtension = SpFileUtils.getFileExtension(xFile.path);
+    final _bytes = await xFile.readAsBytes();
+
+    return BinaryFileInfo(contentType: _mimeType, fileExtension: _fileExtension, bytes: _bytes);
   }
 
   static String _getThumbTitle(String photoName) {

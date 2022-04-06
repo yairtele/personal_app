@@ -16,9 +16,12 @@ import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/utils/sp_file_utils.dart';
+import 'package:navigation_app/utils/sp_product_utils.dart';
 import '../newsan_services.dart';
 import 'new_return.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'photo_detail.dart';
 
 class BusinessServices {
   static const String _batchDocType = 'lote_lif';
@@ -557,7 +560,7 @@ class BusinessServices {
     return returns.toList();
   }
 
-  static Future<Map<String, BinaryFileInfo?>> getPhotosByProductUUID(String productUuid) async{
+  static Future<Map<String, PhotoDetail>> getPhotosByProductUUID(String productUuid) async{
     //Obtener diccionario de inferencia de nombres de campo
     final fieldNameInferenceConfig = _getPhotoFieldNameInferenceConfig();
     //final returnRequestFieldNameInferenceConfig = _getProductFieldNameInferenceConfig();
@@ -581,15 +584,16 @@ class BusinessServices {
     //Convertir resultado a objetos ReturnRequest y retornar resultado
     final productPhotos = entries.map((e) => ProductPhoto.fromJSON(e)).toList();
 
-    final takenPictures = <String, BinaryFileInfo?>{};
+    final takenPictures = <String, PhotoDetail>{};
 
     if (productPhotos.length == 0){
-      takenPictures['otra'] = null;
+      takenPictures['otra'] = PhotoDetail(content: null);
     } else {
       for (final photo in productPhotos){
+
         final content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
 
-        takenPictures[photo.label] = content;
+        takenPictures[photo.label] = PhotoDetail(uuid: photo.uuid, content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid));
       }
     }
     return takenPictures;
@@ -648,8 +652,60 @@ class BusinessServices {
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
   }
 
-  static Future <void> updateProduct (bool referenceModified, String reference, Map<String, BinaryFileInfo> photos, Product product) async {
+  static Future <void> updateProduct (bool referenceModified, String reference, ProductPhotos modifiedPhotos,
+      Map<String, PhotoDetail> photos, Product product) async {
 
+    final configProvider = await  _createConfigProvider();
+
+    if(referenceModified) {
+      Map<String, dynamic> fieldValues = {
+        '${ProductAthentoFieldName.retailReference}': '${reference}'
+      };
+
+      SpAthentoServices.updateDocument(configProvider: configProvider,
+          documentUUID: product.uuid!,
+          fieldValues: fieldValues);
+    }
+
+    for(final photoName in modifiedPhotos.modifiedPhotos) {
+      String? photoUUID = photos[photoName]!.uuid;
+
+      if(photoUUID != null){
+        if(photos[photoName]!.content != null) {
+
+          final photoFileExtension = SpFileUtils.getFileExtension(photos[photoName]!.content!.path);
+
+          SpAthentoServices.updateDocumentContent(
+              configProvider: configProvider,
+              documentUUID: photoUUID,
+              content: await photos[photoName]!.content!.readAsBytes(),
+              friendlyFileName: '$photoName$photoFileExtension'
+          );
+
+          File(photos[photoName]!.content!.path).delete();
+        } else {
+          SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: photoUUID);
+        }
+      }
+      else {
+          final photoTitle = '${product.retailReference}-$photoName';
+          final photoFileExtension = SpFileUtils.getFileExtension(photos[photoName]!.content!.path);
+          final fieldValues = _getPhotoFieldValues(photoName);
+          final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
+
+          await SpAthentoServices.createDocumentWithContent(
+            configProvider: photoConfigProvider,
+            containerUUID: product.uuid!,
+            docType: _photoDocType,
+            title: photoTitle,
+            fieldValues: fieldValues,
+            content: await photos[photoName]!.content!.readAsBytes(),//_getImageByteArray(path: photoPath),
+            friendlyFileName: '$photoName$photoFileExtension',
+          );
+
+          File(photos[photoName]!.content!.path).delete();
+      }
+    }
   }
 
   //TODO: analizar la salida de SpAthentoServices.deleteDocument y ver cómo manejarla y qué devolver y si hay que usar await
