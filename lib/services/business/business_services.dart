@@ -20,6 +20,7 @@ import 'package:navigation_app/utils/sp_product_utils.dart';
 import '../newsan_services.dart';
 import 'new_return.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:collection/collection.dart';
 
 import 'photo_detail.dart';
 
@@ -160,7 +161,7 @@ class BusinessServices {
         chunkSize: chunkSize,
         lineSeparator: '\r\n',
         columnSeparator: '\t',
-        equals: (List<String> row) => row[productFileSearchColumnIndex] == productFileSearchKey,
+        equals: (List<String> row) => equalsIgnoreAsciiCase(row[productFileSearchColumnIndex], productFileSearchKey),
         objectBuilder: _createProductMasterInfo);
 
     if(producMasterInfo == null){
