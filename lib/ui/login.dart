@@ -31,17 +31,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/services/user_services.dart';
-import 'package:navigation_app/ui/screen_data.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
-import '../router/ui_pages.dart';
-import 'package:email_validator/email_validator.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:dio/dio.dart';
 
 //import 'package:keycloak_flutter/keycloak_flutter.dart';
@@ -212,7 +207,7 @@ class _LoginState extends State<Login> {
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Text(_progressText, style: const TextStyle(
-                            color: Colors.grey, height: 8, fontSize: 18)),
+                            color: Colors.grey, height: 8, fontSize: 14)),
                       )
                     ]
                 )
@@ -234,7 +229,9 @@ class _LoginState extends State<Login> {
     emailTextController.text = (await Cache.getUserName()) ?? '';
     passwordTextController.text = (await Cache.getUserPassword()) ?? '';
 
+    // Check and create (if necesary) local folders where the products and sales files will reside.
     final localFolderPath = (await getApplicationDocumentsDirectory()).path;
+
     final productsFolderPath = Directory('$localFolderPath/products');
 
     const filesFolderURL = 'https://socialpath.com.ar/bandeja/newsan';
@@ -243,14 +240,13 @@ class _LoginState extends State<Login> {
       await productsFolderPath.create();
     }
 
-    // Check if the product file exists in the local app products folder. If not, retrieve it
+    // Check if the products file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
     const productsFileName = 'products_db.csv';
     final productsFile = File('${productsFolderPath.path}/$productsFileName');
+    const productsFileURL = '$filesFolderURL/$productsFileName';
     if (!productsFile.existsSync()) {
-      // Write file to local folder
-      const productsFileURL = '$filesFolderURL/$productsFileName';
-
+      // If products file does not exist, download file to local folder
       final response = await Dio().download(productsFileURL, productsFile.path,
           onReceiveProgress: (value1, value2) {
             setState(() {
@@ -259,6 +255,25 @@ class _LoginState extends State<Login> {
           }
       );
       //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
+    }
+    else {
+      // If products file does exist, check if it is outdated and update it in such a case
+      // Get last modified date
+      final response = await http.head(Uri.parse(productsFileURL));
+      final lastModifiedHeader = response.headers[HttpHeaders.lastModifiedHeader];
+
+      // If cached date is different than the file date, download the file and overwrite the old one
+      final cachedLastModifiedDate = (await Cache.getProductsFileLastModifiedDate()) ?? '';
+      if(cachedLastModifiedDate != lastModifiedHeader){
+        final response = await Dio().download(productsFileURL, productsFile.path,
+            onReceiveProgress: (value1, value2) {
+              setState(() {
+                _progressText = 'Actualizando maestro de productos: ${(value1 / value2).toStringAsFixed(2)}';
+              });
+            }
+        );
+        await Cache.saveProductsFileLastModifiedDate(lastModifiedHeader!);
+      }
     }
 
     // Check if the sales file exists in the local app products folder. If not, retrieve it
