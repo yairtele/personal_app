@@ -39,8 +39,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
   @override
   Widget build(BuildContext context) {
+    var enabled_value=true;
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
+    final _batch = this.widget.batch;
+    if (_batch.state!='Draft'){
+      enabled_value = false;
+    }
     return WillPopScope(
       onWillPop: () {
         appState.returnWith(_shouldRefreshParent);
@@ -124,11 +129,12 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         padding: EdgeInsets.all(15),
                         child: TextField(
                           //enabled: false,
-                          autofocus: true,
+                          autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
                           controller: _eanTextController,
+                          enabled: enabled_value,
                           decoration: const InputDecoration(
                             hintText: 'EAN',
                             label: Text.rich(
@@ -151,8 +157,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           margin: EdgeInsets.only(top: 8),
                           padding: EdgeInsets.all(15),
                           child: TextField(
-                            //enabled: false,
-                            autofocus: true,
+                            enabled: enabled_value,
+                            autofocus: false,
                             keyboardType: TextInputType.text,
                             textInputAction: TextInputAction.send,
                             maxLength: 50,
@@ -178,8 +184,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),
                         child: TextField(
-                          //enabled: false,
-                          autofocus: true,
+                          enabled: enabled_value,
+                          autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
@@ -205,8 +211,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),
                         child: TextField(
-                          //enabled: false,
-                          autofocus: true,
+                          enabled: enabled_value,
+                          autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
                           maxLength: 50,

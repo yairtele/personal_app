@@ -117,6 +117,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
                     ),
+                    if (batch.state=='Draft')
                     IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
@@ -155,7 +156,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),
                         child: TextField(
-                          autofocus: true,
+                          autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
                           maxLength: 30,
@@ -183,7 +184,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),
                         child: TextField(
-                          autofocus: true,
+                          autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
@@ -211,7 +212,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),
                         child: TextField(
-                          autofocus: true,
+                          autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
                           maxLength: 250,
@@ -240,7 +241,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (batch.state!='Draft')
+                            if (batch.state=='Draft')
                             ElevatedButton(
                               onPressed: () async {
                                 try{
@@ -264,7 +265,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 primary: Colors.green[400],
                               )
                           ),
-                            if (batch.state!='Draft')
+                            if (batch.state=='Draft')
                             ElevatedButton(
                                 onPressed: () async {
                                   try{
@@ -289,7 +290,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   primary: Colors.grey,
                                 )
                             ),
-                            if (batch.state!='Draft')
+                            if (batch.state=='Draft')
                             ElevatedButton(
                                 onPressed: () async {
                                   showDialog<String>(
