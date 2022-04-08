@@ -125,6 +125,100 @@ class SpUI{
             Row(
               children: [
                 Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
+                if(photo != null) ...[
+                  ElevatedButton( //Edit photo
+                    child: const Icon(FontAwesomeIcons.edit),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.all(4),
+                    ),
+                    onPressed: () async {
+
+                      final pickedPhoto = await _getPhotoFromCamera();
+
+                      state.setState(() {
+                        modifiedPhotos.modifiedPhotos.add(photoName);
+                        photos[photoName] = PhotoDetail(uuid: photoUUID, content: pickedPhoto);
+                      });
+                    },
+                  ),
+                  ElevatedButton( // Delete photo
+                    child: const Icon(FontAwesomeIcons.trash),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.all(4),
+                    ),
+                    onPressed: () async {
+                      //showDeleteAlertDialog(context, state, photos, photoName);
+                      state.setState(() {
+                        modifiedPhotos.modifiedPhotos.add(photoName);
+                        photos[photoName] = PhotoDetail(uuid: photoUUID, content: null);
+                      });
+                    },
+                  )]
+                else
+                  ElevatedButton( // Take photo
+                    child: const Icon(FontAwesomeIcons.camera),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.all(4),
+                    ),
+                    onPressed: () async {
+
+                      final pickedPhoto = await _getPhotoFromCamera();
+
+                      state.setState(() {
+                        modifiedPhotos.modifiedPhotos.add(photoName);
+                        photos[photoName] = PhotoDetail(uuid: photoUUID, content: pickedPhoto);
+                      });
+                    },
+                  )
+              ],
+            )
+          ],
+        )
+    );
+  }
+
+  static Widget buildReturnRequestThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos}) {
+
+    return GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(20),
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        children: <Widget>[
+          for(final photoName in  photos.keys)
+            _buildReturnRequestPhotoThumbnail(photoName, photos, state, context, modifiedPhotos)
+        ]
+    );
+  }
+
+  static Widget _buildReturnRequestPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, PhotoDetail> photos, State<T> state, BuildContext context, ProductPhotos modifiedPhotos) {
+    final photo = photos[photoName]!.content;
+    final photoUUID = photos[photoName]!.uuid;
+
+    return Container(
+        padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
+        ),
+        child: Column(
+          children: [
+            Expanded( // Show photo or icon
+                child: ((){
+                  if (photo != null)
+                    return Image.file(File(photos[photoName]!.content!.path)); //para obtener bytes de un BinaryFileInfo es Image.memory(photo.bytes);
+                  else
+                    return const Icon(FontAwesomeIcons.camera);
+                })()
+            ),
+            Row(
+              children: [
+                Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
                   if(photo != null) ...[
                     ElevatedButton( //Edit photo
                       child: const Icon(FontAwesomeIcons.edit),

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
+import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
+import 'package:navigation_app/services/business/return_request_detail.dart';
 import 'package:navigation_app/ui/batch_details.dart';
+import 'package:navigation_app/utils/sp_product_utils.dart';
+import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/ui/product_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
@@ -24,8 +28,10 @@ class  ReturnRequestDetails extends StatefulWidget {
 }
 
 class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
-  late Future<ScreenData<String, List<Product>>> _localData;
+  late Future<ScreenData<String, ReturnRequestDetail>> _localData;
   bool _shouldRefreshParent = false;
+  Map<String, PhotoDetail> _takenPictures = {};
+  var _modifiedPhotos = ProductPhotos([]);
 
   @override
   void initState() {
@@ -33,8 +39,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     _localData = getScreenData();
   }
 
-  Future<ScreenData<String, List<Product>>> getScreenData() {
-    return ScreenData<String, List<Product>>(dataGetter: _getProducts)
+  Future<ScreenData<String, ReturnRequestDetail>> getScreenData() {
+    return ScreenData<String, ReturnRequestDetail>(dataGetter: _getReturnRequestDetail)
       .getScreenData(dataGetterParam: widget.returnRequest.uuid);
   }
 
@@ -42,6 +48,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
+    final newReturnRequestDetails = this;
+
     return WillPopScope(
       onWillPop: () {
         appState.returnWith(_shouldRefreshParent);
@@ -49,14 +57,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
         //we need to return a future
         return Future.value(false);
       },
-      child: FutureBuilder<ScreenData<String, List<Product>>>(
+      child: FutureBuilder<ScreenData<String, ReturnRequestDetail>>(
           future: _localData,
           builder: (BuildContext context,
-              AsyncSnapshot<ScreenData<String, List<Product>>> snapshot) {
+              AsyncSnapshot<ScreenData<String, ReturnRequestDetail>> snapshot) {
             Widget widget;
             if (snapshot.hasData) {
               final data = snapshot.data!;
-              final products = data.data!;
+              _takenPictures = data.data!.optionalPhoto;
+              final products = data.data!.products;
               final reference = returnRequest.retailReference;
               final _eanTextController = TextEditingController(
                   text: returnRequest.EAN);
@@ -238,7 +247,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
-                                  await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text);
+                                  await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _modifiedPhotos, _takenPictures);
                                   _shouldRefreshParent = true;
                                   _showSnackBar('Solicitud actualizada con éxito');
                                 }
@@ -285,7 +294,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           ],
                         ),
                       ),
-                      DataTable(
+                      if(returnRequest.isAuditable)
+                        DataTable(
                         columns: const <DataColumn>[
                           DataColumn(
                             label: Text('Productos:'),
@@ -322,7 +332,11 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
                               ),
                         ),
-                      ),
+                      )
+                    else
+                      Container(
+                          child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos)
+                      )
                     ],
                   ),
                 ),
@@ -369,6 +383,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
 
   }
 
+  Future<ReturnRequestDetail> _getReturnRequestDetail(String? returnRequestUUID) async {
+    final products = await _getProducts(returnRequestUUID);
+    final optionalPhoto = await _getOptionalPhoto(returnRequestUUID);
+
+    return ReturnRequestDetail(products: products, optionalPhoto: optionalPhoto);
+  }
+
   Future<List<Product>> _getProducts(String? returnRequestUUID) async {
     final products = await BusinessServices.getProductsByReturnRequestUUID(
         returnRequestUUID!);
@@ -381,9 +402,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   }
 
   Future<void> _updateReqReturn(ReturnRequest req_return, String EAN,
-      String reference, String description, String unities) async {
+      String reference, String description, String unities, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos) async {
     await BusinessServices.updateReqReturn(
-        req_return, EAN, reference, description, unities);
+        req_return, EAN, reference, description, unities, modifiedPhotos, photos);
+  }
+
+  Future<Map<String,PhotoDetail>> _getOptionalPhoto(returnRequestUUID) async {
+    return BusinessServices.getPhotosByProductUUID(returnRequestUUID);
   }
 
   void _showSnackBar(String message) {

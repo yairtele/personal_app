@@ -641,7 +641,7 @@ class BusinessServices {
   //TODO: los parámetros String returnEAN,String returnreference,String returndescr,String returnunities ya están en el ReturnRequest
   //TODO: no abreviar nombres de métodos como este.
   //TODO: Usar camelCase para los parámetros y variables.
-  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities) async{
+  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos) async{
     final configProvider = await  _createConfigProvider();
     Map<String, dynamic> fieldValues = {
       '${ReturnRequestAthentoFieldName.EAN}': '${returnEAN}',
@@ -651,6 +651,8 @@ class BusinessServices {
     };
     //TODO:Armado con orden correcto del titulo para la solicitud.
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
+
+    _updatePhotos(configProvider, modifiedPhotos, photos, retReq: req_return);
   }
 
   static Future <void> updateProduct (bool referenceModified, String reference, ProductPhotos modifiedPhotos,
@@ -666,6 +668,21 @@ class BusinessServices {
       SpAthentoServices.updateDocument(configProvider: configProvider,
           documentUUID: product.uuid!,
           fieldValues: fieldValues);
+    }
+
+    _updatePhotos(configProvider, modifiedPhotos, photos, product: product);
+
+  }
+
+  static void _updatePhotos(ConfigProvider configProvider, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos, {Product? product, ReturnRequest? retReq}) async {
+
+    final genericProd;
+    if(product != null){
+      genericProd = product;
+    } else if (retReq != null){
+      genericProd = retReq;
+    } else {
+      throw Error();
     }
 
     for(final photoName in modifiedPhotos.modifiedPhotos) {
@@ -689,22 +706,22 @@ class BusinessServices {
         }
       }
       else {
-          final photoTitle = '${product.retailReference}-$photoName';
-          final photoFileExtension = SpFileUtils.getFileExtension(photos[photoName]!.content!.path);
-          final fieldValues = _getPhotoFieldValues(photoName);
-          final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
+        final photoTitle = '${genericProd.retailReference}-$photoName';
+        final photoFileExtension = SpFileUtils.getFileExtension(photos[photoName]!.content!.path);
+        final fieldValues = _getPhotoFieldValues(photoName);
+        final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
 
-          await SpAthentoServices.createDocumentWithContent(
-            configProvider: photoConfigProvider,
-            containerUUID: product.uuid!,
-            docType: _photoDocType,
-            title: photoTitle,
-            fieldValues: fieldValues,
-            content: await photos[photoName]!.content!.readAsBytes(),//_getImageByteArray(path: photoPath),
-            friendlyFileName: '$photoName$photoFileExtension',
-          );
+        await SpAthentoServices.createDocumentWithContent(
+          configProvider: photoConfigProvider,
+          containerUUID: genericProd.uuid!,
+          docType: _photoDocType,
+          title: photoTitle,
+          fieldValues: fieldValues,
+          content: await photos[photoName]!.content!.readAsBytes(),
+          friendlyFileName: '$photoName$photoFileExtension',
+        );
 
-          File(photos[photoName]!.content!.path).delete();
+        File(photos[photoName]!.content!.path).delete();
       }
     }
   }
