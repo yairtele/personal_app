@@ -318,7 +318,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       return existingPhotoDetails;
   }
 
-  Map<String, XFile?> _getPhotoContents(Map<String, PhotoDetail> photoDetails) {
+/*  Map<String, XFile?> _getPhotoContents(Map<String, PhotoDetail> photoDetails) {
     var photos = <String, XFile?>{};
 
     for (var key in photoDetails.keys){
@@ -326,7 +326,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
 
     return photos;
-  }
+  }*/
 
   Future<void> _updateProduct(bool referenceModified, String reference, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos, Product product) async {
     await BusinessServices.updateProduct(referenceModified, reference, modifiedPhotos, photos, product);

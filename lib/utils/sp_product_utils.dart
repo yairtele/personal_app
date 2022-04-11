@@ -25,6 +25,8 @@ class SpProductUtils{
 }
 
 class ProductPhotos{
+
   List<String> modifiedPhotos;
+
   ProductPhotos(this.modifiedPhotos);
 }
