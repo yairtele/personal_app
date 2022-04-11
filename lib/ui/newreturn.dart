@@ -224,8 +224,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                           Expanded(
                                             child: TextField(
                                               controller: _eanTextController,
-                                              autofocus: true,
-                                              keyboardType: TextInputType.text,
+                                              autofocus: false,
+                                              keyboardType: TextInputType.number,
                                               textInputAction:
                                               TextInputAction.send,
                                               readOnly: true,
@@ -241,7 +241,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                           Expanded(
                                             child: TextField(
                                               controller: _commercialCodeTextController,
-                                              autofocus: true,
+                                              autofocus: false,
                                               keyboardType: TextInputType.text,
                                               textInputAction:
                                               TextInputAction.send,
@@ -369,7 +369,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   controller: _quantityTextController,
                                                   autofocus: true,
                                                   keyboardType:
-                                                  TextInputType.text,
+                                                  TextInputType.number,
                                                   textInputAction:
                                                   TextInputAction.send,
                                                   maxLength: 10,

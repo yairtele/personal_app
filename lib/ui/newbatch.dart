@@ -107,7 +107,7 @@ class _NewBatchState extends State<NewBatch> {
                     maxLength: 50,
                     decoration: const InputDecoration(
                       hintText: 'Descripcion',
-                      helperText: 'Ej: Lote Fravega 4',
+                      helperText: 'Ej: Lote para auditar',
                       label: Text.rich(
                           TextSpan(
                             children: <InlineSpan>[

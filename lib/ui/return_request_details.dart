@@ -76,7 +76,10 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               final _eanTextController = TextEditingController(
                   text: returnRequest.EAN);
               final _reference = TextEditingController(text: reference);
-              final cantidad = returnRequest.quantity;
+              var cantidad = returnRequest.quantity;
+              if (cantidad == null) {
+                cantidad = 1;
+              }
               final _cantidad = TextEditingController(text: cantidad.toString());
               final descripcion = returnRequest.description;
               final _descripcion = TextEditingController(text: descripcion);
@@ -142,7 +145,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         child: TextField(
                           //enabled: false,
                           autofocus: false,
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
                           controller: _eanTextController,
@@ -225,7 +228,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         child: TextField(
                           enabled: enabled_value,
                           autofocus: false,
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
                           controller: _cantidad,
@@ -276,6 +279,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 primary: Colors.green[400],
                               )
                           ),
+                            if (_batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
                                   try {
@@ -345,7 +349,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       )
                     else
                       Container(
-                          child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos)
+                          child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
                       )
                     ],
                   ),
