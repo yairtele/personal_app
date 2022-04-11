@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
+import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
 
@@ -86,7 +88,7 @@ class SpUI{
     );
   }
 
-  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos}) {
+  static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos,required Batch batch}) {
 
     return GridView.count(
         primary: false,
@@ -97,12 +99,12 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildProductPhotoThumbnail(photoName, photos, state, context, modifiedPhotos)
+            _buildProductPhotoThumbnail(photoName, photos, state, context, modifiedPhotos,batch)
         ]
     );
   }
 
-  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, PhotoDetail> photos, State<T> state, BuildContext context, ProductPhotos modifiedPhotos) {
+  static Widget _buildProductPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, PhotoDetail> photos, State<T> state, BuildContext context, ProductPhotos modifiedPhotos,Batch batch) {
     final photo = photos[photoName]!.content;
     final photoUUID = photos[photoName]!.uuid;
 
@@ -126,6 +128,7 @@ class SpUI{
               children: [
                 Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
                   if(photo != null) ...[
+                    if (batch.state==BatchStates.Draft || batch.state==BatchStates.InfoPendiente)
                     ElevatedButton( //Edit photo
                       child: const Icon(FontAwesomeIcons.edit),
                       style: ElevatedButton.styleFrom(
@@ -142,6 +145,7 @@ class SpUI{
                         });
                       },
                     ),
+                    if (batch.state==BatchStates.Draft || batch.state==BatchStates.InfoPendiente)
                     ElevatedButton( // Delete photo
                       child: const Icon(FontAwesomeIcons.trash),
                       style: ElevatedButton.styleFrom(
@@ -157,7 +161,8 @@ class SpUI{
                       },
                     )]
                   else
-                    ElevatedButton( // Take photo
+                    if (batch.state==BatchStates.Draft || batch.state==BatchStates.InfoPendiente)
+                    ElevatedButton(// Take photo
                       child: const Icon(FontAwesomeIcons.camera),
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size.zero,

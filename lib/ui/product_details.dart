@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
+import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/services/business/product.dart';
@@ -19,7 +21,8 @@ import '../router/ui_pages.dart';
 
 class  ProductDetails extends StatefulWidget {
   final Product product;
-  const ProductDetails({Key? key, required this.product}) : super(key: key);
+  final Batch batch;
+  const ProductDetails({Key? key, required this.product,required this.batch}) : super(key: key);
 
   @override
   _ProductDetailsState createState() =>  _ProductDetailsState();
@@ -41,9 +44,13 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
+    var enabled_value = true;
     final product = widget.product;
     final newProductDetails = this;
-
+    final _batch = this.widget.batch;
+    if (_batch.state!=BatchStates.Draft){
+      enabled_value = false;
+    }
     return FutureBuilder<ScreenData<Product, ProductDetail>>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, ProductDetail>> snapshot) {
@@ -77,6 +84,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     onPressed: () => appState.currentAction =
                         PageAction(state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
+                  if (_batch.state==BatchStates.Draft)
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () => appState.currentAction =
@@ -157,7 +165,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.send,
                         maxLength: 50,
-                        enabled: true,
+                        enabled: enabled_value,
                         controller: _reference,
                         onChanged: (_) {
                           _referenceModified = true;
@@ -178,13 +186,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                   Container(
-                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos)
+                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
                    ),
                    Padding(
                       padding: EdgeInsets.only(top:16.0),
                      child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        if (_batch.state==BatchStates.Draft || _batch.state==BatchStates.InfoPendiente)
                         ElevatedButton(
                             onPressed: () async {
                               try{
@@ -207,6 +216,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               primary: Colors.green[400],
                             )
                         ),
+                        if (_batch.state==BatchStates.Draft)
                         ElevatedButton(
                             onPressed: () async {
                               try{

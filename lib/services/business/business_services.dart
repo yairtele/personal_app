@@ -550,8 +550,8 @@ class BusinessServices {
 
 
     // Construir WHERE expression
-    final whereExpression = "WHERE ecm:currentLifeCycleState = 'Draft' AND ecm:parentId = '$returnRequestUUID'";
-
+    //final whereExpression = "WHERE ecm:currentLifeCycleState = ${BatchStates.Draft} AND ecm:parentId = '$returnRequestUUID'";
+    final whereExpression = "WHERE ecm:parentId = '$returnRequestUUID'";
     // Invocar a Athento
     final entries = await SpAthentoServices.findDocuments(
         configProvider, _productDocType, selectFields, whereExpression);

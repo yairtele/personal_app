@@ -29,6 +29,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
@@ -76,7 +77,7 @@ class _BatchDetailsState extends State<BatchDetails> {
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
 
-    if (batch.state!='Draft'){
+    if (batch.state!=BatchStates.Draft){
       enabled_value = false;
     }
 
@@ -117,7 +118,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
                     ),
-                    if (batch.state=='Draft')
+                    if (batch.state==BatchStates.Draft)
                     IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
@@ -241,7 +242,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (batch.state=='Draft')
+                            if (batch.state==BatchStates.Draft)
                             ElevatedButton(
                               onPressed: () async {
                                 try{
@@ -265,7 +266,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                 primary: Colors.green[400],
                               )
                           ),
-                            if (batch.state=='Draft')
+                            if (batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
                                   try{
@@ -290,7 +291,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   primary: Colors.grey,
                                 )
                             ),
-                            if (batch.state=='Draft')
+                            if (batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
                                   showDialog<String>(

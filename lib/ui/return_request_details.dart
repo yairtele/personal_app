@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/product.dart';
@@ -43,7 +44,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
     final _batch = this.widget.batch;
-    if (_batch.state!='Draft'){
+    if (_batch.state!=BatchStates.Draft){
       enabled_value = false;
     }
     return WillPopScope(
@@ -89,6 +90,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
                     ),
+                    if (_batch.state==BatchStates.Draft)
                     IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: () => //TODO: ver si se debe poder realizar una nueva devolución para los EAN no autitables, o cómo precargar los datos en la pantalla NewReturn
@@ -239,7 +241,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         padding: EdgeInsets.only(top: 16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [ ElevatedButton(
+                          children: [
+                            if (_batch.state==BatchStates.Draft)
+                            ElevatedButton(
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
@@ -262,6 +266,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 primary: Colors.green[400],
                               )
                           ),
+                            if (_batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
                                   try {
@@ -312,7 +317,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   appState.waitCurrentAction<bool>(PageAction(
                                       state: PageState.addWidget,
                                       widget: ProductDetails(
-                                          product: products[index]),
+                                          product: products[index],batch: this.widget.batch),
                                       pageConfig: DetailProductPageConfig))
                                   .then((shouldRefresh) {
                                     setState(() {
