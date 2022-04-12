@@ -282,23 +282,41 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                             if (_batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
-                                  try {
-                                    WorkingIndicatorDialog().show(
-                                        context, text: 'Eliminando Solicitud...');
-                                    await _deleteReqReturn(returnRequest);
-                                    _showSnackBar('Solicitud eliminada con éxito');
-                                    appState.returnWith(true);
-                                  }
-                                  on BusinessException catch (e) {
-                                    _showSnackBar(e.message);
-                                  }
-                                  on Exception catch (e) {
-                                    _showSnackBar(
-                                        'Ha ocurrido un error inesperado eliminando la solicitud: $e');
-                                  }
-                                  finally {
-                                    WorkingIndicatorDialog().dismiss();
-                                  }
+                                  showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) => AlertDialog(
+                                      title: const Text('Alerta'),
+                                      content: const Text('¿Seguro quiere eliminar esta Solicitud?'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () => { Navigator.of(context).pop() },
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        TextButton(
+                                            child: const Text('Borrar'),
+                                            onPressed: () async {
+                                              try {
+                                                WorkingIndicatorDialog().show(
+                                                    context,
+                                                    text: 'Eliminando Solicitud...');
+                                                await _deleteReqReturn(returnRequest);
+                                                _showSnackBar('La Solicitud ha sido eliminada exitosamente');
+                                                appState.returnWith(true);
+                                              }
+                                              on BusinessException catch (e){
+                                                _showSnackBar(e.message);
+                                              }
+                                              on Exception catch (e){
+                                                _showSnackBar('Ha ocurrido un error inesperado eliminando la solicitud: $e');
+                                              }
+                                              finally{
+                                                WorkingIndicatorDialog().dismiss();
+                                              }
+                                            }
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                                 child: const Text('Borrar Solicitud'),
                                 style: ElevatedButton.styleFrom(
