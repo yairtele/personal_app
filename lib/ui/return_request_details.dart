@@ -75,6 +75,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               final reference = returnRequest.retailReference;
               final _eanTextController = TextEditingController(
                   text: returnRequest.EAN);
+              final _skuTextController = TextEditingController(
+                  text: returnRequest.sku);
               final _reference = TextEditingController(text: reference);
               var cantidad = returnRequest.quantity;
               if (cantidad == null) {
@@ -158,6 +160,34 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     WidgetSpan(
                                       child: Text(
                                           'EAN:',
+                                          style: const TextStyle(fontSize: 18.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          //enabled: false,
+                          autofocus: false,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _skuTextController,
+                          enabled: enabled_value,
+                          decoration: const InputDecoration(
+                            hintText: 'EAN',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'SKU:',
                                           style: const TextStyle(fontSize: 18.0,
                                               fontWeight: FontWeight.bold)),
                                     ),
