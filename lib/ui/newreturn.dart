@@ -408,6 +408,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         sku: product.sku,
                                         retailReference: _retailReferenceTextController.text,
                                         commercialCode: product.commercialCode,
+                                        brand: product.brand,
                                         description: product.description,
                                         lastSell: _productLastSell,
                                         price: _lastSellPrice,

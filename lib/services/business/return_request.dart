@@ -10,6 +10,7 @@ class ReturnRequest{
   String commercialCode;
   String? description;
   String? retailReference;
+  String? brand;
   bool isAuditable;
   int? quantity;
   String? lastSell;
@@ -28,6 +29,7 @@ class ReturnRequest{
     required this.commercialCode,
     required this.description,
     required this.retailReference,
+    required this.brand,
     required this.isAuditable,
     required this.quantity,
     required this.lastSell,
@@ -47,6 +49,7 @@ class ReturnRequest{
       ReturnRequestAthentoFieldName.sku: sku,
       ReturnRequestAthentoFieldName.commercialCode: commercialCode,
       ReturnRequestAthentoFieldName.retailReference: retailReference,
+      ReturnRequestAthentoFieldName.brand: brand,
       ReturnRequestAthentoFieldName.description: description,
       ReturnRequestAthentoFieldName.isAuditable: isAuditable,
       ReturnRequestAthentoFieldName.quantity: quantity,
@@ -66,6 +69,7 @@ class ReturnRequest{
     sku = json[ReturnRequestAthentoFieldName.sku],
     commercialCode = json[ReturnRequestAthentoFieldName.commercialCode],
     retailReference = json[ReturnRequestAthentoFieldName.retailReference],
+    brand = json[ReturnRequestAthentoFieldName.brand],
     description = json[ReturnRequestAthentoFieldName.description],
     isAuditable = json[ReturnRequestAthentoFieldName.isAuditable] == 'true',
     quantity =  json[ReturnRequestAthentoFieldName.quantity] == null ? null : int.tryParse(json[ReturnRequestAthentoFieldName.quantity]),
@@ -86,6 +90,7 @@ class ReturnRequestAthentoFieldName{
   static const String commercialCode = 'codigo_comercial';
   static const String description = 'descripcion_producto';
   static const String retailReference = 'referencia_interna_solicitud';
+  static const String brand = 'marca';
   static const String isAuditable = 'es_auditable';
   static const String quantity = 'cantidad';
   static const String lastSell = 'fecha_ultima_venta';

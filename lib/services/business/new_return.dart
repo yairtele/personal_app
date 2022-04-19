@@ -8,6 +8,7 @@ class NewReturn {
   String commercialCode;
   String description;
   String retailReference;
+  String brand;
   bool isAuditable;
   String? lastSell;
   String? price;
@@ -22,6 +23,7 @@ class NewReturn {
     required this.commercialCode,
     required this.description,
     required this.retailReference,
+    required this.brand,
     required this.isAuditable,
     required this.lastSell,
     required this.price,

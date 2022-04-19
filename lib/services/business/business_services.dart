@@ -431,6 +431,7 @@ class BusinessServices {
         commercialCode: newReturn.commercialCode,
         description: newReturn.description,
         retailReference: newReturn.retailReference,
+        brand: newReturn.brand,
         isAuditable: newReturn.isAuditable,
         quantity: newReturn.quantity,
         lastSell: newReturn.lastSell,
