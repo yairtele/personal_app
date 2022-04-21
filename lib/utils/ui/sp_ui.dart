@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,11 +8,12 @@ import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
+import 'package:navigation_app/utils/ui/thumb_photo.dart';
 
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, XFile?> photos}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto}) {
 
     return GridView.count(
         primary: false,
@@ -24,13 +24,13 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildPhotoThumbnail(photoName, photos, state)
+            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto)
         ]
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, XFile?> photos, State<T> state) {
-    final photo = photos[photoName];
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto) {
+    final photo = photos[photoName]!;
 
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
@@ -42,16 +42,23 @@ class SpUI{
           children: [
             Expanded( // Show photo or icon
                 child: ((){
-                  if (photo != null)
-                    return  Image.file(File(photo.path));
-                  else
-                    return const Icon(FontAwesomeIcons.camera);
+                  //if (photo != null) {
+                    return Image.file(File(photo.photo.path));
+                  //}
+                  //else {
+                  //  if(dummyPhoto != null){
+                  //    return Image.file(File(dummyPhoto.path));
+                  //  }
+                  //  else {
+                  //    return const Icon(FontAwesomeIcons.camera);
+                  //  }
+                  //}
                 })()
             ),
             Row(
               children: [
                 Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
-                if(photo != null)
+                if(photo.isDummy == false)
                   ElevatedButton( // Delete photo
                     child: const Icon(FontAwesomeIcons.trash),
                     style: ElevatedButton.styleFrom(
@@ -61,7 +68,7 @@ class SpUI{
                     onPressed: () async {
                       //TODO: ver si se debe borrar el archivo donde estaba la foto
                       state.setState(() {
-                        photos[photoName] = null;
+                        photos[photoName] = ThumbPhoto(dummyPhoto,  true);
                       });
                     },
                   )
@@ -76,7 +83,7 @@ class SpUI{
                       //if(cameraOn) {
                         final pickedPhoto = await _getPhotoFromCamera();
                         state.setState(() {
-                          photos[photoName] = pickedPhoto;
+                          photos[photoName] = pickedPhoto != null ? ThumbPhoto(pickedPhoto, false) : ThumbPhoto(dummyPhoto, true);
                         });
                       //}
                     },

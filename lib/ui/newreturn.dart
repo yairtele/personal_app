@@ -1,5 +1,6 @@
 //import 'dart:html';
 
+import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,6 +11,7 @@ import 'package:navigation_app/services/business/new_return.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,7 +45,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _commercialCodeTextController = TextEditingController();
 
   //XFile imageFile;
-  final Map<String, XFile?> _takenPictures = {};
+  final Map<String, ThumbPhoto> _takenPictures = {};
   bool _isAuditableProduct = false;
   var _productSearchBy = ProductSearchBy.EAN;
   ReturnRequest? _existingReturnRequest;
@@ -54,12 +56,13 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   late Batch _globalBatch;
   String _dateWarning = '';
   bool _shouldRefreshParent = false;
+  late final XFile _dummyPhoto;
 
   @override
   void initState() {
     super.initState();
     _globalBatch = widget.batch;
-    _localData = ScreenData<void, void>().getScreenData();
+    _localData = ScreenData<void, void>(dataGetter: _initializeScreen).getScreenData();
   }
 
   @override
@@ -382,7 +385,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   //},
                                                 ),
                                               ),
-                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures),
+                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto),
                                           ]),
                                     ]),
                                 //)
@@ -397,8 +400,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     try{
                                       WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
                                       final thumbsWithPhotos = _takenPictures.entries
-                                          .where((entry) => entry.value != null)
-                                          .map((e) => MapEntry<String, String>(e.key, e.value!.path));
+                                          .map((e) => MapEntry<String, String>(e.key, e.value.photo.path));
 
                                       final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
 
@@ -559,6 +561,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     return quantity;
   }
 
+  Future<void> _initializeScreen(nothing) async{
+    _dummyPhoto = await SpAssetUtils.getImageXFileFromAssets('images/img_not_found.jpg');
+  }
+
   void _lookForProduct ([ScanResult? barcode]) async {
     try {
       // Limpiar campos
@@ -588,12 +594,13 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
       final dateWarning = _dateValidation(productInfo);
 
+
       if (productInfo.auditRules.photos.length == 0){
-        _takenPictures['otra'] = null;
+        _takenPictures['otra'] = ThumbPhoto(_dummyPhoto, true);
       }
       else{
         productInfo.auditRules.photos.forEach((photoAuditInfo) {
-          _takenPictures[photoAuditInfo.name] = null;
+          _takenPictures[photoAuditInfo.name] = ThumbPhoto(_dummyPhoto, true);
         });
       }
 
@@ -639,5 +646,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     }
   }
 }
+
+
 
 enum ProductSearchBy { EAN, CommercialCode }
