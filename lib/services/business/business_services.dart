@@ -365,16 +365,12 @@ class BusinessServices {
 
         // Recuperar solicitud para obtener el nro de solicitud automático
         returnRequestUUID = createdReturnRequestInfo['uid'];
-        final selectFields = [AthentoFieldName.uuid, ReturnRequestAthentoFieldName.requestNumber];
-        final foundReturnRequestInfo = await SpAthentoServices.getDocument(configProvider, _returnRequestDocType, returnRequestUUID, selectFields);
-
-        returnRequestNumber = foundReturnRequestInfo[ReturnRequestAthentoFieldName.requestNumber];
+        returnRequestNumber = null;
       }
       // Tomar valores de la solicitud preexistente
       else {
         returnRequestUUID = existingReturnRequest.uuid!;
-        returnRequestNumber = existingReturnRequest.requestNumber!;
-
+        returnRequestNumber = existingReturnRequest.requestNumber;
         // Verificar que no haya otro producto con la misma referencia interna dentro de la misma solicitud
         final productConfigProvider = await  _createConfigProvider(_getProductFieldNameInferenceConfig());
         final productSelectFields = [AthentoFieldName.uuid];
@@ -391,7 +387,7 @@ class BusinessServices {
       // Crear producto unitario.
       final configProvider = await  _createConfigProvider(
           _getProductFieldNameInferenceConfig());
-      final fieldValues = _getProductFieldValues(returnRequestTitle, returnRequestNumber, newReturn);
+      final fieldValues = _getProductFieldValues(returnRequestTitle,  newReturn);
       final productTitle = '${returnRequestNumber}-${newReturn.EAN}-${newReturn.retailReference}'; //TODO: ver qué título por defecto guardar (para todos los docs en GENERAL)
       final createdProductInfo = await SpAthentoServices.createDocument(
         configProvider: configProvider,
@@ -446,10 +442,10 @@ class BusinessServices {
     return fieldValues;
   }
 
-  static Map<String, dynamic> _getProductFieldValues(String productTitle, String? requestNumber, NewReturn newReturn) {
+  static Map<String, dynamic> _getProductFieldValues(String productTitle, NewReturn newReturn) {
     // Obtener valores de campos para la nueva solicitud
     final product = Product(
-        requestNumber: requestNumber,
+        requestNumber: null,
         title: productTitle,
         EAN: newReturn.EAN.trim(),
         commercialCode: newReturn.commercialCode.trim(),
@@ -458,8 +454,11 @@ class BusinessServices {
     );
     final fieldValues = product.toJSON();
 
-    //No enviar el campo autonumérico y el uuid de la solicitud
-    fieldValues.removeWhere((key, value) =>  key == ReturnRequestAthentoFieldName.uuid);
+    //No enviar el campo autonumérico ni el uuid de la solicitud
+    fieldValues.removeWhere(
+            (key, value) =>  key == ProductAthentoFieldName.uuid ||
+                             key == ProductAthentoFieldName.requestNumber
+    );
     return fieldValues;
   }
 
