@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -118,7 +117,8 @@ class SpUI{
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
         decoration: BoxDecoration(
-            border: Border.all(
+          color: (photo?.name ?? 'sasas') == 'img_not_found.jpg' ?  Colors.yellow.shade300: Theme.of(context).backgroundColor,
+          border: Border.all(
                 color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
         ),
         child: Column(
@@ -135,7 +135,7 @@ class SpUI{
               children: [
                 Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center)), // Photo name
                 if(photo != null) ...[
-                  if (batch.state==BatchStates.Draft || batch.state==BatchStates.InfoPendiente)
+                  if (batch.state==BatchStates.Draft || batch.state==BatchStates.InfoPendiente) //TODO: revisar si hay que preguntar por el estado del batch o de qué cosa
                   ElevatedButton( //Edit photo
                     child: const Icon(FontAwesomeIcons.edit),
                     style: ElevatedButton.styleFrom(
