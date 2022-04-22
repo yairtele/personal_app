@@ -2,6 +2,7 @@ import 'package:navigation_app/services/athento/athento_field_name.dart';
 
 class ReturnRequest{
   String? uuid;
+  String? state;
   String title;
   String? requestNumber;
   String? batchNumber;
@@ -17,10 +18,12 @@ class ReturnRequest{
   String? price;
   String legalEntity;
   String businessUnit;
+
   //Map<String, XFile> photos;
 
   ReturnRequest({
     this.uuid,
+    this.state,
     required this.title,
     this.requestNumber,
     required this.batchNumber,
@@ -42,6 +45,7 @@ class ReturnRequest{
   Map<String, dynamic> toJSON() {
     return {
       AthentoFieldName.uuid: uuid,
+      AthentoFieldName.state: state,
       AthentoFieldName.title: title,
       ReturnRequestAthentoFieldName.requestNumber: requestNumber,
       ReturnRequestAthentoFieldName.batchNumber: batchNumber,
@@ -62,6 +66,7 @@ class ReturnRequest{
 
   ReturnRequest.fromJSON(Map<String, dynamic> json):
     uuid = json[AthentoFieldName.uuid],
+    state = json[AthentoFieldName.state],
     title = json[AthentoFieldName.title],
     requestNumber = json[ReturnRequestAthentoFieldName.requestNumber],
     batchNumber = json[ReturnRequestAthentoFieldName.batchNumber],
@@ -73,7 +78,7 @@ class ReturnRequest{
     description = json[ReturnRequestAthentoFieldName.description],
     isAuditable = json[ReturnRequestAthentoFieldName.isAuditable] == 'true',
     quantity =  json[ReturnRequestAthentoFieldName.quantity] == null ? null : int.tryParse(json[ReturnRequestAthentoFieldName.quantity]),
-    lastSell = json[ReturnRequestAthentoFieldName.lastSell] == null ? null : json[ReturnRequestAthentoFieldName.lastSell],
+    lastSell = json[ReturnRequestAthentoFieldName.lastSell],
     price = json[ReturnRequestAthentoFieldName.price],
     legalEntity = json[ReturnRequestAthentoFieldName.legalEntity],
     businessUnit = json[ReturnRequestAthentoFieldName.businessUnit];

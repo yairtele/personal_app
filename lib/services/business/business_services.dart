@@ -52,7 +52,10 @@ class BusinessServices {
     final fieldValues = batch.toJSON();
 
     //No enviar el campo autonumérico del Lote
-    fieldValues.removeWhere((key, value) => key == BatchAthentoFieldName.batchNumber);
+    fieldValues.removeWhere(
+            (key, value) => key == BatchAthentoFieldName.batchNumber ||
+                            key == BatchAthentoFieldName.uuid
+    );
 
     await SpAthentoServices.createDocument( configProvider: configProvider,
         containerUUID: null,
@@ -68,6 +71,7 @@ class BusinessServices {
         await  _createConfigProvider(fieldNameInferenceConfig);
     final selectFields = [
       BatchAthentoFieldName.uuid,
+      BatchAthentoFieldName.state,
       BatchAthentoFieldName.title,
       BatchAthentoFieldName.state,
       BatchAthentoFieldName.batchNumber,
@@ -96,6 +100,7 @@ class BusinessServices {
     //Definir campos del SELECT
     final selectFields = [
       AthentoFieldName.uuid,
+      AthentoFieldName.state,
       AthentoFieldName.title,
       ReturnRequestAthentoFieldName.requestNumber,
       ReturnRequestAthentoFieldName.batchNumber,
@@ -457,7 +462,8 @@ class BusinessServices {
     //No enviar el campo autonumérico ni el uuid de la solicitud
     fieldValues.removeWhere(
             (key, value) =>  key == ProductAthentoFieldName.uuid ||
-                             key == ProductAthentoFieldName.requestNumber
+                             key == ProductAthentoFieldName.requestNumber ||
+                             key == AthentoFieldName.state
     );
     return fieldValues;
   }
@@ -540,6 +546,7 @@ class BusinessServices {
     //Definir campos del SELECT
     final selectFields = [
       AthentoFieldName.uuid,
+      AthentoFieldName.state,
       AthentoFieldName.title,
       ProductAthentoFieldName.requestNumber,
       ProductAthentoFieldName.EAN,
@@ -572,6 +579,7 @@ class BusinessServices {
     //Definir campos del SELECT
     final selectFields = [
       ProductPhotoAthentoFieldName.uuid,
+      ProductPhotoAthentoFieldName.state,
       ProductPhotoAthentoFieldName.title,
       ProductPhotoAthentoFieldName.photoType
     ];

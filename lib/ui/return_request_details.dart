@@ -7,7 +7,6 @@ import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/return_request_detail.dart';
-import 'package:navigation_app/ui/batch_details.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/ui/product_details.dart';
@@ -32,7 +31,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   late Future<ScreenData<String, ReturnRequestDetail>> _localData;
   bool _shouldRefreshParent = false;
   Map<String, PhotoDetail> _takenPictures = {};
-  var _modifiedPhotos = ProductPhotos([]);
+  final _modifiedPhotos = ProductPhotos([]);
 
   @override
   void initState() {
@@ -52,7 +51,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     final returnRequest = widget.returnRequest;
     final newReturnRequestDetails = this;
 
-    final _batch = this.widget.batch;
+    final _batch = widget.batch;
     if (_batch.state!=BatchStates.Draft){
       enabled_value = false;
     }
@@ -68,8 +67,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           builder: (BuildContext context,
               AsyncSnapshot<ScreenData<String, ReturnRequestDetail>> snapshot) {
             Widget widget;
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
               final data = snapshot.data!;
+              final shouldShowStateColumn = returnRequest.state != 'Draft';
               _takenPictures = data.data!.optionalPhoto;
               final products = data.data!.products;
               final reference = returnRequest.retailReference;
@@ -133,7 +133,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       , icon: Image.asset(
                       'assets/images/boton_athento.png',
                       height: 40.0, width: 40.0,),
-                      label: Text(''),
+                      label: const Text(''),
                     ),
                   ],
                 ),
@@ -142,8 +142,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   child: ListView(
                     children: [
                       Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           //enabled: false,
                           autofocus: false,
@@ -160,7 +160,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     WidgetSpan(
                                       child: Text(
                                           'EAN:',
-                                          style: const TextStyle(fontSize: 18.0,
+                                          style: TextStyle(fontSize: 18.0,
                                               fontWeight: FontWeight.bold)),
                                     ),
                                   ],
@@ -170,8 +170,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           //enabled: false,
                           autofocus: false,
@@ -188,7 +188,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     WidgetSpan(
                                       child: Text(
                                           'SKU:',
-                                          style: const TextStyle(fontSize: 18.0,
+                                          style: TextStyle(fontSize: 18.0,
                                               fontWeight: FontWeight.bold)),
                                     ),
                                   ],
@@ -199,8 +199,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       ),
                       if(!returnRequest.isAuditable)
                         Container(
-                          margin: EdgeInsets.only(top: 8),
-                          padding: EdgeInsets.all(15),
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.all(15),
                           child: TextField(
                             enabled: enabled_value,
                             autofocus: false,
@@ -216,7 +216,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                       WidgetSpan(
                                         child: Text(
                                             'Referencia Interna:',
-                                            style: const TextStyle(fontSize: 18.0,
+                                            style: TextStyle(fontSize: 18.0,
                                                 fontWeight: FontWeight.bold)),
                                       ),
                                     ],
@@ -226,8 +226,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           ),
                         ),
                       Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           enabled: enabled_value,
                           autofocus: false,
@@ -242,7 +242,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   children: <InlineSpan>[
                                     WidgetSpan(
                                       child: Text(
-                                          'Descripcion:', style: const TextStyle(
+                                          'Descripcion:', style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold)),
                                     ),
@@ -253,8 +253,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           enabled: enabled_value,
                           autofocus: false,
@@ -269,7 +269,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   children: <InlineSpan>[
                                     WidgetSpan(
                                       child: Text(
-                                          'Unidades:', style: const TextStyle(
+                                          'Unidades:', style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold)),
                                     ),
@@ -281,7 +281,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       ),
 
                       Padding(
-                        padding: EdgeInsets.only(top: 16.0),
+                        padding: const EdgeInsets.only(top: 16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -358,10 +358,12 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       ),
                       if(returnRequest.isAuditable)
                         DataTable(
-                        columns: const <DataColumn>[
-                          DataColumn(
+                        columns: <DataColumn>[
+                          const DataColumn(
                             label: Text('Productos:'),
                           ),
+                          if(shouldShowStateColumn)
+                            const DataColumn(label: Text('Estado'))
                         ],
                         rows: List<DataRow>.generate(
                           products.length,
@@ -379,22 +381,25 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   appState.waitCurrentAction<bool>(PageAction(
                                       state: PageState.addWidget,
                                       widget: ProductDetails(
-                                          product: products[index],batch: this.widget.batch),
+                                          product: products[index],
+                                          batch: this.widget.batch),
                                       pageConfig: DetailProductPageConfig))
-                                  .then((shouldRefresh) {
+                                      .then((shouldRefresh) {
                                     setState(() {
-                                      if(shouldRefresh!){
-                                        _shouldRefreshParent = shouldRefresh; //TODO: analizar bien esto
+                                      if (shouldRefresh!) {
+                                        _shouldRefreshParent =
+                                            shouldRefresh; //TODO: analizar bien esto
                                         _localData = getScreenData();
                                       }
                                     });
                                   });
-                                })
-                                ],
-
-                              ),
+                                }),
+                                if(shouldShowStateColumn)
+                                  DataCell(Text(products[index].state!))
+                              ],
+                            ),
                         ),
-                      )
+                        )
                     else
                       Container(
                           child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)

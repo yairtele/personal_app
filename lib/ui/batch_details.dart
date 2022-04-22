@@ -95,9 +95,11 @@ class _BatchDetailsState extends State<BatchDetails> {
           builder: (BuildContext context, AsyncSnapshot<ScreenData<Batch, List<ReturnRequest>>> snapshot) {
 
             Widget widget;
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+              final batch = this.widget.batch;
               final data = snapshot.data!;
               final returns = data.data!;
+              final shouldShowStateColumn =batch.state != 'Draft';
               widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -343,10 +345,12 @@ class _BatchDetailsState extends State<BatchDetails> {
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
                         child: DataTable(// Lista de solicitudes del lote
-                          columns: const <DataColumn>[
-                            DataColumn(
+                          columns:  <DataColumn>[
+                            const DataColumn(
                               label: Text('Solicitudes'),
                             ),
+                            if (shouldShowStateColumn)
+                              const DataColumn(label: Text('Estado'))
                           ],
                           rows: List<DataRow>.generate(
                             returns.length,
@@ -378,7 +382,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                                         });
                                       }
                                     });
-                                  })
+                                  }),
+                                  if (shouldShowStateColumn)
+                                    DataCell(Text(returns[index].state!))
                                 ],
                               );
                             },
@@ -390,7 +396,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                   ),
                 ),
               );
-            } else if (snapshot.hasError) {
+            }
+            else if (snapshot.hasError) {
               widget = Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -407,7 +414,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                   ],
                 ),
               );
-            } else {
+            }
+            else {
               widget = Center(
                   child: Stack(
                       children: <Widget>[

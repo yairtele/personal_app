@@ -150,34 +150,37 @@ class _BatchesState extends State<Batches> {
                         rows: List<DataRow>.generate (
                           //batches.where((state) => 'Draft').length,
                           draftBatches.length,
-                              (int index) => DataRow(cells: <DataCell>[
-                            DataCell(ListTile(isThreeLine: true,
-                              leading: const Icon(
-                                  FontAwesomeIcons.archive,
-                                  color: Colors.grey),
-                              title: Text(
-                                  '${_getBatchTitle(draftBatches[index])}',
-                                  style: const TextStyle(fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black)),
-                              subtitle: Text('${_getBatchSubTitle(
-                                  draftBatches[index])}\n\n\n'),
-                            ), onTap: () {
-                              appState.waitCurrentAction<bool>(
-                                  PageAction(
-                                      state: PageState.addWidget,
-                                      widget: BatchDetails(
-                                          batch: draftBatches[index]),
-                                      pageConfig: DetailsPageConfig)
-                              ).then((shouldRefresh) {
-                                if(shouldRefresh!){ //TODO:  Manejar el resultado de la pantalla Batch Details
-                                  setState(() {
-                                    _localData = getScreenData();
+                          (int index) => DataRow(cells: <DataCell>[
+                            DataCell(
+                                ListTile(
+                                  isThreeLine: true,
+                                  leading: const Icon(
+                                      FontAwesomeIcons.archive,
+                                      color: Colors.grey),
+                                  title: Text(
+                                      '${_getBatchTitle(draftBatches[index])}',
+                                      style: const TextStyle(fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black)),
+                                  subtitle: Text('${_getBatchSubTitle(
+                                      draftBatches[index])}\n\n\n'),
+                                ),
+                                onTap: () {
+                                  appState.waitCurrentAction<bool>(
+                                      PageAction(
+                                          state: PageState.addWidget,
+                                          widget: BatchDetails(
+                                              batch: draftBatches[index]),
+                                          pageConfig: DetailsPageConfig)
+                                  ).then((shouldRefresh) {
+                                    if (shouldRefresh!) { //TODO:  Manejar el resultado de la pantalla Batch Details
+                                      setState(() {
+                                        _localData = getScreenData();
+                                      });
+                                    }
                                   });
                                 }
-                              });
-
-                            })
+                            )
                           ],
 
                             //selected: selected[index],
@@ -189,11 +192,21 @@ class _BatchesState extends State<Batches> {
                         const DataColumn(
                           label: Text('Lotes en Auditoria',
                               style: TextStyle(fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black
+                              )
+                          ),
+                        ),
+                        const DataColumn(
+                            label: Text('Estado',
+                                style: TextStyle(fontSize: 18.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
+                                  color: Colors.black
+                                )
+                            ),
                         ),
                       ],
-                        rows: List<DataRow>.generate (
+                      rows: List<DataRow>.generate (
                           auditedBatches.length,
                               (int index) =>
                               DataRow(
@@ -209,22 +222,23 @@ class _BatchesState extends State<Batches> {
                                             color: Colors.black)),
                                     subtitle: Text('${_getBatchSubTitle(
                                         auditedBatches[index])}\n\n\n'),
-                                  ), onTap: () {
+                                  ),
+                                  onTap: () {
                                     appState.waitCurrentAction<bool>(
                                         PageAction(
                                             state: PageState.addWidget,
                                             widget: BatchDetails(
                                                 batch: auditedBatches[index]),
                                             pageConfig: DetailsPageConfig))
-                                    .then((shouldRefresh) {
-                                      if(shouldRefresh! == true){
+                                        .then((shouldRefresh) {
+                                      if (shouldRefresh! == true) {
                                         setState(() {
                                           _localData = getScreenData();
                                         });
                                       }
                                     });
-
-                                  })
+                                  }),
+                                  DataCell(Text(auditedBatches[index].state!))
                                 ],
                                 //selected: selected[index],
                               ),

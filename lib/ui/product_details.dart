@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:navigation_app/services/athento/binary_file_info.dart';
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
@@ -33,7 +30,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   ProductInfo? _productInfo;
   Map<String, PhotoDetail> _takenPictures = {};
   var _referenceModified = false;
-  var _modifiedPhotos = ProductPhotos([]);
+  final _modifiedPhotos =  ProductPhotos([]);
 
   @override
   void initState(){
@@ -47,7 +44,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     var enabled_value = true;
     final product = widget.product;
     final newProductDetails = this;
-    final _batch = this.widget.batch;
+    final _batch = widget.batch;
     if (_batch.state!=BatchStates.Draft){
       enabled_value = false;
     }
@@ -100,7 +97,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ,icon: Image.asset(
                       'assets/images/boton_athento.png',
                       height: 40.0,width: 40.0,),
-                    label: Text(''),
+                    label: const Text(''),
                   ),
                 ],
               ),
@@ -108,8 +105,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                 child: ListView(
                   children: [
                     Container(
-                      margin: EdgeInsets.only(top: 8),
-                      padding: EdgeInsets.all(15),
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.all(15),
                       child: TextField(
                         autofocus: true,
                         keyboardType: TextInputType.text,
@@ -124,7 +121,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 children: <InlineSpan>[
                                   WidgetSpan(
                                     child: Text(
-                                        'EAN:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                        'EAN:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               )
@@ -133,8 +130,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 8),
-                      padding: EdgeInsets.all(15),
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.all(15),
                       child: TextField(
                         autofocus: true,
                         keyboardType: TextInputType.text,
@@ -149,7 +146,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 children: <InlineSpan>[
                                   WidgetSpan(
                                     child: Text(
-                                        'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                        'Descripcion:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               )
@@ -158,8 +155,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 8),
-                      padding: EdgeInsets.all(15),
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.all(15),
                       child: TextField(
                         autofocus: true,
                         keyboardType: TextInputType.text,
@@ -177,7 +174,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 children: <InlineSpan>[
                                   WidgetSpan(
                                     child: Text(
-                                        'Referencia:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                        'Referencia:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               )
@@ -189,7 +186,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
                    ),
                    Padding(
-                      padding: EdgeInsets.only(top:16.0),
+                      padding: const EdgeInsets.only(top:16.0),
                      child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -264,11 +261,11 @@ class _ProductDetailsState extends State<ProductDetails> {
             widget = Center(
                 child: Stack(
                     children: <Widget>[
-                      Opacity(
+                      const Opacity(
                         opacity: 1,
                         child: CircularProgressIndicator(backgroundColor: Colors.grey),
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(top: 16),
                         child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                       )
@@ -310,7 +307,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       else{
         final missingPhotos = _productInfo!.auditRules.photos.where((p) => _doesNotContainPhoto(existingPhotoDetails, p.name)).toList();
 
-        for(var photoAuditInfo in missingPhotos){
+        for(final photoAuditInfo in missingPhotos){
           existingPhotoDetails[photoAuditInfo.name] = PhotoDetail(uuid: null, content: null);
         }
       }

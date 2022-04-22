@@ -3,6 +3,7 @@ import 'package:navigation_app/services/athento/athento_field_name.dart';
 
 class Product {
   String? uuid;
+  String? state;
   String title;
   String EAN;
   String commercialCode;
@@ -11,9 +12,11 @@ class Product {
                           // Lo mismo para los demás autonuméricos en cada formulario de Athento
   String description;
 
+
   // TODO: hacer requeridos los parámetros necesarios
   Product({
     this.uuid,
+    this.state,
     required this.title,
     required this.EAN,
     required this.commercialCode,
@@ -24,6 +27,7 @@ class Product {
   Map<String, dynamic> toJSON() {
     return {
       AthentoFieldName.uuid: uuid,
+      AthentoFieldName.state: state,
       AthentoFieldName.title: title,
       ProductAthentoFieldName.requestNumber: requestNumber,
       ProductAthentoFieldName.EAN: EAN,
@@ -35,6 +39,7 @@ class Product {
 
   Product.fromJSON(Map<String, dynamic> json):
     uuid = json[AthentoFieldName.uuid],
+    state = json[AthentoFieldName.state],
     title = json[AthentoFieldName.title],
     EAN = json[ProductAthentoFieldName.EAN],
     commercialCode = json[ProductAthentoFieldName.commercialCode],
