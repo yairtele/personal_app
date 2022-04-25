@@ -203,6 +203,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
                                 await _updateProduct(_referenceModified, _reference.text, _takenPictures, product);
+
+                                appState.returnWith(true);
+
                                 _showSnackBar('Producto actualizado con éxito');
                               }
                               on BusinessException catch (e){
@@ -226,6 +229,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Eliminando producto...');
                                 await _deleteProduct(product);
+                                appState.returnWith(true);
                                 _showSnackBar('Producto eliminado con éxito');
                               }
                               on BusinessException catch (e){
