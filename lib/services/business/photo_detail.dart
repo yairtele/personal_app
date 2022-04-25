@@ -1,12 +1,14 @@
 import 'package:image_picker/image_picker.dart';
 
 class PhotoDetail {
-  String? uuid;
-  XFile? content;
+  String uuid;
+  XFile content;
+  bool isDummy;
 
   PhotoDetail({
-    this.uuid,
-    required this.content
+    required this.uuid,
+    required this.content,
+    required this.isDummy
   });
 
 }

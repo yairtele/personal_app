@@ -67,7 +67,10 @@ class SpUI{
                     onPressed: () async {
                       //TODO: ver si se debe borrar el archivo donde estaba la foto
                       state.setState(() {
-                        photos[photoName] = ThumbPhoto(dummyPhoto,  true);
+                        //photos[photoName] = ThumbPhoto(dummyPhoto,  true);
+                        photo.isDummy = true;
+                        photo.photo = dummyPhoto;
+                        photo.hasChanged = true;
                       });
                     },
                   )
@@ -82,7 +85,9 @@ class SpUI{
                       //if(cameraOn) {
                         final pickedPhoto = await _getPhotoFromCamera();
                         state.setState(() {
-                          photos[photoName] = pickedPhoto != null ? ThumbPhoto(pickedPhoto, false) : ThumbPhoto(dummyPhoto, true);
+                          photo.photo = pickedPhoto ?? dummyPhoto;
+                          photo.isDummy = pickedPhoto == null;
+                          photo.hasChanged = true;
                         });
                       //}
                     },
@@ -94,6 +99,7 @@ class SpUI{
     );
   }
 
+  /*
   static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos,required Batch batch}) {
 
     return GridView.count(
@@ -117,7 +123,7 @@ class SpUI{
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
         decoration: BoxDecoration(
-          color: (photo?.name ?? 'sasas') == 'img_not_found.jpg' ?  Colors.yellow.shade300: Theme.of(context).backgroundColor,
+          color: (photos[photoName]. ?? 'sasas') == 'img_not_found.jpg' ?  Colors.yellow.shade300: Theme.of(context).backgroundColor,
           border: Border.all(
                 color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
         ),
@@ -191,7 +197,8 @@ class SpUI{
         )
     );
   }
-
+*/
+/*
   static Widget buildReturnRequestThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos,required Batch batch}) {
 
     return GridView.count(
@@ -288,6 +295,7 @@ class SpUI{
         )
     );
   }
+*/
 
   static Future<XFile?> _getPhotoFromCamera() async {
     final pickedFile = await ImagePicker().pickImage(

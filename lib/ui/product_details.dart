@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
@@ -8,8 +9,10 @@ import 'package:navigation_app/services/business/product_detail.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
+import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,9 +31,12 @@ class  ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   late Future<ScreenData<Product, ProductDetail>> _localData;
   ProductInfo? _productInfo;
-  Map<String, PhotoDetail> _takenPictures = {};
+  //Map<String, PhotoDetail> _takenPictures = {};
+  Map<String, ThumbPhoto> _takenPictures = {};
+
   var _referenceModified = false;
   final _modifiedPhotos =  ProductPhotos([]);
+  late XFile _dummyPhoto;
 
   @override
   void initState(){
@@ -43,7 +49,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     final appState = Provider.of<AppState>(context, listen: false);
     var enabled_value = true;
     final product = widget.product;
-    final newProductDetails = this;
+    final newProductDetailsState = this;
     final _batch = widget.batch;
     if (_batch.state!=BatchStates.Draft){
       enabled_value = false;
@@ -183,8 +189,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                   Container(
-                    child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
-                   ),
+                      //child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
+                      child: SpUI.buildThumbnailsGridView(state: newProductDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto)
+            ),
                    Padding(
                       padding: const EdgeInsets.only(top:16.0),
                      child: Row(
@@ -195,7 +202,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             onPressed: () async {
                               try{
                                 WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
-                                await _updateProduct(_referenceModified, _reference.text, _modifiedPhotos, _takenPictures, product);
+                                await _updateProduct(_referenceModified, _reference.text, _takenPictures, product);
                                 _showSnackBar('Producto actualizado con éxito');
                               }
                               on BusinessException catch (e){
@@ -280,9 +287,22 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 
   Future<ProductDetail> _getProductDetail(Product? product) async {
+    _dummyPhoto = await SpAssetUtils.getImageXFileFromAssets('images/img_not_found.jpg');
     _productInfo = await BusinessServices.getProductInfoByEAN(product!.EAN);
     final productExistingPhotos = await BusinessServices.getPhotosByProductUUID(product.uuid!);
-    final productPhotos = await _getFullPhotosInfo(productExistingPhotos);
+    //final productPhotos = (await _getFullPhotosInfo(productExistingPhotos))
+    //  .map((key, photoDetail) => MapEntry(key, ThumbPhoto(uuid: photoDetail.uuid, photo: photoDetail.content!, isDummy: photoDetail.isDummy)));
+    final productPhotos = productExistingPhotos
+      .map((key, photoDetail) => MapEntry(
+        key,
+        ThumbPhoto(
+          uuid: photoDetail.uuid,
+          photo: photoDetail.content,
+          isDummy: photoDetail.isDummy,
+          hasChanged: false
+        )
+      )
+    );
 
     return ProductDetail(productInfo: _productInfo!, productPhotos: productPhotos);
   }
@@ -297,6 +317,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     return !existingPhotos.containsKey(photoName);
   }
 
+  /*
   Future<Map<String,PhotoDetail>> _getFullPhotosInfo(Map<String, PhotoDetail> existingPhotoDetails) async {
 
       //var existingPhotos = _getPhotoContents(existingPhotoDetails);
@@ -314,7 +335,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
       return existingPhotoDetails;
   }
-
+*/
 /*  Map<String, XFile?> _getPhotoContents(Map<String, PhotoDetail> photoDetails) {
     var photos = <String, XFile?>{};
 
@@ -325,8 +346,20 @@ class _ProductDetailsState extends State<ProductDetails> {
     return photos;
   }*/
 
-  Future<void> _updateProduct(bool referenceModified, String reference, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos, Product product) async {
-    await BusinessServices.updateProduct(referenceModified, reference, modifiedPhotos, photos, product);
+  Future<void> _updateProduct(bool referenceModified, String reference,  Map<String, ThumbPhoto> photos, Product product) async {
+    final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
+
+    final photosToUpdate = Map<String, ThumbPhoto>.fromEntries(changedPhotos)
+        .map((key, thumbPhoto) => MapEntry(
+        key,
+        PhotoDetail(
+          uuid: thumbPhoto.uuid!,
+          content: thumbPhoto.photo,
+          isDummy: thumbPhoto.isDummy
+        )
+      )
+    );
+    await BusinessServices.updateProduct(referenceModified, reference,  photosToUpdate, product);
   }
 
   Future <void> _deleteProduct(Product product) async {

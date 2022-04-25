@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
@@ -7,10 +8,12 @@ import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/return_request_detail.dart';
+import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/ui/product_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,8 +33,9 @@ class  ReturnRequestDetails extends StatefulWidget {
 class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   late Future<ScreenData<String, ReturnRequestDetail>> _localData;
   bool _shouldRefreshParent = false;
-  Map<String, PhotoDetail> _takenPictures = {};
+  Map<String, ThumbPhoto> _takenPictures = {};
   final _modifiedPhotos = ProductPhotos([]);
+  late XFile _dummyPhoto;
 
   @override
   void initState() {
@@ -49,7 +53,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     var enabled_value=true;
     final appState = Provider.of<AppState>(context, listen: false);
     final returnRequest = widget.returnRequest;
-    final newReturnRequestDetails = this;
+    final newReturnRequestDetailsState = this;
 
     final _batch = widget.batch;
     if (_batch.state!=BatchStates.Draft){
@@ -70,7 +74,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
               final data = snapshot.data!;
               final shouldShowStateColumn = returnRequest.state != 'Draft';
-              _takenPictures = data.data!.optionalPhoto;
+              _takenPictures = data.data!.optionalPhotos;
               final products = data.data!.products;
               final reference = returnRequest.retailReference;
               final _eanTextController = TextEditingController(
@@ -402,7 +406,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         )
                     else
                       Container(
-                          child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
+                        //child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
+                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto)
+
                       )
                     ],
                   ),
@@ -451,10 +457,22 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   }
 
   Future<ReturnRequestDetail> _getReturnRequestDetail(String? returnRequestUUID) async {
-    final products = await _getProducts(returnRequestUUID);
-    final optionalPhoto = await _getOptionalPhoto(returnRequestUUID);
+    _dummyPhoto = await SpAssetUtils.getImageXFileFromAssets('images/img_not_found.jpg');
 
-    return ReturnRequestDetail(products: products, optionalPhoto: optionalPhoto);
+    final products = await _getProducts(returnRequestUUID);
+    final optionalPhotos = await _getOptionalPhoto(returnRequestUUID);
+    final returnPhotos = optionalPhotos
+        .map((key, photoDetail) => MapEntry(
+        key,
+        ThumbPhoto(
+            uuid: photoDetail.uuid,
+            photo: photoDetail.content,
+            isDummy: photoDetail.isDummy,
+            hasChanged: false
+        )
+    )
+    );
+    return ReturnRequestDetail(products: products, optionalPhotos: returnPhotos);
   }
 
   Future<List<Product>> _getProducts(String? returnRequestUUID) async {
@@ -469,9 +487,22 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   }
 
   Future<void> _updateReqReturn(ReturnRequest req_return, String EAN,
-      String reference, String description, String unities, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos) async {
+      String reference, String description, String unities, ProductPhotos modifiedPhotos, Map<String, ThumbPhoto> photos) async {
+
+    final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
+
+    final photosToUpdate = Map<String, ThumbPhoto>.fromEntries(changedPhotos)
+        .map((key, thumbPhoto) => MapEntry(
+        key,
+        PhotoDetail(
+            uuid: thumbPhoto.uuid!,
+            content: thumbPhoto.photo,
+            isDummy: thumbPhoto.isDummy
+        )
+    )
+    );
     await BusinessServices.updateReqReturn(
-        req_return, EAN, reference, description, unities, modifiedPhotos, photos);
+        req_return, EAN, reference, description, unities, modifiedPhotos, photosToUpdate);
   }
 
   Future<Map<String,PhotoDetail>> _getOptionalPhoto(returnRequestUUID) async {
