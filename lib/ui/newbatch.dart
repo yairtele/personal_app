@@ -7,11 +7,15 @@ import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
+import 'package:navigation_app/services/business/new_return.dart';
+import 'package:navigation_app/ui/batches.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 
 import '../app_state.dart';
+import '../router/ui_pages.dart';
+import 'newreturn.dart';
 
 
 class NewBatch extends StatefulWidget {
@@ -41,16 +45,15 @@ class _NewBatchState extends State<NewBatch> {
   TextEditingController referenceTextController = TextEditingController();
   TextEditingController descriptionTextController = TextEditingController();
   TextEditingController observationTextController = TextEditingController();
+  var _shouldRefreshParent = false;
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    referenceTextController.text= appState.reference;
-    descriptionTextController.text = appState.description;
-    observationTextController.text = appState.observation;
+    _shouldRefreshParent = false;
     return WillPopScope(
       onWillPop: () {
-        appState.returnWith(false);
+        appState.returnWith(_shouldRefreshParent);
 
         //we need to return a future
         return Future.value(false);
@@ -156,10 +159,31 @@ class _NewBatchState extends State<NewBatch> {
                       child: const Text('Crear lote'),
                       onPressed: () async {
                         try{
+                          var uuid;
+                          final cuitRetail = (await Cache.getUserInfo())!.idNumber;
+                          final retailCompanyName = (await Cache.getCompanyName())!;
                           WorkingIndicatorDialog().show(context, text: 'Creando nuevo lote...');
-                          await _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
-                          appState.returnWith(true);
-
+                          final response = await _createBatch(referenceTextController.text, descriptionTextController.text,observationTextController.text);
+                          //Obtengo datos del lote recien creado
+                          for (var param in response.keys){
+                            if (param == 'uid') {
+                            uuid = response[param];
+                            }
+                          }
+                          appState.waitCurrentAction(PageAction(state: PageState.addWidget,
+                              widget: NewReturnScreen(batch: Batch(
+                                uuid: uuid,
+                                title: '${referenceTextController.text} - ${descriptionTextController.text}',
+                                state:BatchStates.Draft,
+                                retailReference: referenceTextController.text,
+                                description: descriptionTextController.text,
+                                cuitRetail: cuitRetail,
+                                retailCompanyName: retailCompanyName,
+                                observation:observationTextController.text,
+                              )),
+                              pageConfig: NewReturnPageConfig));
+                          //appState.returnWith(true);
+                          _shouldRefreshParent = true;
                           _showSnackBar('Nuevo batch creado con éxito');
                         }
                         on BusinessException catch (e){
@@ -184,10 +208,10 @@ class _NewBatchState extends State<NewBatch> {
     );
   }
 
-  Future<void> _createBatch(String retailReference, String description, String observation) async {
+  Future<Map<String, dynamic>> _createBatch(String retailReference, String description, String observation) async {
     final cuitRetail = (await Cache.getUserInfo())!.idNumber;
     final retailCompanyName = (await Cache.getCompanyName())!;
-    await BusinessServices.createBatch(Batch(
+    final response = await BusinessServices.createBatch(Batch(
         title: '$retailReference - $description',
         state:BatchStates.Draft,
         retailReference: retailReference,
@@ -196,6 +220,7 @@ class _NewBatchState extends State<NewBatch> {
         retailCompanyName: retailCompanyName,
         observation:observation,
     ));
+    return response;
   }
 
   void _showSnackBar(String message){

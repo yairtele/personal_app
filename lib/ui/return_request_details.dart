@@ -114,7 +114,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       icon: const Icon(Icons.add),
                       onPressed: () => //TODO: ver si se debe poder realizar una nueva devolución para los EAN no autitables, o cómo precargar los datos en la pantalla NewReturn
                       appState.waitCurrentAction<bool>(
-                          PageAction(state: PageState.addPage,
+                          PageAction(state: PageState.addWidget,
                               widget: NewReturnScreen(batch: this.widget.batch, returnRequest: this.widget.returnRequest),
                               pageConfig: NewReturnPageConfig))
                       .then((shouldRefresh) {

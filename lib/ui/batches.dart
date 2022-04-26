@@ -76,7 +76,6 @@ class _BatchesState extends State<Batches> {
             final batches = data.data!;
             final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
             final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
-
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -158,7 +157,7 @@ class _BatchesState extends State<Batches> {
                                       FontAwesomeIcons.archive,
                                       color: Colors.grey),
                                   title: Text(
-                                      '${_getBatchTitle(draftBatches[index])}',
+                                      '${draftBatches[index].batchNumber}',
                                       style: const TextStyle(fontSize: 14.0,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black)),
@@ -216,7 +215,7 @@ class _BatchesState extends State<Batches> {
                                         FontAwesomeIcons.archive,
                                         color: Colors.blue),
                                     title: Text(
-                                        '${_getBatchTitle(auditedBatches[index])}',
+                                        '${auditedBatches[index].batchNumber}',
                                         style: const TextStyle(fontSize: 14.0,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black)),
@@ -306,9 +305,12 @@ class _BatchesState extends State<Batches> {
     return batchRetailReference != '' ? batchRetailReference : batchDescription;
   }
   String _getBatchSubTitle(Batch batch) {
-    final batchDescription = (batch.description ?? '' ).trim();
+    var batchDescription = (batch.description ?? '' ).trim();
+    if (batchDescription.length==0){
+      batchDescription = '(sin descripción)';
+    }
     final batchRetailReference = (batch.retailReference ?? '').trim();
-    return batchDescription  != '' ? batchDescription : '(sin descripción)';
+    return batchRetailReference  != '' ? batchRetailReference : batchDescription;
   }
 }
 
