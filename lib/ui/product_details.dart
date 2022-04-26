@@ -352,16 +352,18 @@ class _ProductDetailsState extends State<ProductDetails> {
   }*/
 
   Future<void> _updateProduct(bool referenceModified, String reference,  Map<String, ThumbPhoto> photos, Product product) async {
-    final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
+    //final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
 
-    final photosToUpdate = Map<String, ThumbPhoto>.fromEntries(changedPhotos)
+    //final photosToUpdate = Map<String, ThumbPhoto>.fromEntries(changedPhotos)
+    final photosToUpdate = photos
         .map((key, thumbPhoto) => MapEntry(
         key,
         PhotoDetail(
           uuid: thumbPhoto.uuid!,
           content: thumbPhoto.photo,
           isDummy: thumbPhoto.isDummy,
-          state: thumbPhoto.state
+          state: thumbPhoto.state,
+          hasChanged: thumbPhoto.hasChanged
         )
       )
     );

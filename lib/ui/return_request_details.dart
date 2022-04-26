@@ -34,7 +34,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   late Future<ScreenData<String, ReturnRequestDetail>> _localData;
   bool _shouldRefreshParent = false;
   Map<String, ThumbPhoto> _takenPictures = {};
-  final _modifiedPhotos = ProductPhotos([]);
   late XFile _dummyPhoto;
 
   @override
@@ -155,7 +154,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
                           controller: _eanTextController,
-                          enabled: enabled_value,
+                          enabled: false,
                           decoration: const InputDecoration(
                             hintText: 'EAN',
                             label: Text.rich(
@@ -183,9 +182,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           textInputAction: TextInputAction.send,
                           maxLength: 50,
                           controller: _skuTextController,
-                          enabled: enabled_value,
+                          enabled: false,
                           decoration: const InputDecoration(
-                            hintText: 'EAN',
+                            hintText: 'Código de inventario',
                             label: Text.rich(
                                 TextSpan(
                                   children: <InlineSpan>[
@@ -233,7 +232,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(15),
                         child: TextField(
-                          enabled: enabled_value,
+                          enabled: false,
                           autofocus: false,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.send,
@@ -260,7 +259,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(15),
                         child: TextField(
-                          enabled: enabled_value,
+                          enabled: enabled_value && returnRequest.isAuditable == false,
                           autofocus: false,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.send,
@@ -294,7 +293,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
-                                  await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _modifiedPhotos, _takenPictures);
+                                  await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _takenPictures);
                                   _shouldRefreshParent = true;
                                   _showSnackBar('Solicitud actualizada con éxito');
                                 }
@@ -488,7 +487,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   }
 
   Future<void> _updateReqReturn(ReturnRequest req_return, String EAN,
-      String reference, String description, String unities, ProductPhotos modifiedPhotos, Map<String, ThumbPhoto> photos) async {
+      String reference, String description, String unities, Map<String, ThumbPhoto> photos) async {
 
     final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
 
@@ -499,12 +498,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           uuid: thumbPhoto.uuid!,
           content: thumbPhoto.photo,
           isDummy: thumbPhoto.isDummy,
-          state: thumbPhoto.state
+          state: thumbPhoto.state,
+          hasChanged: thumbPhoto.hasChanged
         )
     )
     );
     await BusinessServices.updateReqReturn(
-        req_return, EAN, reference, description, unities, modifiedPhotos, photosToUpdate);
+        req_return, EAN, reference, description, unities, photosToUpdate);
   }
 
   Future<Map<String,PhotoDetail>> _getOptionalPhoto(returnRequestUUID) async {
