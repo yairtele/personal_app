@@ -190,7 +190,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ),
                   Container(
                       //child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
-                      child: SpUI.buildThumbnailsGridView(state: newProductDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto)
+                      child: SpUI.buildThumbnailsGridView(state: newProductDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: product.state!)
             ),
                    Padding(
                       padding: const EdgeInsets.only(top:16.0),
@@ -303,7 +303,8 @@ class _ProductDetailsState extends State<ProductDetails> {
           uuid: photoDetail.uuid,
           photo: photoDetail.content,
           isDummy: photoDetail.isDummy,
-          hasChanged: false
+          hasChanged: false,
+          state: photoDetail.state!
         )
       )
     );
@@ -359,7 +360,8 @@ class _ProductDetailsState extends State<ProductDetails> {
         PhotoDetail(
           uuid: thumbPhoto.uuid!,
           content: thumbPhoto.photo,
-          isDummy: thumbPhoto.isDummy
+          isDummy: thumbPhoto.isDummy,
+          state: thumbPhoto.state
         )
       )
     );

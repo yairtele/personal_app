@@ -407,7 +407,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     else
                       Container(
                         //child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
-                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto)
+                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: returnRequest.state!)
 
                       )
                     ],
@@ -468,7 +468,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             uuid: photoDetail.uuid,
             photo: photoDetail.content,
             isDummy: photoDetail.isDummy,
-            hasChanged: false
+            hasChanged: false,
+            state: photoDetail.state!
         )
     )
     );
@@ -495,9 +496,10 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
         .map((key, thumbPhoto) => MapEntry(
         key,
         PhotoDetail(
-            uuid: thumbPhoto.uuid!,
-            content: thumbPhoto.photo,
-            isDummy: thumbPhoto.isDummy
+          uuid: thumbPhoto.uuid!,
+          content: thumbPhoto.photo,
+          isDummy: thumbPhoto.isDummy,
+          state: thumbPhoto.state
         )
     )
     );

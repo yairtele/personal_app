@@ -342,7 +342,7 @@ class BusinessServices {
       }
 
       // Validar cantidad de fotos
-      if (newReturn.photos.length < 1) {
+      if (!newReturn.photos.values.any((photo) => photo.isDummy == false)) {
         throw BusinessException(
             'Los productos auditables deben tener al menos foto.');
       }
@@ -608,7 +608,8 @@ class BusinessServices {
         takenPictures[photo.label] = PhotoDetail(
           uuid: photo.uuid,
           content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid),
-          isDummy: photo.isDummy
+          isDummy: photo.isDummy,
+          state: photo.state
         );
       }
     //}
@@ -677,7 +678,7 @@ class BusinessServices {
 
     if(referenceModified) {
       final  fieldValues = {
-        '${ProductAthentoFieldName.retailReference}': '${reference}'
+        ProductAthentoFieldName.retailReference: reference
       };
 
       SpAthentoServices.updateDocument(configProvider: configProvider,
@@ -685,21 +686,39 @@ class BusinessServices {
           fieldValues: fieldValues);
     }
 
-    _updatePhotos(configProvider, photos);
+    await _updatePhotos(configProvider, photos);
 
   }
 
-  static void _updatePhotos(ConfigProvider configProvider, Map<String, PhotoDetail> photos) async {
+  static Future<void> _updatePhotos(ConfigProvider configProvider, Map<String, PhotoDetail> photos) async {
     for(final entry in photos.entries) {
         final photoName = entry.key;
         final photoDetail = entry.value;
         final photoFileExtension = SpFileUtils.getFileExtension(photoDetail.content.path);
+
+        // Actualizar binario
         await SpAthentoServices.updateDocumentContent(
             configProvider: configProvider,
             documentUUID: photoDetail.uuid,
             content: await photos[photoName]!.content.readAsBytes(),
             friendlyFileName: '$photoName$photoFileExtension'
         );
+
+        // Actualizar metadatos
+        final photoState = photoDetail.state == BatchStates.InfoPendiente && photoDetail.isDummy != false ? BatchStates.InfoEnviada : photoDetail.state;
+
+        final fieldValues = {
+          if (photoState == BatchStates.InfoEnviada)
+            AthentoFieldName.state: photoState,
+          ProductPhotoAthentoFieldName.isDummy: photoDetail.isDummy
+        };
+
+        await SpAthentoServices.updateDocument(
+            configProvider: configProvider,
+            documentUUID: photoDetail.uuid,
+            fieldValues: fieldValues);
+
+
         File(photoDetail.content.path).delete();
     }
   }

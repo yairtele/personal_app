@@ -1,5 +1,6 @@
 //import 'dart:html';
 
+import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/return_photo.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
@@ -386,7 +387,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   //},
                                                 ),
                                               ),
-                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto),
+                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _existingReturnRequest?.state ?? BatchStates.Draft),
                                           ]),
                                     ]),
                                 //)
@@ -597,11 +598,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
 
       if (productInfo.auditRules.photos.length == 0){
-        _takenPictures['otra'] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true);
+        _takenPictures['otra'] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
       }
       else{
         productInfo.auditRules.photos.forEach((photoAuditInfo) {
-          _takenPictures[photoAuditInfo.name] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true);
+          _takenPictures[photoAuditInfo.name] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
         });
       }
 

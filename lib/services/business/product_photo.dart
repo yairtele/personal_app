@@ -17,9 +17,9 @@ class ProductPhoto {
   });
 
   ProductPhoto.fromJSON(Map<String, dynamic> json):
-    uuid = json[AthentoFieldName.uuid],
-    state = json[AthentoFieldName.uuid],
-    title = json[AthentoFieldName.title],
+    uuid = json[ProductPhotoAthentoFieldName.uuid],
+    state = json[ProductPhotoAthentoFieldName.state],
+    title = json[ProductPhotoAthentoFieldName.title],
     label = json[ProductPhotoAthentoFieldName.photoType],
     isDummy = json[ProductPhotoAthentoFieldName.isDummy] == 'true';
 }

@@ -5,6 +5,7 @@ class ThumbPhoto {
   XFile photo;
   bool isDummy;
   bool hasChanged;
+  String state;
 
-  ThumbPhoto({this.uuid, required XFile this.photo, required this.isDummy, required this.hasChanged});
+  ThumbPhoto({this.uuid, required XFile this.photo, required this.isDummy, required this.hasChanged, required this.state});
 }

@@ -12,7 +12,7 @@ import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto, required String photoParentState}) {
 
     return GridView.count(
         primary: false,
@@ -23,12 +23,12 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto)
+            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto, photoParentState)
         ]
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto) {
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto, photoParentState) {
     final photo = photos[photoName]!;
 
     return Container(
@@ -64,7 +64,7 @@ class SpUI{
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(4),
                     ),
-                    onPressed: () async {
+                    onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null : () async {
                       //TODO: ver si se debe borrar el archivo donde estaba la foto
                       state.setState(() {
                         //photos[photoName] = ThumbPhoto(dummyPhoto,  true);
@@ -81,7 +81,7 @@ class SpUI{
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(4),
                     ),
-                    onPressed: () async {
+                    onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
                       //if(cameraOn) {
                         final pickedPhoto = await _getPhotoFromCamera();
                         state.setState(() {
@@ -350,5 +350,9 @@ class SpUI{
         return alert;
       },
     );
+  }
+
+  static bool _shouldDisablePhotoButton(String photoParentState, String photoState) {
+    return photoParentState != BatchStates.Draft && photoState != BatchStates.InfoPendiente;
   }
 }
