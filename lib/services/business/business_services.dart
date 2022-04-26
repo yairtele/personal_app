@@ -607,7 +607,7 @@ class BusinessServices {
 
         takenPictures[photo.label] = PhotoDetail(
           uuid: photo.uuid,
-          content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid),
+          content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, photo.uuid),
           isDummy: photo.isDummy,
           state: photo.state
         );
@@ -718,8 +718,19 @@ class BusinessServices {
             documentUUID: photoDetail.uuid,
             fieldValues: fieldValues);
 
+        _silentlyDeleteFile(photoDetail.content.path);
+    }
+  }
 
-        File(photoDetail.content.path).delete();
+  static void _silentlyDeleteFile(String path){
+    try{
+      if (!path.contains('img_not_found.jpg')){
+        File(path).delete();
+      }
+    }
+    on Exception catch (e){
+      print('Error borrando archivo: ' + path);
+      final foo = e;
     }
   }
 

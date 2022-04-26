@@ -12,9 +12,10 @@ class SpProductUtils{
     return BusinessServices.getProductInfoByEAN(eanCode);
   }
 
-  static Future<XFile> binaryFileInfo2XFile(BinaryFileInfo content, String label, String prodUuid) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final tempPath = dir.path + '/' + label + prodUuid;
+  static Future<XFile> binaryFileInfo2XFile(BinaryFileInfo content, String label, String photoUUID) async {
+    //final dir = await getApplicationDocumentsDirectory();
+    final dir = await getTemporaryDirectory();
+    final tempPath = dir.path + '/' + label + '-' + photoUUID;
     final fil = File(tempPath);
     fil.writeAsBytes(content.bytes);
 
