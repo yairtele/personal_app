@@ -1,5 +1,7 @@
 //import 'dart:html';
 
+import 'package:navigation_app/services/business/batch_states.dart';
+import 'package:navigation_app/services/business/return_photo.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
@@ -385,7 +387,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   //},
                                                 ),
                                               ),
-                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto),
+                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _existingReturnRequest?.state ?? BatchStates.Draft),
                                           ]),
                                     ]),
                                 //)
@@ -399,10 +401,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   onPressed: () async {
                                     try{
                                       WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
-                                      final thumbsWithPhotos = _takenPictures.entries
-                                          .map((e) => MapEntry<String, String>(e.key, e.value.photo.path));
 
-                                      final photosToSave = Map<String, String>.fromEntries(thumbsWithPhotos);
+                                      final photosToSave = _takenPictures.map(
+                                              (key, thumbPhoto) => MapEntry(key, ReturnPhoto(path: thumbPhoto.photo.path, isDummy: thumbPhoto.isDummy))
+                                      );
 
                                       final product = _product!;
                                       final newReturn = NewReturn(
@@ -596,11 +598,11 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
 
       if (productInfo.auditRules.photos.length == 0){
-        _takenPictures['otra'] = ThumbPhoto(_dummyPhoto, true);
+        _takenPictures['otra'] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
       }
       else{
         productInfo.auditRules.photos.forEach((photoAuditInfo) {
-          _takenPictures[photoAuditInfo.name] = ThumbPhoto(_dummyPhoto, true);
+          _takenPictures[photoAuditInfo.name] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
         });
       }
 

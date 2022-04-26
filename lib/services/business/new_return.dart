@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:navigation_app/services/business/return_photo.dart';
 
 
 class NewReturn {
@@ -15,7 +15,7 @@ class NewReturn {
   String legalEntity;
   String businessUnit;
   int? quantity;
-  Map<String, String> photos;
+  Map<String, ReturnPhoto> photos;
 
   NewReturn({
     required this.EAN,

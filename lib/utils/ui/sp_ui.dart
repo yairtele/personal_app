@@ -12,7 +12,7 @@ import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto, required String photoParentState}) {
 
     return GridView.count(
         primary: false,
@@ -23,12 +23,12 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto)
+            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto, photoParentState)
         ]
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto) {
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto, photoParentState) {
     final photo = photos[photoName]!;
 
     return Container(
@@ -64,10 +64,13 @@ class SpUI{
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(4),
                     ),
-                    onPressed: () async {
+                    onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null : () async {
                       //TODO: ver si se debe borrar el archivo donde estaba la foto
                       state.setState(() {
-                        photos[photoName] = ThumbPhoto(dummyPhoto,  true);
+                        //photos[photoName] = ThumbPhoto(dummyPhoto,  true);
+                        photo.isDummy = true;
+                        photo.photo = dummyPhoto;
+                        photo.hasChanged = true;
                       });
                     },
                   )
@@ -78,11 +81,13 @@ class SpUI{
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(4),
                     ),
-                    onPressed: () async {
+                    onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
                       //if(cameraOn) {
                         final pickedPhoto = await _getPhotoFromCamera();
                         state.setState(() {
-                          photos[photoName] = pickedPhoto != null ? ThumbPhoto(pickedPhoto, false) : ThumbPhoto(dummyPhoto, true);
+                          photo.photo = pickedPhoto ?? dummyPhoto;
+                          photo.isDummy = pickedPhoto == null;
+                          photo.hasChanged = true;
                         });
                       //}
                     },
@@ -94,6 +99,7 @@ class SpUI{
     );
   }
 
+  /*
   static Widget buildProductThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos,required Batch batch}) {
 
     return GridView.count(
@@ -117,7 +123,7 @@ class SpUI{
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
         decoration: BoxDecoration(
-          color: (photo?.name ?? 'sasas') == 'img_not_found.jpg' ?  Colors.yellow.shade300: Theme.of(context).backgroundColor,
+          color: (photos[photoName]. ?? 'sasas') == 'img_not_found.jpg' ?  Colors.yellow.shade300: Theme.of(context).backgroundColor,
           border: Border.all(
                 color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
         ),
@@ -191,7 +197,8 @@ class SpUI{
         )
     );
   }
-
+*/
+/*
   static Widget buildReturnRequestThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, PhotoDetail> photos, required BuildContext context, required ProductPhotos modifiedPhotos,required Batch batch}) {
 
     return GridView.count(
@@ -288,6 +295,7 @@ class SpUI{
         )
     );
   }
+*/
 
   static Future<XFile?> _getPhotoFromCamera() async {
     final pickedFile = await ImagePicker().pickImage(
@@ -342,5 +350,9 @@ class SpUI{
         return alert;
       },
     );
+  }
+
+  static bool _shouldDisablePhotoButton(String photoParentState, String photoState) {
+    return photoParentState != BatchStates.Draft && photoState != BatchStates.InfoPendiente;
   }
 }

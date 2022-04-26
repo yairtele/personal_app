@@ -12,6 +12,7 @@ import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/product_photo.dart';
+import 'package:navigation_app/services/business/return_photo.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product_info.dart';
@@ -310,10 +311,10 @@ class BusinessServices {
         // Crear foto asociada a la solicitud
         final photoEntry = newReturn.photos.entries.toList()[0];
         final photoName = photoEntry.key;
-        final photoPath = photoEntry.value;
-        final photoFileExtension = SpFileUtils.getFileExtension(photoPath);
+        final returnPhoto = photoEntry.value;
+        final photoFileExtension = SpFileUtils.getFileExtension(returnPhoto.path);
         final configProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
-        final fieldValues = _getPhotoFieldValues(photoName);
+        final fieldValues = _getPhotoFieldValues(photoName, returnPhoto.isDummy);
         final photoTitle = '$photoName'; //TODO: En Athento agregar al título de la foto el nro de solicitud???
         final createdPhotoInfo = await SpAthentoServices.createDocumentWithContent(
           configProvider: configProvider,
@@ -321,7 +322,7 @@ class BusinessServices {
           docType: _photoDocType,
           title: photoTitle,
           fieldValues: fieldValues,
-          content: _getImageByteArray(path: photoPath),
+          content: _getImageByteArray(path: returnPhoto.path),
           friendlyFileName: '$photoName$photoFileExtension',
         );
       }
@@ -341,7 +342,7 @@ class BusinessServices {
       }
 
       // Validar cantidad de fotos
-      if (newReturn.photos.length < 1) {
+      if (!newReturn.photos.values.any((photo) => photo.isDummy == false)) {
         throw BusinessException(
             'Los productos auditables deben tener al menos foto.');
       }
@@ -403,10 +404,10 @@ class BusinessServices {
       );
 
       // Crear fotos asociadas al producto. //TODO: ver cómo manejar los errores asociados a la creación
-      newReturn.photos.forEach((String photoName, String photoPath) async {
+      newReturn.photos.forEach((String photoName, ReturnPhoto returnPhoto) async {
         final photoTitle = '${newReturn.retailReference}-$photoName';  //TODO: hacer en Athento algo similar
-        final photoFileExtension = SpFileUtils.getFileExtension(photoPath);
-        final fieldValues = _getPhotoFieldValues(photoName);
+        final photoFileExtension = SpFileUtils.getFileExtension(returnPhoto.path);
+        final fieldValues = _getPhotoFieldValues(photoName, returnPhoto.isDummy);
         final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
 
         final createdPhotoInfo = await SpAthentoServices.createDocumentWithContent(
@@ -415,7 +416,7 @@ class BusinessServices {
           docType: _photoDocType,
           title: photoTitle,
           fieldValues: fieldValues,
-          content: _getImageByteArray(path: photoPath),
+          content: _getImageByteArray(path: returnPhoto.path),
           friendlyFileName: '$photoName$photoFileExtension',
         );
       });
@@ -468,9 +469,10 @@ class BusinessServices {
     return fieldValues;
   }
 
-  static Map<String, dynamic>  _getPhotoFieldValues(String photoName) {
+  static Map<String, dynamic>  _getPhotoFieldValues(String photoName, bool isDummy) {
     return {
-      'tipo_de_foto': photoName,
+      ProductPhotoAthentoFieldName.photoType: photoName,
+      ProductPhotoAthentoFieldName.isDummy: isDummy,
     };
   }
 
@@ -581,7 +583,8 @@ class BusinessServices {
       ProductPhotoAthentoFieldName.uuid,
       ProductPhotoAthentoFieldName.state,
       ProductPhotoAthentoFieldName.title,
-      ProductPhotoAthentoFieldName.photoType
+      ProductPhotoAthentoFieldName.photoType,
+      ProductPhotoAthentoFieldName.isDummy
     ];
 
     // Construir WHERE expression
@@ -595,16 +598,21 @@ class BusinessServices {
 
     final takenPictures = <String, PhotoDetail>{};
 
-    if (productPhotos.length == 0){
-      takenPictures['otra'] = PhotoDetail(content: null);
-    } else {
+    //if (productPhotos.length == 0){
+    //  takenPictures['otra'] = PhotoDetail(content: null, isDummy: true);
+    //} else {
       for (final photo in productPhotos){
 
         final content = await SpAthentoServices.getContentAsBytes(configProvider: configProvider, documentUUID: photo.uuid);
 
-        takenPictures[photo.label] = PhotoDetail(uuid: photo.uuid, content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid));
+        takenPictures[photo.label] = PhotoDetail(
+          uuid: photo.uuid,
+          content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid),
+          isDummy: photo.isDummy,
+          state: photo.state
+        );
       }
-    }
+    //}
     return takenPictures;
   }
 
@@ -649,28 +657,28 @@ class BusinessServices {
   //TODO: los parámetros String returnEAN,String returnreference,String returndescr,String returnunities ya están en el ReturnRequest
   //TODO: no abreviar nombres de métodos como este.
   //TODO: Usar camelCase para los parámetros y variables.
-  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnreference,String returndescr,String returnunities, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos) async{
+  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnReference,String returnDescr,String returnunities, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos) async{
     final configProvider = await  _createConfigProvider();
-    Map<String, dynamic> fieldValues = {
+    final fieldValues = {
       '${ReturnRequestAthentoFieldName.EAN}': '${returnEAN}',
-      '${ReturnRequestAthentoFieldName.retailReference}': '${returnreference}',
-      '${ReturnRequestAthentoFieldName.description}': '${returndescr}',
+      '${ReturnRequestAthentoFieldName.retailReference}': '${returnReference}',
+      '${ReturnRequestAthentoFieldName.description}': '${returnDescr}',
       '${ReturnRequestAthentoFieldName.quantity}': '${returnunities}',
     };
     //TODO:Armado con orden correcto del titulo para la solicitud.
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
 
-    _updatePhotos(configProvider, modifiedPhotos, photos, retReq: req_return);
+    _updatePhotos(configProvider, photos);
   }
 
-  static Future <void> updateProduct (bool referenceModified, String reference, ProductPhotos modifiedPhotos,
+  static Future <void> updateProduct (bool referenceModified, String reference,
       Map<String, PhotoDetail> photos, Product product) async {
 
     final configProvider = await  _createConfigProvider();
 
     if(referenceModified) {
-      Map<String, dynamic> fieldValues = {
-        '${ProductAthentoFieldName.retailReference}': '${reference}'
+      final  fieldValues = {
+        ProductAthentoFieldName.retailReference: reference
       };
 
       SpAthentoServices.updateDocument(configProvider: configProvider,
@@ -678,59 +686,40 @@ class BusinessServices {
           fieldValues: fieldValues);
     }
 
-    _updatePhotos(configProvider, modifiedPhotos, photos, product: product);
+    await _updatePhotos(configProvider, photos);
 
   }
 
-  static void _updatePhotos(ConfigProvider configProvider, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos, {Product? product, ReturnRequest? retReq}) async {
+  static Future<void> _updatePhotos(ConfigProvider configProvider, Map<String, PhotoDetail> photos) async {
+    for(final entry in photos.entries) {
+        final photoName = entry.key;
+        final photoDetail = entry.value;
+        final photoFileExtension = SpFileUtils.getFileExtension(photoDetail.content.path);
 
-    final genericProd;
-    if(product != null){
-      genericProd = product;
-    } else if (retReq != null){
-      genericProd = retReq;
-    } else {
-      throw Error();
-    }
-
-    for(final photoName in modifiedPhotos.modifiedPhotos) {
-      String? photoUUID = photos[photoName]!.uuid;
-
-      if(photoUUID != null){
-        if(photos[photoName]!.content != null) {
-
-          final photoFileExtension = SpFileUtils.getFileExtension(photos[photoName]!.content!.path);
-
-          SpAthentoServices.updateDocumentContent(
-              configProvider: configProvider,
-              documentUUID: photoUUID,
-              content: await photos[photoName]!.content!.readAsBytes(),
-              friendlyFileName: '$photoName$photoFileExtension'
-          );
-
-          File(photos[photoName]!.content!.path).delete();
-        } else {
-          SpAthentoServices.deleteDocument(configProvider: configProvider, documentUUID: photoUUID);
-        }
-      }
-      else {
-        final photoTitle = '${genericProd.retailReference}-$photoName';
-        final photoFileExtension = SpFileUtils.getFileExtension(photos[photoName]!.content!.path);
-        final fieldValues = _getPhotoFieldValues(photoName);
-        final photoConfigProvider = await  _createConfigProvider(_getPhotoFieldNameInferenceConfig());
-
-        await SpAthentoServices.createDocumentWithContent(
-          configProvider: photoConfigProvider,
-          containerUUID: genericProd.uuid!,
-          docType: _photoDocType,
-          title: photoTitle,
-          fieldValues: fieldValues,
-          content: await photos[photoName]!.content!.readAsBytes(),
-          friendlyFileName: '$photoName$photoFileExtension',
+        // Actualizar binario
+        await SpAthentoServices.updateDocumentContent(
+            configProvider: configProvider,
+            documentUUID: photoDetail.uuid,
+            content: await photos[photoName]!.content.readAsBytes(),
+            friendlyFileName: '$photoName$photoFileExtension'
         );
 
-        File(photos[photoName]!.content!.path).delete();
-      }
+        // Actualizar metadatos
+        final photoState = photoDetail.state == BatchStates.InfoPendiente && photoDetail.isDummy != false ? BatchStates.InfoEnviada : photoDetail.state;
+
+        final fieldValues = {
+          if (photoState == BatchStates.InfoEnviada)
+            AthentoFieldName.state: photoState,
+          ProductPhotoAthentoFieldName.isDummy: photoDetail.isDummy
+        };
+
+        await SpAthentoServices.updateDocument(
+            configProvider: configProvider,
+            documentUUID: photoDetail.uuid,
+            fieldValues: fieldValues);
+
+
+        File(photoDetail.content.path).delete();
     }
   }
 
