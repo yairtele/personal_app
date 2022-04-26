@@ -9,7 +9,6 @@ import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/return_request_detail.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
-import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/ui/product_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
