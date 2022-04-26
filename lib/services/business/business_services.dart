@@ -733,7 +733,7 @@ class BusinessServices {
         );
 
         // Actualizar metadatos
-        final photoState = photoDetail.state == BatchStates.InfoPendiente && photoDetail.isDummy != false ? BatchStates.InfoEnviada : photoDetail.state;
+        final photoState = photoDetail.state == BatchStates.InfoPendiente && photoDetail.isDummy == false ? BatchStates.InfoEnviada : photoDetail.state;
 
         final fieldValues = {
           if (photoState == BatchStates.InfoEnviada)
