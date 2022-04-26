@@ -183,6 +183,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           _addPageData(const NewBatch(), NewBatchPageConfig);
           break;
         case PageEnum.NewReturn:
+          _addPageData(const NewBatch(), NewReturnPageConfig);
           if (pageConfig.currentPageAction != null) {
             _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
           }

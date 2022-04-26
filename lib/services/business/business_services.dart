@@ -41,7 +41,7 @@ class BusinessServices {
     return NewsanServices.getCompanyInfo(cuit);
   }
 
-  static Future<void> createBatch(Batch batch) async {
+  static Future<Map<String, dynamic>> createBatch(Batch batch) async {
     final fieldNameInferenceConfig = _getBatchFieldNameInferenceConfig();
 
     final configProvider = await  _createConfigProvider(fieldNameInferenceConfig);
@@ -58,12 +58,13 @@ class BusinessServices {
                             key == BatchAthentoFieldName.uuid
     );
 
-    await SpAthentoServices.createDocument( configProvider: configProvider,
+    final response = await SpAthentoServices.createDocument( configProvider: configProvider,
         containerUUID: null,
         docType: _batchDocType,
         title: title,
         fieldValues: fieldValues
     );
+    return response;
   }
 
   static Future<List<Batch>> getRetailActiveBatches() async {

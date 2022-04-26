@@ -80,6 +80,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   text: returnRequest.EAN);
               final _skuTextController = TextEditingController(
                   text: returnRequest.sku);
+              final _commercialCodeTextController = TextEditingController(
+                  text: returnRequest.commercialCode);
               final _reference = TextEditingController(text: reference);
               var cantidad = returnRequest.quantity;
               if (cantidad == null) {
@@ -113,7 +115,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       icon: const Icon(Icons.add),
                       onPressed: () => //TODO: ver si se debe poder realizar una nueva devolución para los EAN no autitables, o cómo precargar los datos en la pantalla NewReturn
                       appState.waitCurrentAction<bool>(
-                          PageAction(state: PageState.addPage,
+                          PageAction(state: PageState.addWidget,
                               widget: NewReturnScreen(batch: this.widget.batch, returnRequest: this.widget.returnRequest),
                               pageConfig: NewReturnPageConfig))
                       .then((shouldRefresh) {
@@ -200,34 +202,61 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           ),
                         ),
                       ),
-                      if(!returnRequest.isAuditable)
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          padding: const EdgeInsets.all(15),
-                          child: TextField(
-                            enabled: enabled_value,
-                            autofocus: false,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.send,
-                            maxLength: 50,
-                            controller: _reference,
-                            decoration: const InputDecoration(
-                              hintText: 'Referencia Interna',
-                              label: Text.rich(
-                                  TextSpan(
-                                    children: <InlineSpan>[
-                                      WidgetSpan(
-                                        child: Text(
-                                            'Referencia Interna:',
-                                            style: TextStyle(fontSize: 18.0,
-                                                fontWeight: FontWeight.bold)),
-                                      ),
-                                    ],
-                                  )
-                              ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: false,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _commercialCodeTextController,
+                          enabled: false,
+                          decoration: const InputDecoration(
+                            hintText: 'Código Comercial',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Código Comercial:',
+                                          style: TextStyle(fontSize: 18.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
                             ),
                           ),
                         ),
+                      ),
+                      //if(!returnRequest.isAuditable)
+                      Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
+                        child: TextField(
+                          enabled: enabled_value,
+                          autofocus: false,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 50,
+                          controller: _reference,
+                          decoration: const InputDecoration(
+                            hintText: 'Referencia Interna',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Referencia Interna:',
+                                          style: TextStyle(fontSize: 18.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
                       Container(
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(15),
@@ -259,7 +288,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(15),
                         child: TextField(
-                          enabled: enabled_value && returnRequest.isAuditable == false,
+                          enabled: enabled_value && !returnRequest.isAuditable,
                           autofocus: false,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.send,

@@ -72,11 +72,12 @@ class _BatchDetailsState extends State<BatchDetails> {
     final title = batch.retailReference;
     final subTitle = batch.description;
     final observation = batch.observation;
+    final batchnumber = batch.batchNumber;
     final appState = Provider.of<AppState>(context, listen: false);
     final _reference = TextEditingController(text: title);
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
-
+    final _batchnumber = TextEditingController(text:batchnumber);
     if (batch.state!=BatchStates.Draft){
       enabled_value = false;
     }
@@ -105,7 +106,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                   elevation: 0,
                   backgroundColor: Colors.grey,
                   title: Text(
-                    '$title',
+                    '$batchnumber',
                     style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -124,7 +125,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                     IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          appState.waitCurrentAction(PageAction(state: PageState.addPage,
+                          appState.waitCurrentAction(PageAction(state: PageState.addWidget,
                               widget: NewReturnScreen(batch: this.widget.batch),
                               pageConfig: NewReturnPageConfig))
                               .then((shouldRefresh) {
@@ -155,6 +156,32 @@ class _BatchDetailsState extends State<BatchDetails> {
                   padding: const EdgeInsets.all(16.0),
                   child: ListView(
                     children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.all(15),
+                        child: TextField(
+                          autofocus: false,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 100,
+                          controller: _batchnumber,
+                          enabled: false,
+                          decoration: const InputDecoration(
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'N° Lote:',
+                                          style: const TextStyle(fontSize: 18.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                      ),
                       Container(
                         margin: EdgeInsets.only(top: 8),
                         padding: EdgeInsets.all(15),

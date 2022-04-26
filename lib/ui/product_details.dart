@@ -88,11 +88,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                         PageAction(state: PageState.addPage, pageConfig: SettingsPageConfig),
                   ),
                   if (_batch.state==BatchStates.Draft)
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, pageConfig: NewReturnPageConfig),
-                  ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       primary: Colors.grey,
