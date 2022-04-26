@@ -42,7 +42,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _brandTextController = TextEditingController();
   final _legalEntityTextController = TextEditingController();
   final _dateTextController = TextEditingController();
-  final _priceTextController = TextEditingController();
+  //final _priceTextController = TextEditingController();
   final _eanTextController = TextEditingController();
   final _commercialCodeTextController = TextEditingController();
 
@@ -318,7 +318,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                 ),
                                               ),
                                             ),
-                                            Expanded(
+                                            /*Expanded(
                                               child: TextField(
                                                 controller: _priceTextController,
                                                 autofocus: true,
@@ -334,7 +334,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                     counter: Offstage()
                                                 ),
                                               ),
-                                            )
+                                            )*/
                                           ]),
                                       if(_dateWarning != '')
                                         Icon(FontAwesomeIcons.exclamationTriangle),
@@ -542,7 +542,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _quantityTextController.text = '';
     _descriptionTextController.text = '';
     _dateTextController.text = '';
-    _priceTextController.text = '';
+    //_priceTextController.text = '';
     _eanTextController.text = '';
     _commercialCodeTextController.text = '';
     _brandTextController.text = '';
@@ -588,7 +588,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       _descriptionTextController.text = productInfo.description;
       final formatter = DateFormat('dd/MM/yyyy');
       _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
-      _priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
+      //_priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
       _brandTextController.text = productInfo.brand;
       _legalEntityTextController.text = productInfo.legalEntity;
       _eanTextController.text = productInfo.EAN;
