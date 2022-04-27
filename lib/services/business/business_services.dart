@@ -677,7 +677,8 @@ class BusinessServices {
   }
 
   static Future<void> _deletePhotoCacheDirectory(String directoryName) async {
-    final dir = await getTemporaryDirectory();
+    final dir = await getApplicationDocumentsDirectory();
+    //final dir = await getTemporaryDirectory();
     final tempPath = dir.path + '/' + directoryName;
     final tempDir = Directory(tempPath);
     final tempDirExists = tempDir.existsSync(); // Para debug
