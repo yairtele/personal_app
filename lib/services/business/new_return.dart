@@ -16,6 +16,7 @@ class NewReturn {
   String businessUnit;
   int? quantity;
   String? observations;
+  String? customer_account;
   Map<String, ReturnPhoto> photos;
 
   NewReturn({
@@ -32,6 +33,7 @@ class NewReturn {
     required this.businessUnit,
     required this.quantity,
     required this.observations,
+    required this.customer_account,
     required this.photos
   });
 }

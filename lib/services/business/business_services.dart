@@ -441,7 +441,8 @@ class BusinessServices {
         price: newReturn.price,
         legalEntity: newReturn.legalEntity,
         businessUnit: newReturn.businessUnit,
-        observations: newReturn.observations
+        observations: newReturn.observations,
+        customer_account: newReturn.customer_account
     );
     final fieldValues = returnRequest.toJSON();
 

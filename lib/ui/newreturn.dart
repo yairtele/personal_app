@@ -43,7 +43,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _brandTextController = TextEditingController();
   final _legalEntityTextController = TextEditingController();
   final _dateTextController = TextEditingController();
-  //final _priceTextController = TextEditingController();
   final _eanTextController = TextEditingController();
   final _commercialCodeTextController = TextEditingController();
 
@@ -372,7 +371,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                 ),
                                               ),
                                               Container(
-                                                //margin: const EdgeInsets.only(top: 8),
                                                 padding: const EdgeInsets.fromLTRB(30,0,30,30),
                                                 child: TextField(
                                                   controller: _commentsTextController,
@@ -426,7 +424,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         quantity: _getQuantity(),
                                         isAuditable: _isAuditableProduct,
                                         photos: photosToSave,
-                                        observations: _commentsTextController.text
+                                        observations: _commentsTextController.text,
+                                        customer_account: product.salesInfo != null? product.salesInfo!.retailAccount : '(No disponible)'
                                       );
                                       //print('GLOBAL BATCH: ' + batch.batchNumber!);
                                       await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
@@ -548,7 +547,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _quantityTextController.text = '';
     _descriptionTextController.text = '';
     _dateTextController.text = '';
-    //_priceTextController.text = '';
     _eanTextController.text = '';
     _commercialCodeTextController.text = '';
     _brandTextController.text = '';
