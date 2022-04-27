@@ -682,6 +682,8 @@ class BusinessServices {
   }
 
   static Future<void> _deletePhotoCacheDirectory(String directoryName) async {
+    //TODO: IMPORTANTE: Sólo se están borrando fotos si se grabaron las fotos. Habría que borrar cache de fotos desde las pantallas, apenas se sale de la pantalla.
+
     final dir = await getApplicationDocumentsDirectory();
     //final dir = await getTemporaryDirectory();
     final tempPath = dir.path + '/' + directoryName;

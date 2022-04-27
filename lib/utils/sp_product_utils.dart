@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/business/business_services.dart';
@@ -13,10 +15,13 @@ class SpProductUtils{
   }
 
   static Future<XFile> binaryFileInfo2XFile(BinaryFileInfo content, String label, String parentUUID, String photoUUID) async {
+
     final dir = await getApplicationDocumentsDirectory();
-    //final dir = await getTemporaryDirectory();
+    //final dir = await getTemporaryDirectory(); //TODO: es probable que sea mejor usar esta carpeta
+
     //final tempPath = dir.path + '/' + parentUUID + '/' + label + '-' + photoUUID;
-    final tempPath = dir.path + '/' + parentUUID + '/' + label + content.fileExtension;
+    //TODO: no se debería necestar el RANDOM, ya que todos los temporales fueron borrados, pero algo no está funcionando.
+    final tempPath = dir.path + '/' + parentUUID + '/' + label + '.' + Random().nextInt(1000000).toString()  + '.' +  content.fileExtension;
 
     final tempDirPath = dir.path + '/' + parentUUID;
     final tempDirExists = Directory(tempDirPath).existsSync();
