@@ -18,6 +18,7 @@ class ReturnRequest{
   String? price;
   String legalEntity;
   String businessUnit;
+  String? observations;
 
   //Map<String, XFile> photos;
 
@@ -38,7 +39,8 @@ class ReturnRequest{
     required this.lastSell,
     required this.price,
     required this.legalEntity,
-    required this.businessUnit
+    required this.businessUnit,
+    required this.observations
     //@required this.photos
   });
 
@@ -60,7 +62,8 @@ class ReturnRequest{
       ReturnRequestAthentoFieldName.lastSell: lastSell,
       ReturnRequestAthentoFieldName.price: price,
       ReturnRequestAthentoFieldName.legalEntity: legalEntity,
-      ReturnRequestAthentoFieldName.businessUnit: businessUnit
+      ReturnRequestAthentoFieldName.businessUnit: businessUnit,
+      ReturnRequestAthentoFieldName.observations: observations
     };
   }
 
@@ -81,7 +84,8 @@ class ReturnRequest{
     lastSell = json[ReturnRequestAthentoFieldName.lastSell],
     price = json[ReturnRequestAthentoFieldName.price],
     legalEntity = json[ReturnRequestAthentoFieldName.legalEntity],
-    businessUnit = json[ReturnRequestAthentoFieldName.businessUnit];
+    businessUnit = json[ReturnRequestAthentoFieldName.businessUnit],
+    observations = json[ReturnRequestAthentoFieldName.observations];
 }
 
 class ReturnRequestAthentoFieldName{
@@ -101,4 +105,5 @@ class ReturnRequestAthentoFieldName{
   static const String lastSell = 'fecha_ultima_venta';
   static const String price = 'precio';
   static const String legalEntity = 'juridica';
+  static const String observations = 'observaciones';
 }

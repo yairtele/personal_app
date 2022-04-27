@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
+import 'package:navigation_app/services/business/return_request.dart';
 
 class Product {
   String? uuid;
@@ -7,6 +8,7 @@ class Product {
   String title;
   String EAN;
   String commercialCode;
+  String? observations;
   String? retailReference; //TODO: está bien que pueda ser nulo? Debería ser string vacío en todo caso?
   String? requestNumber; //TODO: ver cómo asegurarnos que este dato nunca sea nulo. O ver si se elimina.
                           // Lo mismo para los demás autonuméricos en cada formulario de Athento
@@ -23,6 +25,7 @@ class Product {
     required this.retailReference,
     required this.requestNumber,
     required this.description,
+    required this.observations
   });
   Map<String, dynamic> toJSON() {
     return {
@@ -34,6 +37,7 @@ class Product {
       ProductAthentoFieldName.commercialCode: commercialCode,
       ProductAthentoFieldName.retailReference: retailReference,
       ProductAthentoFieldName.description: description,
+      ProductAthentoFieldName.observations: observations
     };
   }
 
@@ -45,7 +49,8 @@ class Product {
     commercialCode = json[ProductAthentoFieldName.commercialCode],
     retailReference = json[ProductAthentoFieldName.retailReference],
     description = json[ProductAthentoFieldName.description],
-    requestNumber = json[ProductAthentoFieldName.requestNumber];
+    requestNumber = json[ProductAthentoFieldName.requestNumber],
+    observations = json[ProductAthentoFieldName.observations];
 }
 
 class ProductAthentoFieldName{
@@ -56,5 +61,6 @@ class ProductAthentoFieldName{
   static const String retailReference = 'id_retail';
   static const String description = 'descripcion_producto';
   static const String requestNumber = 'ndeg_solicitud';
+  static const String observations = 'observaciones';
 }
 

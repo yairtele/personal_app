@@ -230,34 +230,34 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           ),
                         ),
                       ),
-                      //if(!returnRequest.isAuditable)
-                      Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
-                        child: TextField(
-                          enabled: enabled_value,
-                          autofocus: false,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.send,
-                          maxLength: 50,
-                          controller: _reference,
-                          decoration: const InputDecoration(
-                            hintText: 'Referencia Interna',
-                            label: Text.rich(
-                                TextSpan(
-                                  children: <InlineSpan>[
-                                    WidgetSpan(
-                                      child: Text(
-                                          'Referencia Interna:',
-                                          style: TextStyle(fontSize: 18.0,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                )
+                      if(!returnRequest.isAuditable)
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.all(15),
+                          child: TextField(
+                            enabled: enabled_value,
+                            autofocus: false,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.send,
+                            maxLength: 50,
+                            controller: _reference,
+                            decoration: const InputDecoration(
+                              hintText: 'Referencia Interna',
+                              label: Text.rich(
+                                  TextSpan(
+                                    children: <InlineSpan>[
+                                      WidgetSpan(
+                                        child: Text(
+                                            'Referencia Interna:',
+                                            style: TextStyle(fontSize: 18.0,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                  )
+                              ),
                             ),
                           ),
                         ),
-                      ),
                       Container(
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(15),

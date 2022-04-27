@@ -38,6 +38,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   final _searchParamTextController = TextEditingController();
   final _retailReferenceTextController = TextEditingController();
   final _quantityTextController = TextEditingController();
+  final _commentsTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
   final _brandTextController = TextEditingController();
   final _legalEntityTextController = TextEditingController();
@@ -317,24 +318,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                     counter: Offstage()
                                                 ),
                                               ),
-                                            ),
-                                            /*Expanded(
-                                              child: TextField(
-                                                controller: _priceTextController,
-                                                autofocus: true,
-                                                keyboardType: TextInputType.text,
-                                                textInputAction:
-                                                TextInputAction.send,
-                                                readOnly: true,
-                                                maxLength: 30,
-
-                                                decoration: const InputDecoration(
-                                                    labelText: 'Precio',
-                                                    border: InputBorder.none,
-                                                    counter: Offstage()
-                                                ),
-                                              ),
-                                            )*/
+                                            )
                                           ]),
                                       if(_dateWarning != '')
                                         Icon(FontAwesomeIcons.exclamationTriangle),
@@ -387,6 +371,27 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   //},
                                                 ),
                                               ),
+                                              Container(
+                                                //margin: const EdgeInsets.only(top: 8),
+                                                padding: const EdgeInsets.fromLTRB(30,0,30,30),
+                                                child: TextField(
+                                                  controller: _commentsTextController,
+                                                  autofocus: true,
+                                                  keyboardType:
+                                                  TextInputType.multiline,
+                                                  textInputAction:
+                                                  TextInputAction.send,
+                                                  maxLines: null,
+                                                  maxLength: 50,
+                                                  decoration:
+                                                  const InputDecoration(
+                                                      labelText:
+                                                      'Observaciones',
+                                                      helperText:
+                                                      'Ej: Grietas'),
+                                                  //},
+                                                ),
+                                              ),
                                             SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _existingReturnRequest?.state ?? BatchStates.Draft),
                                           ]),
                                     ]),
@@ -421,6 +426,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                         quantity: _getQuantity(),
                                         isAuditable: _isAuditableProduct,
                                         photos: photosToSave,
+                                        observations: _commentsTextController.text
                                       );
                                       //print('GLOBAL BATCH: ' + batch.batchNumber!);
                                       await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);

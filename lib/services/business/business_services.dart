@@ -357,7 +357,7 @@ class BusinessServices {
             returnRequestTitle, batch, newReturn);
 
         // Las solicitudes de productos auditables no deben tener referencia interna. Esta se asigna a cada producto unitario devuelto.
-        fieldValues.removeWhere((fieldName, value) => fieldName == ReturnRequestAthentoFieldName.retailReference);
+        fieldValues.removeWhere((fieldName, value) => fieldName == ReturnRequestAthentoFieldName.retailReference || fieldName == ReturnRequestAthentoFieldName.observations);
 
         final configProvider = await  _createConfigProvider(
             _getReturnRequestFieldNameInferenceConfig());
@@ -440,7 +440,8 @@ class BusinessServices {
         lastSell: newReturn.lastSell,
         price: newReturn.price,
         legalEntity: newReturn.legalEntity,
-        businessUnit: newReturn.businessUnit
+        businessUnit: newReturn.businessUnit,
+        observations: newReturn.observations
     );
     final fieldValues = returnRequest.toJSON();
 
@@ -458,6 +459,7 @@ class BusinessServices {
         commercialCode: newReturn.commercialCode.trim(),
         description: newReturn.description.trim(),
         retailReference: newReturn.retailReference.trim(),
+        observations: newReturn.observations
     );
     final fieldValues = product.toJSON();
 
@@ -527,7 +529,9 @@ class BusinessServices {
   }
 
   static  Map<String, String> _getProductFieldNameInferenceConfig() {
-    return _getFieldNameInferenceConfig(defaultPrefix: 'producto_wli_');
+    var productInferenceConfig = _getFieldNameInferenceConfig(defaultPrefix: 'producto_wli_');
+    productInferenceConfig['observaciones'] = 'solicitud_auditoria_kvg_observaciones';
+    return productInferenceConfig;
   }
 
   static  Map<String, String> _getPhotoFieldNameInferenceConfig() {
