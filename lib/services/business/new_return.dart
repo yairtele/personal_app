@@ -10,7 +10,7 @@ class NewReturn {
   String retailReference;
   String brand;
   bool isAuditable;
-  String? lastSell;
+  DateTime? lastSell;
   String? price;
   String legalEntity;
   String businessUnit;

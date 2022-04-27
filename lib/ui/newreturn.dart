@@ -52,7 +52,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   var _productSearchBy = ProductSearchBy.EAN;
   ReturnRequest? _existingReturnRequest;
   ProductInfo? _product;
-  String? _productLastSell;
+  DateTime? _productLastSell;
   String? _lastSellPrice;
   Future<ScreenData<void, void>>? _localData;
   late Batch _globalBatch;
@@ -597,7 +597,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       _legalEntityTextController.text = productInfo.legalEntity;
       _eanTextController.text = productInfo.EAN;
       _commercialCodeTextController.text = productInfo.commercialCode;
-
+      _productLastSell = productInfo.salesInfo?.lastSellDate;
       final dateWarning = _dateValidation(productInfo);
 
 
@@ -633,7 +633,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
   String _dateValidation(ProductInfo productInfo){
 
-    _productLastSell = null;
     _lastSellPrice = null;
 
     if(productInfo.salesInfo == null) {
@@ -643,8 +642,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     final lastSell = productInfo.salesInfo!.lastSellDate;
 
     if(lastSell != null && DateTime.now().difference(lastSell).inDays > productInfo.auditRules.lastSaleMaxAge.inDays){
-      final DateFormat formatter = DateFormat('yyyy-MM-dd');
-      _productLastSell = formatter.format(productInfo.salesInfo!.lastSellDate).toString();
+
       _lastSellPrice = '\$' +productInfo.salesInfo!.price.toString();
       return 'La última compra fue realizada hace más de ${productInfo.auditRules.lastSaleMaxAge.inDays} días. La devolución podría ser rechazada por el auditor.';
     } else {

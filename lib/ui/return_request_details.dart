@@ -316,7 +316,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (_batch.state==BatchStates.Draft)
+                            if (_batch.state==BatchStates.Draft || _batch.state==BatchStates.InfoPendiente)
                             ElevatedButton(
                               onPressed: () async {
                                 try{
@@ -417,7 +417,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                       pageConfig: DetailProductPageConfig))
                                       .then((shouldRefresh) {
                                     setState(() {
-                                      if (shouldRefresh!) {
+                                      if (shouldRefresh!) { //TODO: meter el if fuera del setstate
                                         _shouldRefreshParent =
                                             shouldRefresh; //TODO: analizar bien esto
                                         _localData = getScreenData();

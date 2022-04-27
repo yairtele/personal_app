@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
@@ -425,6 +426,10 @@ class BusinessServices {
   }
 
   static Map<String, dynamic> _getReturnRequestFieldValues(String returnRequestTitle, Batch batch, NewReturn newReturn) {
+    final lastSell = newReturn.lastSell != null ? DateFormat('yyyy-MM-dd').format(newReturn.lastSell!).toString() : null;
+
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
     // Obtener valores de campos para la nueva solicitud
     final returnRequest = ReturnRequest(
         title: returnRequestTitle,
@@ -437,7 +442,7 @@ class BusinessServices {
         brand: newReturn.brand,
         isAuditable: newReturn.isAuditable,
         quantity: newReturn.quantity,
-        lastSell: newReturn.lastSell,
+        lastSell: lastSell,
         price: newReturn.price,
         legalEntity: newReturn.legalEntity,
         businessUnit: newReturn.businessUnit,
@@ -673,7 +678,7 @@ class BusinessServices {
       '${ReturnRequestAthentoFieldName.quantity}': '${returnunities}',
     };
     //TODO:Armado con orden correcto del titulo para la solicitud.
-    SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
+    await SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
 
     await _updatePhotos(configProvider, photos);
 
@@ -714,7 +719,7 @@ class BusinessServices {
         ProductAthentoFieldName.retailReference: reference
       };
 
-      SpAthentoServices.updateDocument(configProvider: configProvider,
+      await SpAthentoServices.updateDocument(configProvider: configProvider,
           documentUUID: product.uuid!,
           fieldValues: fieldValues);
     }
