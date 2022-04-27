@@ -612,9 +612,10 @@ class BusinessServices {
 
         takenPictures[photo.label] = PhotoDetail(
           uuid: photo.uuid,
-          content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid),
+          content: await SpProductUtils.binaryFileInfo2XFile(content, photo.label, productUuid, photo.uuid),
           isDummy: photo.isDummy,
-          state: photo.state
+          state: photo.state,
+          hasChanged: false
         );
       }
     //}
@@ -662,7 +663,7 @@ class BusinessServices {
   //TODO: los parámetros String returnEAN,String returnreference,String returndescr,String returnunities ya están en el ReturnRequest
   //TODO: no abreviar nombres de métodos como este.
   //TODO: Usar camelCase para los parámetros y variables.
-  static Future <void> updateReqReturn (ReturnRequest req_return,String returnEAN,String returnReference,String returnDescr,String returnunities, ProductPhotos modifiedPhotos, Map<String, PhotoDetail> photos) async{
+  static Future <void> updateReqReturn (ReturnRequest req_return, String returnEAN, String returnReference, String returnDescr, String returnunities,  Map<String, PhotoDetail> photos) async{
     final configProvider = await  _createConfigProvider();
     final fieldValues = {
       '${ReturnRequestAthentoFieldName.EAN}': '${returnEAN}',
@@ -673,11 +674,35 @@ class BusinessServices {
     //TODO:Armado con orden correcto del titulo para la solicitud.
     SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
 
-    _updatePhotos(configProvider, photos);
+    await _updatePhotos(configProvider, photos);
+
+    // Delete cached images
+    await _deletePhotoCacheDirectory(req_return.uuid!);
+  }
+
+  static Future<void> _deletePhotoCacheDirectory(String directoryName) async {
+    final dir = await getApplicationDocumentsDirectory();
+    //final dir = await getTemporaryDirectory();
+    final tempPath = dir.path + '/' + directoryName;
+    final tempDir = Directory(tempPath);
+    final tempDirExists = tempDir.existsSync(); // Para debug
+    if(tempDirExists){
+      tempDir.deleteSync(recursive: true);
+    }
   }
 
   static Future <void> updateProduct (bool referenceModified, String reference,
       Map<String, PhotoDetail> photos, Product product) async {
+
+    // Validar que al menos una foto (modificada o no) no sea dummy
+    if(!photos.values.any((photoDetail) => photoDetail.isDummy == false)){
+      throw BusinessException('Se debe cargar al menos una foto.');
+    }
+
+    //Obtener fotos modificadas
+    final changedPhotos = Map<String, PhotoDetail>.fromEntries(photos.entries
+        .where((entry) => entry.value.hasChanged == true));
+
 
     final configProvider = await  _createConfigProvider();
 
@@ -691,7 +716,10 @@ class BusinessServices {
           fieldValues: fieldValues);
     }
 
-    await _updatePhotos(configProvider, photos);
+    await _updatePhotos(configProvider, changedPhotos);
+
+    // Delete cached images
+    await _deletePhotoCacheDirectory(product.uuid!);
 
   }
 
@@ -710,7 +738,7 @@ class BusinessServices {
         );
 
         // Actualizar metadatos
-        final photoState = photoDetail.state == BatchStates.InfoPendiente && photoDetail.isDummy != false ? BatchStates.InfoEnviada : photoDetail.state;
+        final photoState = photoDetail.state == BatchStates.InfoPendiente && photoDetail.isDummy == false ? BatchStates.InfoEnviada : photoDetail.state;
 
         final fieldValues = {
           if (photoState == BatchStates.InfoEnviada)
@@ -723,8 +751,19 @@ class BusinessServices {
             documentUUID: photoDetail.uuid,
             fieldValues: fieldValues);
 
+        //_silentlyDeleteFile(photoDetail.content.path);
+    }
+  }
 
-        File(photoDetail.content.path).delete();
+  static void _silentlyDeleteFile(String path){
+    try{
+      if (!path.contains('img_not_found.jpg')){
+        File(path).delete();
+      }
+    }
+    on Exception catch (e){
+      print('Error borrando archivo: ' + path);
+      final foo = e;
     }
   }
 

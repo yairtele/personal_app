@@ -12,13 +12,24 @@ class SpProductUtils{
     return BusinessServices.getProductInfoByEAN(eanCode);
   }
 
-  static Future<XFile> binaryFileInfo2XFile(BinaryFileInfo content, String label, String prodUuid) async {
+  static Future<XFile> binaryFileInfo2XFile(BinaryFileInfo content, String label, String parentUUID, String photoUUID) async {
     final dir = await getApplicationDocumentsDirectory();
-    final tempPath = dir.path + '/' + label + prodUuid;
-    final fil = File(tempPath);
-    fil.writeAsBytes(content.bytes);
+    //final dir = await getTemporaryDirectory();
+    //final tempPath = dir.path + '/' + parentUUID + '/' + label + '-' + photoUUID;
+    final tempPath = dir.path + '/' + parentUUID + '/' + label + content.fileExtension;
 
-    final xFile = XFile(tempPath);//XFile.fromData(content.bytes, mimeType: content.contentType, path: tempPath);
+    final tempDirPath = dir.path + '/' + parentUUID;
+    final tempDirExists = Directory(tempDirPath).existsSync();
+
+    final fil = File(tempPath);
+
+    if(fil.existsSync()){
+      fil.deleteSync();
+    }
+    fil.createSync(recursive: true);
+    fil.writeAsBytesSync(content.bytes, mode: FileMode.write, flush: true);
+
+    final xFile = XFile(fil.path);//XFile.fromData(content.bytes, mimeType: content.contentType, path: tempPath);
 
     return xFile;
   }

@@ -85,7 +85,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
           builder: (BuildContext context,
               AsyncSnapshot<ScreenData<void, void>> snapshot) {
             Widget widget;
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
               final batch = this.widget.batch;
               _globalBatch = batch;
               widget = Scaffold(

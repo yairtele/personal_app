@@ -5,12 +5,14 @@ class PhotoDetail {
   XFile content;
   bool isDummy;
   String? state;
+  bool hasChanged;
 
   PhotoDetail({
     required this.uuid,
     required this.content,
     required this.isDummy,
-    required this.state
+    required this.state,
+    required this.hasChanged
   });
 
 }

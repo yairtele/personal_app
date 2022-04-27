@@ -9,7 +9,6 @@ import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/return_request_detail.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
-import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/ui/product_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
@@ -34,7 +33,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   late Future<ScreenData<String, ReturnRequestDetail>> _localData;
   bool _shouldRefreshParent = false;
   Map<String, ThumbPhoto> _takenPictures = {};
-  final _modifiedPhotos = ProductPhotos([]);
   late XFile _dummyPhoto;
 
   @override
@@ -187,7 +185,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           controller: _skuTextController,
                           enabled: false,
                           decoration: const InputDecoration(
-                            hintText: 'EAN',
+                            hintText: 'Código de inventario',
                             label: Text.rich(
                                 TextSpan(
                                   children: <InlineSpan>[
@@ -323,7 +321,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
-                                  await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _modifiedPhotos, _takenPictures);
+                                  await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _takenPictures);
                                   _shouldRefreshParent = true;
                                   _showSnackBar('Solicitud actualizada con éxito');
                                 }
@@ -517,7 +515,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   }
 
   Future<void> _updateReqReturn(ReturnRequest req_return, String EAN,
-      String reference, String description, String unities, ProductPhotos modifiedPhotos, Map<String, ThumbPhoto> photos) async {
+      String reference, String description, String unities, Map<String, ThumbPhoto> photos) async {
 
     final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
 
@@ -528,12 +526,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           uuid: thumbPhoto.uuid!,
           content: thumbPhoto.photo,
           isDummy: thumbPhoto.isDummy,
-          state: thumbPhoto.state
+          state: thumbPhoto.state,
+          hasChanged: thumbPhoto.hasChanged
         )
     )
     );
     await BusinessServices.updateReqReturn(
-        req_return, EAN, reference, description, unities, modifiedPhotos, photosToUpdate);
+        req_return, EAN, reference, description, unities, photosToUpdate);
   }
 
   Future<Map<String,PhotoDetail>> _getOptionalPhoto(returnRequestUUID) async {
