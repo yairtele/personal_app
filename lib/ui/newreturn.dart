@@ -552,6 +552,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     _commercialCodeTextController.text = '';
     _brandTextController.text = '';
     _legalEntityTextController.text = '';
+    _commentsTextController.text = '';
 
     _takenPictures.clear();
   }
