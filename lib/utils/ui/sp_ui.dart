@@ -353,6 +353,7 @@ class SpUI{
   }
 
   static bool _shouldDisablePhotoButton(String photoParentState, String photoState) {
-    return photoParentState != BatchStates.Draft && photoState != BatchStates.InfoPendiente;
+    return !(photoParentState == BatchStates.Draft ||
+        (photoParentState == BatchStates.InfoPendiente && photoState == BatchStates.InfoPendiente));
   }
 }

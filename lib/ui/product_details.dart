@@ -192,7 +192,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                      child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (_batch.state==BatchStates.Draft || _batch.state==BatchStates.InfoPendiente)
+                        if (product.state==BatchStates.Draft || product.state==BatchStates.InfoPendiente)
                         ElevatedButton(
                             onPressed: () async {
                               try{
@@ -218,7 +218,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               primary: Colors.green[400],
                             )
                         ),
-                        if (_batch.state==BatchStates.Draft)
+                        if (product.state==BatchStates.Draft)
                         ElevatedButton(
                             onPressed: () async {
                               try{

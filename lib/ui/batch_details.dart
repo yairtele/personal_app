@@ -405,6 +405,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     .then((shouldRefresh) {
                                       if(shouldRefresh!){
                                         setState(() {
+                                          _shouldRefreshParent = shouldRefresh;
                                           _localData = getScreenData();
                                         });
                                       }

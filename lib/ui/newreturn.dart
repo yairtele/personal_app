@@ -75,6 +75,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       onWillPop: () {
 
         appState.returnWith(_shouldRefreshParent);
+        _shouldRefreshParent = false;
 
         //we need to return a future
         return Future.value(false);

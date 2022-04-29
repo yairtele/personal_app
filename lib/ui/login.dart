@@ -279,11 +279,10 @@ class _LoginState extends State<Login> {
     // Check if the sales file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
     const salesFileName = 'sales_db.csv';
+    const salesFileURL = '$filesFolderURL/$salesFileName';
     final salesFile = File('${productsFolderPath.path}/$salesFileName');
     if (!salesFile.existsSync()) {
       // Write file to local folder
-      const salesFileURL = '$filesFolderURL/$salesFileName';
-
       final response = await Dio().download(salesFileURL, salesFile.path,
           onReceiveProgress: (value1, value2) {
             setState(() {
@@ -293,14 +292,32 @@ class _LoginState extends State<Login> {
       );
       //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
     }
+    else {
+      // If sales file does exist, check if it is outdated and update it in such a case
+      // Get last modified date
+      final response = await http.head(Uri.parse(salesFileURL));
+      final lastModifiedHeader = response.headers[HttpHeaders.lastModifiedHeader];
 
+      // If cached date is different than the file date, download the file and overwrite the old one
+      final cachedLastModifiedDate = (await Cache.getSalesFileLastModifiedDate()) ?? '';
+      if(cachedLastModifiedDate != lastModifiedHeader){
+        final response = await Dio().download(salesFileURL, salesFile.path,
+            onReceiveProgress: (value1, value2) {
+              setState(() {
+                _progressText = 'Actualizando registros de ventas: ${(value1 / value2).toStringAsFixed(2)}';
+              });
+            }
+        );
+        await Cache.saveSalesFileLastModifiedDate(lastModifiedHeader!);
+      }
+    }
     // Check if the rules file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
     const rulesFileName = 'rules_db.csv';
+    const rulesFileURL = '$filesFolderURL/$rulesFileName';
     final rulesFile = File('${productsFolderPath.path}/$rulesFileName');
     if (!rulesFile.existsSync()) {
       // Write file to local folder
-      const rulesFileURL = '$filesFolderURL/$rulesFileName';
 
       final response = await Dio().download(rulesFileURL, rulesFile.path,
           onReceiveProgress: (value1, value2) {
@@ -309,8 +326,27 @@ class _LoginState extends State<Login> {
             });
           }
       );
-      //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
     }
+    else {
+      // If rules file does exist, check if it is outdated and update it in such a case
+      // Get last modified date
+      final response = await http.head(Uri.parse(rulesFileURL));
+      final lastModifiedHeader = response.headers[HttpHeaders.lastModifiedHeader];
+
+      // If cached date is different than the file date, download the file and overwrite the old one
+      final cachedLastModifiedDate = (await Cache.getRulesFileLastModifiedDate()) ?? '';
+      if(cachedLastModifiedDate != lastModifiedHeader){
+        final response = await Dio().download(rulesFileURL, rulesFile.path,
+            onReceiveProgress: (value1, value2) {
+              setState(() {
+                _progressText = 'Actualizando maestro de productos: ${(value1 / value2).toStringAsFixed(2)}';
+              });
+            }
+        );
+        await Cache.saveRulesFileLastModifiedDate(lastModifiedHeader!);
+      }
+    }
+
     return true;
   }
 }
