@@ -316,6 +316,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            //TODO: chequear estado de la solicitud y no del lote.
                             if (_batch.state==BatchStates.Draft || _batch.state==BatchStates.InfoPendiente)
                             ElevatedButton(
                               onPressed: () async {
