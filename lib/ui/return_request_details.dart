@@ -8,6 +8,7 @@ import 'package:navigation_app/services/business/photo_detail.dart';
 import 'package:navigation_app/services/business/product.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/return_request_detail.dart';
+import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/ui/product_details.dart';
@@ -401,6 +402,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           products.length,
                               (int index) =>
                               DataRow(
+                                color: UIHelper.getAuditItemBackgroundColor(products[index].state!),
                                 cells: <DataCell>[DataCell(
                                     ListTile(isThreeLine: true,
                                       leading: const Icon(Icons.workspaces_filled,
