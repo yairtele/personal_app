@@ -35,6 +35,7 @@ import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/ui/newreturn.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -372,6 +373,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
                         child: DataTable(// Lista de solicitudes del lote
+
                           columns:  <DataColumn>[
                             const DataColumn(
                               label: Text('Solicitudes'),
@@ -379,6 +381,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                             if (shouldShowStateColumn)
                               const DataColumn(label: Text('Estado'))
                           ],
+
                           rows: List<DataRow>.generate(
                             returns.length,
                                 (int index) {
@@ -386,8 +389,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                               final title = _getReturnTitle(returnRequest);
                               final subtitle = _getReturnSubTitle(returnRequest);
                               return DataRow(
+                                color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
                                 cells: <DataCell>[
-                                  DataCell(ListTile(isThreeLine: true,
+                                   DataCell(ListTile(isThreeLine: true,
                                     leading: const Icon(
                                       Icons.art_track_sharp, color: Colors.grey,),
                                     title: Text(
@@ -405,6 +409,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     .then((shouldRefresh) {
                                       if(shouldRefresh!){
                                         setState(() {
+                                          _shouldRefreshParent = shouldRefresh;
                                           _localData = getScreenData();
                                         });
                                       }

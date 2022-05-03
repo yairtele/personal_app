@@ -142,7 +142,7 @@ class BusinessServices {
   }
 
   static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
-    const EAN_INDEX = 0;
+    const EAN_INDEX = 3;
     return _getProductInfoByEANorCodefromFile(EAN_INDEX, eanCode);
 
   }
@@ -176,8 +176,8 @@ class BusinessServices {
       throw BusinessException('No se ha podido encontrar un producto con el código "$productFileSearchKey" en el maestro de productos.');
     }
 
-    const SKU_INDEX = 15;
-    const CUIT_INDEX = 23;
+    const SKU_INDEX = 1;
+    const CUIT_INDEX = 4;
     final retailCUIT = (await Cache.getUserInfo())!.idNumber;
     final producSalesInfo = await _getRowAsObjectFromFile(
         fileName: 'sales_db.csv' ,
@@ -796,13 +796,13 @@ class ProductMasterInfo{
     required this.businessUnit, required this.legalEntity});
 
   ProductMasterInfo.fromCsvRow(List<String> row) : this(
-    ean: row[0],
+    ean: row[3],
     commercialCode: row[1],
-    sku: row[2],
-    description: row[3],
-    brand: row[6],
-    businessUnit: row[8],
-    legalEntity: row[5]
+    sku: row[0],
+    description: row[2],
+    brand: row[5],
+    businessUnit: row[6],
+    legalEntity: row[4]
   );
 }
 
@@ -815,8 +815,8 @@ class ProductSalesInfo{
 
   ProductSalesInfo.fromCsvRow(List<String> row) : this(
       lastSellDate: _parseDate(row[0]),
-      price: _parsePrice(row[36]),
-      retailAccount: row[21],
+      price: _parsePrice(row[5]),
+      retailAccount: row[2],
   );
 
   static double  _parsePrice(String priceString) {

@@ -34,8 +34,11 @@ class SpUI{
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
         decoration: BoxDecoration(
-            border: Border.all(
-                color: Colors.blueGrey, width: 1, style: BorderStyle.solid)
+          border: Border.all(
+              color: photo.state == BatchStates.InfoPendiente ?  Colors.yellow : Colors.blueGrey,
+              width: photo.state == BatchStates.InfoPendiente ? 3 : 1,
+              style: BorderStyle.solid
+          )
         ),
         child: Column(
           children: [
@@ -353,6 +356,7 @@ class SpUI{
   }
 
   static bool _shouldDisablePhotoButton(String photoParentState, String photoState) {
-    return photoParentState != BatchStates.Draft && photoState != BatchStates.InfoPendiente;
+    return !(photoParentState == BatchStates.Draft ||
+        (photoParentState == BatchStates.InfoPendiente && photoState == BatchStates.InfoPendiente));
   }
 }

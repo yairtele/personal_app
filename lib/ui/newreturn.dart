@@ -75,6 +75,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       onWillPop: () {
 
         appState.returnWith(_shouldRefreshParent);
+        _shouldRefreshParent = false;
 
         //we need to return a future
         return Future.value(false);
@@ -322,7 +323,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       if(_dateWarning != '')
                                         Icon(FontAwesomeIcons.exclamationTriangle),
                                       Text(_dateWarning,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.red
                                           )),

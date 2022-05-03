@@ -34,6 +34,7 @@ import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/batch_details.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -149,7 +150,8 @@ class _BatchesState extends State<Batches> {
                         rows: List<DataRow>.generate (
                           //batches.where((state) => 'Draft').length,
                           draftBatches.length,
-                          (int index) => DataRow(cells: <DataCell>[
+                          (int index) => DataRow(
+                            cells: <DataCell>[
                             DataCell(
                                 ListTile(
                                   isThreeLine: true,
@@ -209,6 +211,7 @@ class _BatchesState extends State<Batches> {
                           auditedBatches.length,
                               (int index) =>
                               DataRow(
+                                color: UIHelper.getAuditItemBackgroundColor(auditedBatches[index].state!),
                                 cells: <DataCell>[
                                   DataCell(ListTile(isThreeLine: true,
                                     leading: const Icon(
