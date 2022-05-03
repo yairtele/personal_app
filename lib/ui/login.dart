@@ -51,6 +51,7 @@ class _LoginState extends State<Login> {
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late Future<bool> _localData;
+  bool _isObscure = true;
   var _progressText = 'Cargando...';
 
   @override
@@ -60,11 +61,9 @@ class _LoginState extends State<Login> {
     //updateLocalFiles();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-
 
     //emailTextController.text = 'adrian.scotto.newsan';
     //passwordTextController.text = r'N$ju7ilo9#4791AS';
@@ -114,10 +113,21 @@ class _LoginState extends State<Login> {
                                         child: TextFormField(
                                             enableSuggestions: false,
                                             autocorrect: false,
-                                            obscureText: true,
-                                            decoration: const InputDecoration(
-                                                border: UnderlineInputBorder(),
-                                                hintText: 'Password'),
+                                            obscureText: _isObscure,
+                                            decoration: InputDecoration(
+                                                border: const UnderlineInputBorder(),
+                                                hintText: 'Password',
+                                                suffixIcon: IconButton(
+                                                    icon: Icon(
+                                                        _isObscure? Icons.visibility : Icons.visibility_off
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _isObscure = !_isObscure;
+                                                      });
+                                                    }
+                                                ),
+                                            ),
                                             onChanged: (password) =>
                                             appState.password = password,
                                             controller: passwordTextController),
