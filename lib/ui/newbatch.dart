@@ -75,8 +75,9 @@ class _NewBatchState extends State<NewBatch> {
               children: [
                 //Text('ID Lote Retail: '),
                 Container(
-                  margin: EdgeInsets.only(top: 8),
-                  padding: EdgeInsets.all(15),
+
+                  margin: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -101,8 +102,8 @@ class _NewBatchState extends State<NewBatch> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 8),
-                  padding: EdgeInsets.all(15),
+                  margin: const EdgeInsets.only(top: 0),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -127,8 +128,8 @@ class _NewBatchState extends State<NewBatch> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 8),
-                  padding: EdgeInsets.all(15),
+                  margin: const EdgeInsets.only(top: 0  ),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -153,8 +154,8 @@ class _NewBatchState extends State<NewBatch> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 8),
-                  padding: EdgeInsets.all(15),
+                  margin: const EdgeInsets.only(top: 0),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: ElevatedButton(
                       child: const Text('Crear lote'),
                       onPressed: () async {

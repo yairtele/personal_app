@@ -321,7 +321,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                             )
                                           ]),
                                       if(_dateWarning != '')
-                                        Icon(FontAwesomeIcons.exclamationTriangle),
+                                        const Icon(FontAwesomeIcons.exclamationTriangle),
                                       Text(_dateWarning,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
