@@ -58,10 +58,11 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     if (_batch.state!=BatchStates.Draft){
       enabled_value = false;
     }
+
     return WillPopScope(
       onWillPop: () {
         appState.returnWith(_shouldRefreshParent);
-
+        _shouldRefreshParent = false;
         //we need to return a future
         return Future.value(false);
       },
@@ -318,13 +319,14 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             //TODO: chequear estado de la solicitud y no del lote.
-                            if (returnRequest.state==BatchStates.Draft || returnRequest.state==BatchStates.InfoPendiente)
+                            if (returnRequest.isAuditable == false && (returnRequest.state==BatchStates.Draft || returnRequest.state==BatchStates.InfoPendiente))
                             ElevatedButton(
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
                                   await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _takenPictures);
-                                  _shouldRefreshParent = true;
+                                  appState.returnWith(true);
+                                  //_shouldRefreshParent = true;
                                   _showSnackBar('Solicitud actualizada con éxito');
                                 }
                                 on BusinessException catch (e){
@@ -337,6 +339,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   WorkingIndicatorDialog().dismiss();
                                 }
                               },
+
                               child: const Text('Guardar'),
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.green[400],

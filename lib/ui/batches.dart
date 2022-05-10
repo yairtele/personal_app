@@ -57,237 +57,255 @@ class _BatchesState extends State<Batches> {
   @override
   void initState(){
     super.initState();
-    _localData =  getScreenData();
+    _localData =  _getScreenData();
   }
 
-  Future<ScreenData<dynamic, List<Batch>>> getScreenData() => ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData();
+  Future<ScreenData<dynamic, List<Batch>>> _getScreenData() => ScreenData<dynamic, List<Batch>>(dataGetter: _getBatchData).getScreenData();
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
 
     return FutureBuilder<ScreenData<void, List<Batch>>>(
-        future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
 
-          Widget widget;
-          if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
-            final data = snapshot.data!;
-            final userInfo = data.userInfo;
-            final batches = data.data!;
-            final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
-            final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
-            widget = Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                backgroundColor: Colors.grey,
-                title: const Text(
-                  '',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white),
-                ),
-                actions: [
-                  Center(
-                      child: Text(
-                        'Bienvenido, ${userInfo.firstName}!\nCUIT: ${data
-                            .userInfo.idNumber}',
-                        style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      )),
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () =>
-                    appState.currentAction =
-                        PageAction(
-                            state: PageState.addPage, pageConfig: SettingsPageConfig),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () =>
-                    appState.waitCurrentAction<bool>(
-                        PageAction(state: PageState.addPage, pageConfig: NewBatchPageConfig)
-                    ).then((shouldRefresh) {
-                      if(shouldRefresh!){
-                        setState(() {
-                          _localData = getScreenData();
-                        });
-                      }
-                    })
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.grey,
+            future: _localData,
+            builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Batch>>> snapshot) {
+
+              Widget widget;
+              if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
+                final data = snapshot.data!;
+                final userInfo = data.userInfo;
+                final batches = data.data!;
+                final draftBatches = batches.where((batch) =>
+                batch.state == BatchStates.Draft).toList();
+                final auditedBatches = batches.where((batch) =>
+                batch.state != BatchStates.Draft).toList();
+                widget = Scaffold(
+                  appBar: AppBar(
+                    elevation: 0,
+                    backgroundColor: Colors.grey,
+                    title: const Text(
+                      '',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
                     ),
-                    onPressed: () {
-                      launch(
-                          'https://newsan.athento.com/accounts/login/?next=/dashboard/');
-                    }
-                    ,
-                    icon: Image.asset(
-                      'assets/images/boton_athento.png',
-                      height: 40.0, width: 40.0,),
-                    label: const Text(''),
-                    //color: Colors.grey,
-                  ),
-                ],
-              ),
-              body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      DataTable(columns: <DataColumn>[
-                        const DataColumn(
-                          label: Text('Lotes en Draft',
-                              style: TextStyle(fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
-                        ),
-                      ],
-                        rows: List<DataRow>.generate (
-                          //batches.where((state) => 'Draft').length,
-                          draftBatches.length,
-                          (int index) => DataRow(
-                            cells: <DataCell>[
-                            DataCell(
-                                ListTile(
-                                  isThreeLine: true,
-                                  leading: const Icon(
-                                      FontAwesomeIcons.archive,
-                                      color: Colors.grey),
-                                  title: Text(
-                                      '${draftBatches[index].batchNumber}',
-                                      style: const TextStyle(fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black)),
-                                  subtitle: Text('${_getBatchSubTitle(
-                                      draftBatches[index])}\n\n\n'),
-                                ),
-                                onTap: () {
-                                  appState.waitCurrentAction<bool>(
-                                      PageAction(
-                                          state: PageState.addWidget,
-                                          widget: BatchDetails(
-                                              batch: draftBatches[index]),
-                                          pageConfig: DetailsPageConfig)
-                                  ).then((shouldRefresh) {
-                                    if (shouldRefresh!) { //TODO:  Manejar el resultado de la pantalla Batch Details
-                                      setState(() {
-                                        _localData = getScreenData();
-                                      });
-                                    }
+                    actions: [
+                      Center(
+                          child: Text(
+                            'Bienvenido, ${userInfo.firstName}!\nCUIT: ${data
+                                .userInfo.idNumber}',
+                            style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          )),
+                      IconButton(
+                        icon: const Icon(Icons.settings),
+                        onPressed: () =>
+                        appState.currentAction =
+                            PageAction(
+                                state: PageState.addPage,
+                                pageConfig: SettingsPageConfig),
+                      ),
+                      IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () =>
+                              appState.waitCurrentAction<bool>(
+                                  PageAction(state: PageState.addPage,
+                                      pageConfig: NewBatchPageConfig)
+                              ).then((shouldRefresh) {
+                                if (shouldRefresh!) {
+                                  setState(() {
+                                    _localData = _getScreenData();
                                   });
                                 }
-                            )
-                          ],
-
-                            //selected: selected[index],
-                          ),
-                        ),
+                              })
                       ),
-
-                      DataTable(columns: <DataColumn>[
-                        const DataColumn(
-                          label: Text('Lotes en Auditoria',
-                              style: TextStyle(fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black
-                              )
-                          ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.grey,
                         ),
-                        const DataColumn(
-                            label: Text('Estado',
-                                style: TextStyle(fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black
-                                )
-                            ),
-                        ),
-                      ],
-                      rows: List<DataRow>.generate (
-                          auditedBatches.length,
-                              (int index) =>
-                              DataRow(
-                                color: UIHelper.getAuditItemBackgroundColor(auditedBatches[index].state!),
-                                cells: <DataCell>[
-                                  DataCell(ListTile(isThreeLine: true,
-                                    leading: const Icon(
-                                        FontAwesomeIcons.archive,
-                                        color: Colors.blue),
-                                    title: Text(
-                                        '${auditedBatches[index].batchNumber}',
-                                        style: const TextStyle(fontSize: 14.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                    subtitle: Text('${_getBatchSubTitle(
-                                        auditedBatches[index])}\n\n\n'),
-                                  ),
-                                  onTap: () {
-                                    appState.waitCurrentAction<bool>(
-                                        PageAction(
-                                            state: PageState.addWidget,
-                                            widget: BatchDetails(
-                                                batch: auditedBatches[index]),
-                                            pageConfig: DetailsPageConfig))
-                                        .then((shouldRefresh) {
-                                      if (shouldRefresh! == true) {
-                                        setState(() {
-                                          _localData = getScreenData();
-                                        });
-                                      }
-                                    });
-                                  }),
-                                  DataCell(Text(auditedBatches[index].state!))
-                                ],
-                                //selected: selected[index],
-                              ),
-                        ),
+                        onPressed: () {
+                          launch(
+                              'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                        }
+                        ,
+                        icon: Image.asset(
+                          'assets/images/boton_athento.png',
+                          height: 40.0, width: 40.0,),
+                        label: const Text(''),
+                        //color: Colors.grey,
                       ),
-
                     ],
                   ),
-                ),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            widget = Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
-                  )
-                ],
-              ),
-            );
-          } else {
-            widget = Center(
-                child: Stack(
-                    children: <Widget>[
-                      const Opacity(
-                        opacity: 1,
-                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                  body: SafeArea(
+                    child: RefreshIndicator(child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          DataTable(columns: <DataColumn>[
+                            const DataColumn(
+                              label: Text('Lotes en Draft',
+                                  style: TextStyle(fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black)),
+                            ),
+                          ],
+                            rows: List<DataRow>.generate (
+                              //batches.where((state) => 'Draft').length,
+                              draftBatches.length,
+                                  (int index) =>
+                                  DataRow(
+                                    cells: <DataCell>[
+                                      DataCell(
+                                          ListTile(
+                                            isThreeLine: true,
+                                            leading: const Icon(
+                                                FontAwesomeIcons.archive,
+                                                color: Colors.grey),
+                                            title: Text(
+                                                '${draftBatches[index]
+                                                    .batchNumber}',
+                                                style: const TextStyle(
+                                                    fontSize: 14.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black)),
+                                            subtitle: Text('${_getBatchSubTitle(
+                                                draftBatches[index])}\n\n\n'),
+                                          ),
+                                          onTap: () {
+                                            appState.waitCurrentAction<bool>(
+                                                PageAction(
+                                                    state: PageState.addWidget,
+                                                    widget: BatchDetails(
+                                                        batch: draftBatches[index]),
+                                                    pageConfig: DetailsPageConfig)
+                                            ).then((shouldRefresh) {
+                                              if (shouldRefresh!) { //TODO:  Manejar el resultado de la pantalla Batch Details
+                                                setState(() {
+                                                  _localData = _getScreenData();
+                                                });
+                                              }
+                                            });
+                                          }
+                                      )
+                                    ],
+
+                                    //selected: selected[index],
+                                  ),
+                            ),
+                          ),
+
+                          DataTable(columns: <DataColumn>[
+                            const DataColumn(
+                              label: Text('Lotes en Auditoria',
+                                  style: TextStyle(fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black
+                                  )
+                              ),
+                            ),
+                            const DataColumn(
+                              label: Text('Estado',
+                                  style: TextStyle(fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black
+                                  )
+                              ),
+                            ),
+                          ],
+                            rows: List<DataRow>.generate (
+                              auditedBatches.length,
+                                  (int index) =>
+                                  DataRow(
+                                    color: UIHelper.getAuditItemBackgroundColor(
+                                        auditedBatches[index].state!),
+                                    cells: <DataCell>[
+                                      DataCell(ListTile(isThreeLine: true,
+                                        leading: const Icon(
+                                            FontAwesomeIcons.archive,
+                                            color: Colors.blue),
+                                        title: Text(
+                                            '${auditedBatches[index]
+                                                .batchNumber}',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black)),
+                                        subtitle: Text('${_getBatchSubTitle(
+                                            auditedBatches[index])}\n\n\n'),
+                                      ),
+                                          onTap: () {
+                                            appState.waitCurrentAction<bool>(
+                                                PageAction(
+                                                    state: PageState.addWidget,
+                                                    widget: BatchDetails(
+                                                        batch: auditedBatches[index]),
+                                                    pageConfig: DetailsPageConfig))
+                                                .then((shouldRefresh) {
+                                              if (shouldRefresh! == true) {
+                                                setState(() {
+                                                  _localData = _getScreenData();
+                                                });
+                                              }
+                                            });
+                                          }),
+                                      DataCell(
+                                          Text(auditedBatches[index].state!))
+                                    ],
+                                    //selected: selected[index],
+                                  ),
+                            ),
+                          ),
+
+                        ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+                    ),
+                        onRefresh: _refresh
+                    ),
+                  ),
+                );
+              }
+              else if (snapshot.hasError) {
+                widget = Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 60,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text('Error: ${snapshot.error}'),
                       )
-                    ]
-                )
-            );
-          }
-          return widget;
-        }
-    );
+                    ],
+                  ),
+                );
+              } else {
+                widget = Center(
+                    child: Stack(
+                        children: <Widget>[
+                          const Opacity(
+                            opacity: 1,
+                            child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+                          )
+                        ]
+                    )
+                );
+              }
+              return widget;
+            }
+        );
+
+
 
   }
 
@@ -314,6 +332,12 @@ class _BatchesState extends State<Batches> {
     }
     final batchRetailReference = (batch.retailReference ?? '').trim();
     return batchRetailReference  != '' ? batchRetailReference : batchDescription;
+  }
+
+  Future<void> _refresh() async{
+    setState(() {
+      _localData =  _getScreenData();
+    });
   }
 }
 

@@ -33,7 +33,6 @@ class _ProductDetailsState extends State<ProductDetails> {
   ProductInfo? _productInfo;
   //Map<String, PhotoDetail> _takenPictures = {};
   Map<String, ThumbPhoto> _takenPictures = {};
-
   var _referenceModified = false;
   final _modifiedPhotos =  ProductPhotos([]);
   late XFile _dummyPhoto;
@@ -51,238 +50,285 @@ class _ProductDetailsState extends State<ProductDetails> {
     final product = widget.product;
     final newProductDetailsState = this;
     final _batch = widget.batch;
-    if (_batch.state!=BatchStates.Draft){
+    if (_batch.state != BatchStates.Draft) {
       enabled_value = false;
     }
-    return FutureBuilder<ScreenData<Product, ProductDetail>>(
-        future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<Product, ProductDetail>> snapshot) {
 
-          Widget widget;
-          if (snapshot.hasData) {
-            final data = snapshot.data!;
-            _takenPictures = data.data!.productPhotos;
-            _productInfo = data.data!.productInfo;
-            final EAN = product.EAN;
-            final _EAN = TextEditingController(text:EAN);
-            final descripcion = product.description;
-            final _descripcion = TextEditingController(text:descripcion);
-            final reference = product.retailReference;
-            final _reference = TextEditingController(text:reference);
 
-            //List<String> _modifiedPhotos = [];
+    return WillPopScope(
+        onWillPop: () {
+          appState.returnWith(false);
 
-            widget = Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                backgroundColor: Colors.grey,
-                title: Text(
-                  'Producto ${product.retailReference}',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
-                ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () => appState.currentAction =
-                        PageAction(state: PageState.addPage, pageConfig: SettingsPageConfig),
-                  ),
-                  if (_batch.state==BatchStates.Draft)
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.grey,
-                    ),
-                    onPressed:(){
-                    launch('https://newsan.athento.com/accounts/login/?next=/dashboard/');
-                  }
-                    ,icon: Image.asset(
-                      'assets/images/boton_athento.png',
-                      height: 40.0,width: 40.0,),
-                    label: const Text(''),
-                  ),
-                ],
-              ),
-              body: SafeArea(
-                child: ListView(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.all(15),
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.send,
-                        maxLength: 30,
-                        enabled: false,
-                        controller: _EAN,
-                        decoration: const InputDecoration(
-                          hintText: '-',
-                          label: Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  WidgetSpan(
-                                    child: Text(
-                                        'EAN:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              )
-                          ),
-                        ),
+          //we need to return a future
+          return Future.value(false);
+        },
+        child: FutureBuilder<ScreenData<Product, ProductDetail>>(
+            future: _localData,
+            builder: (BuildContext context,
+                AsyncSnapshot<ScreenData<Product, ProductDetail>> snapshot) {
+              Widget widget;
+              if (snapshot.hasData) {
+                final data = snapshot.data!;
+                _takenPictures = data.data!.productPhotos;
+                _productInfo = data.data!.productInfo;
+                final EAN = product.EAN;
+                final _EAN = TextEditingController(text: EAN);
+                final descripcion = product.description;
+                final _descripcion = TextEditingController(text: descripcion);
+                final reference = product.retailReference;
+                final _reference = TextEditingController(text: reference);
+
+                //List<String> _modifiedPhotos = [];
+
+                widget = Scaffold(
+                    appBar: AppBar(
+                      elevation: 0,
+                      backgroundColor: Colors.grey,
+                      title: Text(
+                        'Producto ${product.retailReference}',
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.all(15),
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.send,
-                        maxLength: 50,
-                        enabled: false,
-                        controller: _descripcion,
-                        decoration: const InputDecoration(
-                          hintText: '-',
-                          label: Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  WidgetSpan(
-                                    child: Text(
-                                        'Descripcion:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              )
-                          ),
+                      actions: [
+                        IconButton(
+                          icon: const Icon(Icons.settings),
+                          onPressed: () =>
+                          appState.currentAction =
+                              PageAction(state: PageState.addPage,
+                                  pageConfig: SettingsPageConfig),
                         ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.all(15),
-                      child: TextField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.send,
-                        maxLength: 50,
-                        enabled: enabled_value,
-                        controller: _reference,
-                        onChanged: (_) {
-                          _referenceModified = true;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: '-',
-                          label: Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  WidgetSpan(
-                                    child: Text(
-                                        'Referencia:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              )
-                          ),
-                        ),
-                      ),
-                    ),
-                  Container(
-                      //child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
-                      child: SpUI.buildThumbnailsGridView(state: newProductDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: product.state!)
-            ),
-                   Padding(
-                      padding: const EdgeInsets.only(top:16.0),
-                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (product.state==BatchStates.Draft || product.state==BatchStates.InfoPendiente)
-                        ElevatedButton(
-                            onPressed: () async {
-                              try{
-                                WorkingIndicatorDialog().show(context, text: 'Actualizando producto...');
-                                await _updateProduct(_referenceModified, _reference.text, _takenPictures, product);
-
-                                appState.returnWith(true);
-
-                                _showSnackBar('Producto actualizado con éxito');
-                              }
-                              on BusinessException catch (e){
-                                _showSnackBar(e.message);
-                              }
-                              on Exception catch (e){
-                                _showSnackBar('Ha ocurrido un error inesperado al actualizar el producto: $e');
-                              }
-                              finally{
-                                WorkingIndicatorDialog().dismiss();
-                              }
-                            },
-                            child: const Text('Guardar'),
+                        if (_batch.state == BatchStates.Draft)
+                          ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.green[400],
-                            )
-                        ),
-                        if (product.state==BatchStates.Draft)
-                        ElevatedButton(
-                            onPressed: () async {
-                              try{
-                                WorkingIndicatorDialog().show(context, text: 'Eliminando producto...');
-                                await _deleteProduct(product);
-                                appState.returnWith(true);
-                                _showSnackBar('Producto eliminado con éxito');
-                              }
-                              on BusinessException catch (e){
-                                _showSnackBar(e.message);
-                              }
-                              on Exception catch (e){
-                                _showSnackBar('Ha ocurrido un error inesperado al eliminar el producto: $e');
-                              }
-                              finally{
-                                WorkingIndicatorDialog().dismiss();
-                              }
-                            },
-                            child: const Text('Eliminar'),
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.red[400],
-                            )
-                          )]
-                    )
-                  )
-                ]
-            )));
-          } else if (snapshot.hasError) {
-            widget = Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
-                  )
-                ],
-              ),
-            );
-          } else {
-            widget = Center(
-                child: Stack(
+                              primary: Colors.grey,
+                            ),
+                            onPressed: () {
+                              launch(
+                                  'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                            }
+                            , icon: Image.asset(
+                            'assets/images/boton_athento.png',
+                            height: 40.0, width: 40.0,),
+                            label: const Text(''),
+                          ),
+                      ],
+                    ),
+                    body: SafeArea(
+                        child: ListView(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.all(15),
+                                child: TextField(
+                                  autofocus: true,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.send,
+                                  maxLength: 30,
+                                  enabled: false,
+                                  controller: _EAN,
+                                  decoration: const InputDecoration(
+                                    hintText: '-',
+                                    label: Text.rich(
+                                        TextSpan(
+                                          children: <InlineSpan>[
+                                            WidgetSpan(
+                                              child: Text(
+                                                  'EAN:', style: TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold)),
+                                            ),
+                                          ],
+                                        )
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.all(15),
+                                child: TextField(
+                                  autofocus: true,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.send,
+                                  maxLength: 50,
+                                  enabled: false,
+                                  controller: _descripcion,
+                                  decoration: const InputDecoration(
+                                    hintText: '-',
+                                    label: Text.rich(
+                                        TextSpan(
+                                          children: <InlineSpan>[
+                                            WidgetSpan(
+                                              child: Text(
+                                                  'Descripcion:',
+                                                  style: TextStyle(
+                                                      fontSize: 18.0,
+                                                      fontWeight: FontWeight
+                                                          .bold)),
+                                            ),
+                                          ],
+                                        )
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.all(15),
+                                child: TextField(
+                                  autofocus: true,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.send,
+                                  maxLength: 50,
+                                  enabled: enabled_value,
+                                  controller: _reference,
+                                  onChanged: (_) {
+                                    _referenceModified = true;
+                                  },
+                                  decoration: const InputDecoration(
+                                    hintText: '-',
+                                    label: Text.rich(
+                                        TextSpan(
+                                          children: <InlineSpan>[
+                                            WidgetSpan(
+                                              child: Text(
+                                                  'Referencia:',
+                                                  style: TextStyle(
+                                                      fontSize: 18.0,
+                                                      fontWeight: FontWeight
+                                                          .bold)),
+                                            ),
+                                          ],
+                                        )
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                //child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
+                                  child: SpUI.buildThumbnailsGridView(
+                                      state: newProductDetailsState,
+                                      photos: _takenPictures,
+                                      dummyPhoto: _dummyPhoto,
+                                      photoParentState: product.state!)
+                              ),
+                              Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center,
+                                      children: [
+                                        if (product.state ==
+                                            BatchStates.Draft || product
+                                            .state == BatchStates.InfoPendiente)
+                                          ElevatedButton(
+                                              onPressed: () async {
+                                                try {
+                                                  WorkingIndicatorDialog().show(
+                                                      context,
+                                                      text: 'Actualizando producto...');
+                                                  await _updateProduct(
+                                                      _referenceModified,
+                                                      _reference.text,
+                                                      _takenPictures, product);
+
+                                                  appState.returnWith(true);
+
+                                                  _showSnackBar(
+                                                      'Producto actualizado con éxito');
+                                                }
+                                                on BusinessException catch (e) {
+                                                  _showSnackBar(e.message);
+                                                }
+                                                on Exception catch (e) {
+                                                  _showSnackBar(
+                                                      'Ha ocurrido un error inesperado al actualizar el producto: $e');
+                                                }
+                                                finally {
+                                                  WorkingIndicatorDialog()
+                                                      .dismiss();
+                                                }
+                                              },
+                                              child: const Text('Guardar'),
+                                              style: ElevatedButton.styleFrom(
+                                                primary: Colors.green[400],
+                                              )
+                                          ),
+                                        if (product.state == BatchStates.Draft)
+                                          ElevatedButton(
+                                              onPressed: () async {
+                                                try {
+                                                  WorkingIndicatorDialog().show(
+                                                      context,
+                                                      text: 'Eliminando producto...');
+                                                  await _deleteProduct(product);
+                                                  appState.returnWith(true);
+                                                  _showSnackBar(
+                                                      'Producto eliminado con éxito');
+                                                }
+                                                on BusinessException catch (e) {
+                                                  _showSnackBar(e.message);
+                                                }
+                                                on Exception catch (e) {
+                                                  _showSnackBar(
+                                                      'Ha ocurrido un error inesperado al eliminar el producto: $e');
+                                                }
+                                                finally {
+                                                  WorkingIndicatorDialog()
+                                                      .dismiss();
+                                                }
+                                              },
+                                              child: const Text('Eliminar'),
+                                              style: ElevatedButton.styleFrom(
+                                                primary: Colors.red[400],
+                                              )
+                                          )
+                                      ]
+                                  )
+                              )
+                            ]
+                        )));
+              } else if (snapshot.hasError) {
+                widget = Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Opacity(
-                        opacity: 1,
-                        child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 60,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text('Error: ${snapshot.error}'),
                       )
-                    ]
-                )
-            );
-          }
-          return widget;
-        }
+                    ],
+                  ),
+                );
+              } else {
+                widget = Center(
+                    child: Stack(
+                        children: <Widget>[
+                          const Opacity(
+                            opacity: 1,
+                            child: CircularProgressIndicator(
+                                backgroundColor: Colors.grey),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Text('Cargando...', style: TextStyle(
+                                color: Colors.grey, height: 4, fontSize: 9)),
+                          )
+                        ]
+                    )
+                );
+              }
+              return widget;
+            }
+        )
     );
-
   }
 
   Future<ProductDetail> _getProductDetail(Product? product) async {
