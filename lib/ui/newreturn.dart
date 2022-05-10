@@ -176,10 +176,9 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       } else {
                                         if (Platform.isAndroid ||
                                             Platform.isIOS) {
+                                          FocusManager.instance.primaryFocus?.unfocus();
                                           final barcode = await BarcodeScanner.scan();
-                                          //setState((){
                                           _lookForProduct(barcode);
-                                          //});
                                         }
                                       }
                                     },
