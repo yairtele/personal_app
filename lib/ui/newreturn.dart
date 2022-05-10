@@ -326,27 +326,60 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               fontWeight: FontWeight.bold,
                                               color: Colors.red
                                           )),
-                                      Container(
-                                        margin:
-                                        const EdgeInsets.only(top: 8),
-                                        padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                                        child: TextField(
-                                          controller: _retailReferenceTextController,
-                                          autofocus: true,
-                                          keyboardType:
-                                          TextInputType.text,
-                                          textInputAction:
-                                          TextInputAction.send,
-                                          maxLength: 30,
-                                          decoration: const InputDecoration(
-                                              labelText:
-                                              'Referencia interna',
-                                              helperText:'Ej: AEF54216CV'
-                                          ),
-                                        ),
+                                      Row(
+                                        children:[
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.fromLTRB(30, 0, 10, 0),
+                                              child: TextField(
+                                              controller: _retailReferenceTextController,
+                                              autofocus: true,
+                                              keyboardType:
+                                              TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.send,
+                                              maxLength: 30,
+                                              decoration: const InputDecoration(
+                                                  labelText:
+                                                  'Referencia interna',
+                                                  helperText:'Ej: AEF54216CV'
+                                              ),
+                                            ),
+                                          )),
+                                          Container(
+                                            width: 45,
+                                            margin: const EdgeInsets.only(top: 8),
+                                            padding: const EdgeInsets.only(left: 2, right: 2),
+                                            child: ElevatedButton(
+                                              child: const Icon(FontAwesomeIcons.barcode),
+                                              onPressed: () async {
+                                                if (kIsWeb) {
+                                                  /*final tmpFile = await getImage(1);
+                                                  setState(() async {
+                                                    imageFile = tmpFile;
+                                                    var fileBytes = await imageFile.readAsBytes();
+                                                    //print('Path: ' + imageFile.files.single.path);
+                                                    //metodo no soportado en Flutter web, buscar otra libreria
+                                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                                                    print('Barcode: ' + results[0].toString());
+                                                    _controller.text = results[0].toString();
+                                                  });*/
+                                                } else {
+                                                  if (Platform.isAndroid ||
+                                                      Platform.isIOS) {
+                                                    FocusManager.instance.primaryFocus?.unfocus();
+                                                    final barcode = await BarcodeScanner.scan();
+                                                    setState(() {
+                                                      _retailReferenceTextController.text = barcode.rawContent;
+                                                    });
+                                                  }
+                                                }
+                                              },
+                                            ),
+                                          )]
                                       ),
                                       Column(
-                                          mainAxisAlignment:
+                                      mainAxisAlignment:
                                           MainAxisAlignment.start,
                                           children: [
                                             if (!_isAuditableProduct)
