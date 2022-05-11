@@ -224,6 +224,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     padding: const EdgeInsets.only(right: 10),
                                     child: ElevatedButton(
                                       child: const Icon(FontAwesomeIcons.barcode),
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.only(left: 0, right: 0),
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
                                       onPressed: () async {
                                         if (kIsWeb) {
                                           /*final tmpFile = await getImage(1);

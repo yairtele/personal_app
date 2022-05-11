@@ -161,6 +161,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   padding: const EdgeInsets.only(left: 2, right: 2),
                                   child: ElevatedButton(
                                     child: const Icon(FontAwesomeIcons.barcode),
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.only(left: 0, right: 0),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
                                     onPressed: () async {
                                       if (kIsWeb) {
                                         /*final tmpFile = await getImage(1);
@@ -191,6 +195,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   child: ElevatedButton(
                                     child: const Icon(// Botón Buscar
                                         FontAwesomeIcons.search),
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.only(left: 0, right: 0),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
                                     onPressed: _lookForProduct,
                                   ),
                                 ),
@@ -352,6 +360,10 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                             padding: const EdgeInsets.only(left: 2, right: 2),
                                             child: ElevatedButton(
                                               child: const Icon(FontAwesomeIcons.barcode),
+                                              style: ElevatedButton.styleFrom(
+                                                padding: const EdgeInsets.only(left: 0, right: 0),
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              ),
                                               onPressed: () async {
                                                 if (kIsWeb) {
                                                   /*final tmpFile = await getImage(1);
