@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
@@ -34,8 +39,9 @@ class _ProductDetailsState extends State<ProductDetails> {
   //Map<String, PhotoDetail> _takenPictures = {};
   Map<String, ThumbPhoto> _takenPictures = {};
   var _referenceModified = false;
-  final _modifiedPhotos =  ProductPhotos([]);
+  //final _modifiedPhotos =  ProductPhotos([]);
   late XFile _dummyPhoto;
+  var _reference;
 
   @override
   void initState(){
@@ -53,7 +59,10 @@ class _ProductDetailsState extends State<ProductDetails> {
     if (_batch.state != BatchStates.Draft) {
       enabled_value = false;
     }
-
+    if(!_referenceModified){
+      final reference = product.retailReference;
+      _reference = TextEditingController(text: reference);
+    }
 
     return WillPopScope(
         onWillPop: () {
@@ -75,8 +84,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                 final _EAN = TextEditingController(text: EAN);
                 final descripcion = product.description;
                 final _descripcion = TextEditingController(text: descripcion);
-                final reference = product.retailReference;
-                final _reference = TextEditingController(text: reference);
 
                 //List<String> _modifiedPhotos = [];
 
@@ -174,37 +181,75 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.all(15),
-                                child: TextField(
-                                  autofocus: true,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.send,
-                                  maxLength: 50,
-                                  enabled: enabled_value,
-                                  controller: _reference,
-                                  onChanged: (_) {
-                                    _referenceModified = true;
-                                  },
-                                  decoration: const InputDecoration(
-                                    hintText: '-',
-                                    label: Text.rich(
-                                        TextSpan(
-                                          children: <InlineSpan>[
-                                            WidgetSpan(
-                                              child: Text(
-                                                  'Referencia:',
-                                                  style: TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontWeight: FontWeight
-                                                          .bold)),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child:
+                                        Container(
+                                            margin: const EdgeInsets.only(top: 8),
+                                            padding: const EdgeInsets.fromLTRB(15, 0, 10, 0),
+                                            child: TextField(
+                                              autofocus: true,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction: TextInputAction.send,
+                                              maxLength: 50,
+                                              enabled: enabled_value,
+                                              controller: _reference,
+                                              onChanged: (_) {
+                                                _referenceModified = true;
+                                              },
+                                              decoration: const InputDecoration(
+                                                hintText: '-',
+                                                label: Text.rich(
+                                                    TextSpan(
+                                                      children: <InlineSpan>[
+                                                        WidgetSpan(
+                                                          child: Text(
+                                                              'Referencia:',
+                                                              style: TextStyle(
+                                                                  fontSize: 18.0,
+                                                                  fontWeight: FontWeight
+                                                                      .bold)),
+                                                        ),
+                                                      ],
+                                                    )
+                                                ),
+                                              ),
                                             ),
-                                          ],
-                                        )
+                                          )
+                                      ),
+                                  Container(
+                                    width: 45,
+                                    margin: const EdgeInsets.only(top: 8),
+                                    padding: const EdgeInsets.only(right: 10),
+                                    child: ElevatedButton(
+                                      child: const Icon(FontAwesomeIcons.barcode),
+                                      onPressed: () async {
+                                        if (kIsWeb) {
+                                          /*final tmpFile = await getImage(1);
+                                                  setState(() async {
+                                                    imageFile = tmpFile;
+                                                    var fileBytes = await imageFile.readAsBytes();
+                                                    //print('Path: ' + imageFile.files.single.path);
+                                                    //metodo no soportado en Flutter web, buscar otra libreria
+                                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                                                    print('Barcode: ' + results[0].toString());
+                                                    _controller.text = results[0].toString();
+                                                  });*/
+                                        } else {
+                                          if (Platform.isAndroid || Platform.isIOS) {
+                                            FocusManager.instance.primaryFocus?.unfocus();
+                                            final barcode = await BarcodeScanner.scan();
+                                            setState(() {
+                                              _reference.text = barcode.rawContent;
+                                              _referenceModified = true;
+                                            });
+                                          }
+                                        }
+                                      },
                                     ),
-                                  ),
-                                ),
+                                  )
+                                ],
                               ),
                               Container(
                                 //child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
