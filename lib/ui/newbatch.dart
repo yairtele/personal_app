@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:navigation_app/config/cache.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
-import 'package:navigation_app/services/business/new_return.dart';
-import 'package:navigation_app/ui/batches.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 
 import '../app_state.dart';
@@ -74,33 +74,61 @@ class _NewBatchState extends State<NewBatch> {
             child: ListView(
               children: [
                 //Text('ID Lote Retail: '),
-                Container(
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
 
-                  margin: const EdgeInsets.only(top: 8),
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: TextField(
-                    autofocus: true,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.send,
-                    maxLength: 30,
-                    decoration: const InputDecoration(
-                      hintText: 'Referencia Interna Lote',
-                      helperText: 'Ej: LOT-35266',
-                      label: Text.rich(
-                          TextSpan(
-                            children: <InlineSpan>[
-                              WidgetSpan(
-                                child: Text(
-                                    'Referencia Interna Lote:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
-                              ),
-                            ],
-                          )
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(left: 15, right: 15),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.send,
+                          maxLength: 30,
+                          decoration: const InputDecoration(
+                            hintText: 'Referencia Interna Lote',
+                            helperText: 'Ej: LOT-35266',
+                            label: Text.rich(
+                                TextSpan(
+                                  children: <InlineSpan>[
+                                    WidgetSpan(
+                                      child: Text(
+                                          'Referencia Interna Lote:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                          onChanged: (reference) => appState.reference = reference,
+                          controller: referenceTextController,
+                        ),
                       ),
                     ),
-                    onChanged: (reference) => appState.reference = reference,
-                    controller: referenceTextController,
-                  ),
+                    Container(
+                      width: 45,
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.only(left: 0, right: 0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Icon(FontAwesomeIcons.barcode),
+                        onPressed: () async {
+                            if (Platform.isAndroid || Platform.isIOS) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final barcode = await BarcodeScanner.scan();
+                              setState(() {
+                                referenceTextController.text = barcode.rawContent;
+                              });
+                            }
+                        },
+                      ),
+                    )
+                  ],
                 ),
+
                 Container(
                   margin: const EdgeInsets.only(top: 0),
                   padding: const EdgeInsets.only(left: 15, right: 15),
@@ -117,7 +145,7 @@ class _NewBatchState extends State<NewBatch> {
                             children: <InlineSpan>[
                               WidgetSpan(
                                 child: Text(
-                                    'Descripcion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    'Descripcion:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
                               ),
                             ],
                           )
@@ -143,7 +171,7 @@ class _NewBatchState extends State<NewBatch> {
                             children: <InlineSpan>[
                               WidgetSpan(
                                 child: Text(
-                                    'Observacion:',style: const TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
+                                    'Observacion:',style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold)),
                               ),
                             ],
                           )

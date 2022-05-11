@@ -27,7 +27,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+import 'dart:io';
+
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
@@ -157,9 +161,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                   padding: const EdgeInsets.all(16.0),
                   child: ListView(
                     children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                      Container( //Nro Lote
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.text,
@@ -174,7 +178,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     WidgetSpan(
                                       child: Text(
                                           'N° Lote:',
-                                          style: const TextStyle(fontSize: 18.0,
+                                          style: TextStyle(fontSize: 18.0,
                                               fontWeight: FontWeight.bold)),
                                     ),
                                   ],
@@ -183,37 +187,64 @@ class _BatchDetailsState extends State<BatchDetails> {
                           ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
-                        child: TextField(
-                          autofocus: false,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.send,
-                          maxLength: 30,
-                          controller: _reference,
-                          enabled: enabled_value,
-                          decoration: const InputDecoration(
-                            hintText: 'Referencia Interna Lote',
-                            helperText: 'Ej: LOT-35266',
-                            label: Text.rich(
-                                TextSpan(
-                                  children: <InlineSpan>[
-                                    WidgetSpan(
-                                      child: Text(
-                                          'Referencia Interna Lote:',
-                                          style: const TextStyle(fontSize: 18.0,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                )
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Container( //Referencia Interna - TextField
+                            margin: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.all(15),
+                            child: TextField(
+                              autofocus: false,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.send,
+                              maxLength: 30,
+                              controller: _reference,
+                              enabled: enabled_value,
+                              decoration: const InputDecoration(
+                                hintText: 'Referencia Interna Lote',
+                                helperText: 'Ej: LOT-35266',
+                                label: Text.rich(
+                                    TextSpan(
+                                      children: <InlineSpan>[
+                                        WidgetSpan(
+                                          child: Text(
+                                              'Referencia Interna Lote:',
+                                              style: TextStyle(fontSize: 18.0,
+                                                  fontWeight: FontWeight.bold)),
+                                        ),
+                                      ],
+                                    )
+                                ),
+                              ),
                             ),
+                          )
                           ),
-                        ),
+                          Container( //Referencia Interna - Boton Codigo Barras
+                            width: 45,
+                            margin: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.only(right: 10),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.only(left: 0, right: 0),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Icon(FontAwesomeIcons.barcode),
+                              onPressed: () async {
+                                if (Platform.isAndroid || Platform.isIOS) {
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  final barcode = await BarcodeScanner.scan();
+                                  setState(() {
+                                    _reference.text = barcode.rawContent;
+                                  });
+                                }
+                              },
+                            ),
+                          )
+                        ],
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.text,
@@ -229,7 +260,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   children: <InlineSpan>[
                                     WidgetSpan(
                                       child: Text(
-                                          'Descripcion:', style: const TextStyle(
+                                          'Descripcion:', style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold)),
                                     ),
@@ -240,8 +271,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 8),
-                        padding: EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(15),
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.text,
@@ -257,7 +288,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   children: <InlineSpan>[
                                     WidgetSpan(
                                       child: Text(
-                                          'Observacion:', style: const TextStyle(
+                                          'Observacion:', style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold)),
                                     ),
@@ -268,7 +299,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 16.0),
+                        padding: const EdgeInsets.only(top: 16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
