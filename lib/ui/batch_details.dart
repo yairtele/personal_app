@@ -60,6 +60,8 @@ class BatchDetails extends StatefulWidget {
 class _BatchDetailsState extends State<BatchDetails> {
   late Future<ScreenData<Batch, List<ReturnRequest>>> _localData;
   bool _shouldRefreshParent = false;
+  var _reference;
+  var _referenceModified = false;
 
   @override
   void initState(){
@@ -74,12 +76,15 @@ class _BatchDetailsState extends State<BatchDetails> {
   Widget build(BuildContext context) {
     var enabled_value = true;
     final batch = widget.batch;
-    final title = batch.retailReference;
+    if(!_referenceModified) {
+      final title = batch.retailReference;
+      _reference = TextEditingController(text: title);
+    }
     final subTitle = batch.description;
     final observation = batch.observation;
     final batchnumber = batch.batchNumber;
     final appState = Provider.of<AppState>(context, listen: false);
-    final _reference = TextEditingController(text: title);
+
     final _description = TextEditingController(text:subTitle);
     final _observation = TextEditingController(text:observation);
     final _batchnumber = TextEditingController(text:batchnumber);
@@ -200,6 +205,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                               maxLength: 30,
                               controller: _reference,
                               enabled: enabled_value,
+                              onChanged: (_) {
+                                _referenceModified = true;
+                              },
                               decoration: const InputDecoration(
                                 hintText: 'Referencia Interna Lote',
                                 helperText: 'Ej: LOT-35266',
@@ -235,6 +243,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   final barcode = await BarcodeScanner.scan();
                                   setState(() {
                                     _reference.text = barcode.rawContent;
+                                    _referenceModified = true;
                                   });
                                 }
                               },
