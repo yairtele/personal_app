@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
@@ -35,6 +40,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
   bool _shouldRefreshParent = false;
   Map<String, ThumbPhoto> _takenPictures = {};
   late XFile _dummyPhoto;
+  var _referenceModified = false;
+  var _reference;
 
   @override
   void initState() {
@@ -76,14 +83,16 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               final shouldShowStateColumn = returnRequest.state != 'Draft';
               _takenPictures = data.data!.optionalPhotos;
               final products = data.data!.products;
-              final reference = returnRequest.retailReference;
+              if(!_referenceModified){
+                final reference = returnRequest.retailReference;
+                _reference = TextEditingController(text: reference);
+              }
               final _eanTextController = TextEditingController(
                   text: returnRequest.EAN);
               final _skuTextController = TextEditingController(
                   text: returnRequest.sku);
               final _commercialCodeTextController = TextEditingController(
                   text: returnRequest.commercialCode);
-              final _reference = TextEditingController(text: reference);
               var cantidad = returnRequest.quantity;
               if (cantidad == null) {
                 cantidad = 1;
@@ -231,32 +240,72 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       if(!returnRequest.isAuditable)
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          padding: const EdgeInsets.all(15),
-                          child: TextField(
-                            enabled: enabled_value,
-                            autofocus: false,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.send,
-                            maxLength: 50,
-                            controller: _reference,
-                            decoration: const InputDecoration(
-                              hintText: 'Referencia Interna',
-                              label: Text.rich(
-                                  TextSpan(
-                                    children: <InlineSpan>[
-                                      WidgetSpan(
-                                        child: Text(
-                                            'Referencia Interna:',
-                                            style: TextStyle(fontSize: 18.0,
-                                                fontWeight: FontWeight.bold)),
-                                      ),
-                                    ],
-                                  )
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.all(15),
+                              child: TextField(
+                                enabled: enabled_value,
+                                autofocus: false,
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.send,
+                                maxLength: 50,
+                                controller: _reference,
+                                onChanged: (_) {
+                                  _referenceModified = true;
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: 'Referencia Interna',
+                                  label: Text.rich(
+                                      TextSpan(
+                                        children: <InlineSpan>[
+                                          WidgetSpan(
+                                            child: Text(
+                                                'Referencia Interna:',
+                                                style: TextStyle(fontSize: 18.0,
+                                                    fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                      )
+                                  ),
+                                ),
                               ),
+                            )
                             ),
-                          ),
+                            Container(
+                              width: 45,
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.only(right: 10),
+                              child: ElevatedButton(
+                                child: const Icon(FontAwesomeIcons.barcode),
+                                onPressed: () async {
+                                  if (kIsWeb) {
+                                    /*final tmpFile = await getImage(1);
+                                                  setState(() async {
+                                                    imageFile = tmpFile;
+                                                    var fileBytes = await imageFile.readAsBytes();
+                                                    //print('Path: ' + imageFile.files.single.path);
+                                                    //metodo no soportado en Flutter web, buscar otra libreria
+                                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
+                                                    print('Barcode: ' + results[0].toString());
+                                                    _controller.text = results[0].toString();
+                                                  });*/
+                                  } else {
+                                    if (Platform.isAndroid || Platform.isIOS) {
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      final barcode = await BarcodeScanner.scan();
+                                      setState(() {
+                                        _reference.text = barcode.rawContent;
+                                        _referenceModified = true;
+                                      });
+                                    }
+                                  }
+                                },
+                              ),
+                            )
+                          ],
                         ),
                       Container(
                         margin: const EdgeInsets.only(top: 8),
