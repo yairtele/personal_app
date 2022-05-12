@@ -113,13 +113,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         color: Colors.white),
                   ),
                   actions: [
-                    IconButton(
+                    /*IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () =>
                       appState.currentAction =
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
-                    ),
+                    ),*/
                     if (_batch.state==BatchStates.Draft)
                     IconButton(
                       icon: const Icon(Icons.add),

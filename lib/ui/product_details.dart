@@ -99,13 +99,13 @@ class _ProductDetailsState extends State<ProductDetails> {
                             color: Colors.white),
                       ),
                       actions: [
-                        IconButton(
+                        /*IconButton(
                           icon: const Icon(Icons.settings),
                           onPressed: () =>
                           appState.currentAction =
                               PageAction(state: PageState.addPage,
                                   pageConfig: SettingsPageConfig),
-                        ),
+                        ),*/
                         if (_batch.state == BatchStates.Draft)
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(

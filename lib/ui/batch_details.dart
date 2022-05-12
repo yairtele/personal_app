@@ -124,13 +124,13 @@ class _BatchDetailsState extends State<BatchDetails> {
                   ),
                   actions: [
 
-                    IconButton(
+                    /*IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () =>
                       appState.currentAction =
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
-                    ),
+                    ),*/
                     if (batch.state==BatchStates.Draft)
                     IconButton(
                         icon: const Icon(Icons.add),

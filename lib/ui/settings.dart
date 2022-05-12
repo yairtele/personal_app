@@ -58,7 +58,7 @@ class Settings extends StatelessWidget {
                onPressed: () async {
                   await appState.logout();
                 },
-                child: const Text('Log Out'),
+                child: const Text('Cerrar sesión'),
               ),
             ],
           ),
