@@ -162,14 +162,18 @@ class BusinessServices {
   static Future<ProductInfo> _getProductInfoByEANorCodefromFile(int productFileSearchColumnIndex, String productFileSearchKey) async {
     //TODO: Consultar Athento
     const chunkSize = 32 * 1024;
+    final searchPattern = RegExp(r'[^A-Z0-9-]', caseSensitive: false);
+    const replaceString = '-';
 
+
+    productFileSearchKey = productFileSearchKey.replaceAll(searchPattern, replaceString);
 
     final producMasterInfo = await _getRowAsObjectFromFile(
         fileName: 'products_db.csv' ,
         chunkSize: chunkSize,
         lineSeparator: '\r\n',
         columnSeparator: '\t',
-        equals: (List<String> row) => equalsIgnoreAsciiCase(row[productFileSearchColumnIndex], productFileSearchKey),
+        equals: (List<String> row) => equalsIgnoreAsciiCase(row[productFileSearchColumnIndex].replaceAll(searchPattern, replaceString), productFileSearchKey),
         objectBuilder: _createProductMasterInfo);
 
     if(producMasterInfo == null){
