@@ -179,7 +179,6 @@ class _BatchDetailsState extends State<BatchDetails> {
                           controller: _batchnumber,
                           enabled: false,
                           decoration: const InputDecoration(
-                            helperText: 'LOT-000002456',
                             label: Text.rich(
                                 TextSpan(
                                   children: <InlineSpan>[
@@ -416,6 +415,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
                         child: DataTable(// Lista de solicitudes del lote
+
                           columns:  <DataColumn>[
                             const DataColumn(
                               label: Text('Solicitudes'),
@@ -423,6 +423,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                             if (shouldShowStateColumn)
                               const DataColumn(label: Text('Estado'))
                           ],
+
                           rows: List<DataRow>.generate(
                             returns.length,
                                 (int index) {

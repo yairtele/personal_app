@@ -462,7 +462,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 color: UIHelper.getAuditItemBackgroundColor(products[index].state!),
                                 cells: <DataCell>[DataCell(
                                     ListTile(isThreeLine: true,
-                                      leading: const Icon(Icons.workspaces_filled, color: Colors.grey,),
+                                      leading: const Icon(Icons.workspaces_filled,
+                                        color: Colors.grey,),
                                       title: Text(
                                           'Ref: ${products[index].retailReference ??
                                               '(sin referencia interna)' }'),

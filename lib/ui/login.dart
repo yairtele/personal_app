@@ -145,7 +145,7 @@ class _LoginState extends State<Login> {
                                     ),
                                     Expanded(
                                       child: ElevatedButton(
-                                        child: const Text('Login',
+                                        child: const Text('Iniciar sesión',
                                           style: TextStyle(
                                               color: Colors.black),),
                                         style: ElevatedButton.styleFrom(
