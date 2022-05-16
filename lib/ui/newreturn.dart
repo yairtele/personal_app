@@ -446,7 +446,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                 margin: const EdgeInsets.only(top: 8),
                                 padding: const EdgeInsets.all(15),
                                 child: ElevatedButton( // Botón Registrar
-                                  child: const Text('Registrar'),
+                                  child: const Icon(FontAwesomeIcons.save),//Text('Registrar'),
                                   onPressed: () async {
                                     try{
                                       WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
