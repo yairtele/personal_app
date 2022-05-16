@@ -2,6 +2,7 @@
 
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/return_photo.dart';
+import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
@@ -142,8 +143,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                               children: [
                                 Expanded(
                                     child: Container(
-                                      margin: const EdgeInsets.only(top: 8),
-                                      padding: const EdgeInsets.all(15),
+                                      margin: UIHelper.formFieldContainerMargin,
+                                      padding: UIHelper.formFieldContainerPadding,
                                       child: TextField(
                                         autofocus: true,
                                         controller: _searchParamTextController,
@@ -157,7 +158,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     )),
                                 Container(
                                   width: 45,
-                                  margin: const EdgeInsets.only(top: 8),
+                                  margin: UIHelper.formFieldContainerMargin,
                                   padding: const EdgeInsets.only(left: 2, right: 2),
                                   child: ElevatedButton(
                                     child: const Icon(FontAwesomeIcons.barcode),

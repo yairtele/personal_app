@@ -105,21 +105,22 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   elevation: 0,
                   backgroundColor: Colors.grey,
                   title: Text(
-                    'Solicitud ${returnRequest.retailReference ??
-                        returnRequest.description}',
+                    returnRequest.retailReference ??
+                        returnRequest.requestNumber ?? 'Generando N° Solicitud...',
                     style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                         color: Colors.white),
                   ),
                   actions: [
+                    /*
                     IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () =>
                       appState.currentAction =
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
-                    ),
+                    ),*/
                     if (_batch.state==BatchStates.Draft)
                     IconButton(
                       icon: const Icon(Icons.add),
@@ -461,8 +462,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 color: UIHelper.getAuditItemBackgroundColor(products[index].state!),
                                 cells: <DataCell>[DataCell(
                                     ListTile(isThreeLine: true,
-                                      leading: const Icon(Icons.workspaces_filled,
-                                        color: Colors.grey,),
+                                      leading: const Icon(Icons.workspaces_filled, color: Colors.grey,),
                                       title: Text(
                                           'Ref: ${products[index].retailReference ??
                                               '(sin referencia interna)' }'),

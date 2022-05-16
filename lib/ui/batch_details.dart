@@ -30,6 +30,7 @@
 import 'dart:io';
 
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:navigation_app/services/business/batch.dart';
@@ -116,14 +117,14 @@ class _BatchDetailsState extends State<BatchDetails> {
                   elevation: 0,
                   backgroundColor: Colors.grey,
                   title: Text(
-                    '$batchnumber',
+                    batch.retailReference ?? batch.batchNumber ?? '(Generando N° Lote...)',
                     style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
                   ),
                   actions: [
-
+                    /*
                     IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () =>
@@ -131,6 +132,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           PageAction(
                               state: PageState.addPage, pageConfig: SettingsPageConfig),
                     ),
+                    */
                     if (batch.state==BatchStates.Draft)
                     IconButton(
                         icon: const Icon(Icons.add),
@@ -167,8 +169,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                   child: ListView(
                     children: [
                       Container( //Nro Lote
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        margin: UIHelper.formFieldContainerMargin,
+                        padding: UIHelper.formFieldContainerPadding,
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.text,
@@ -177,6 +179,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           controller: _batchnumber,
                           enabled: false,
                           decoration: const InputDecoration(
+                            helperText: 'LOT-000002456',
                             label: Text.rich(
                                 TextSpan(
                                   children: <InlineSpan>[
@@ -196,8 +199,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                         children: [
                           Expanded(
                               child: Container( //Referencia Interna - TextField
-                            margin: const EdgeInsets.only(top: 8),
-                            padding: const EdgeInsets.all(15),
+                                margin: UIHelper.formFieldContainerMargin,
+                                padding: UIHelper.formFieldContainerPadding,
                             child: TextField(
                               autofocus: false,
                               keyboardType: TextInputType.text,
@@ -210,7 +213,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                               },
                               decoration: const InputDecoration(
                                 hintText: 'Referencia Interna Lote',
-                                helperText: 'Ej: LOT-35266',
+                                helperText: 'Ej: L0035266',
                                 label: Text.rich(
                                     TextSpan(
                                       children: <InlineSpan>[
@@ -229,7 +232,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           ),
                           Container( //Referencia Interna - Boton Codigo Barras
                             width: 45,
-                            margin: const EdgeInsets.only(top: 8),
+                            margin: UIHelper.formFieldContainerMargin,
                             padding: const EdgeInsets.only(right: 10),
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -252,8 +255,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                         ],
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        margin: UIHelper.formFieldContainerMargin,
+                        padding: UIHelper.formFieldContainerPadding,
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.text,
@@ -263,7 +266,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                           enabled: enabled_value,
                           decoration: const InputDecoration(
                             hintText: 'Descripcion',
-                            helperText: 'Ej: Lote Fravega 4',
+                            helperText: 'Ej: Lote de televisores SONY',
                             label: Text.rich(
                                 TextSpan(
                                   children: <InlineSpan>[
@@ -280,8 +283,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        margin: UIHelper.formFieldContainerMargin,
+                        padding: UIHelper.formFieldContainerPadding,
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.text,
@@ -413,7 +416,6 @@ class _BatchDetailsState extends State<BatchDetails> {
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
                         child: DataTable(// Lista de solicitudes del lote
-
                           columns:  <DataColumn>[
                             const DataColumn(
                               label: Text('Solicitudes'),
@@ -421,7 +423,6 @@ class _BatchDetailsState extends State<BatchDetails> {
                             if (shouldShowStateColumn)
                               const DataColumn(label: Text('Estado'))
                           ],
-
                           rows: List<DataRow>.generate(
                             returns.length,
                                 (int index) {
@@ -431,9 +432,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                               return DataRow(
                                 color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
                                 cells: <DataCell>[
-                                   DataCell(ListTile(isThreeLine: true,
-                                    leading: const Icon(
-                                      Icons.art_track_sharp, color: Colors.grey,),
+                                   DataCell(ListTile(
+                                    leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
+                                    // leading: Container(width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
                                     title: Text(
                                         title,
                                         style: const TextStyle(fontSize: 14.0,
@@ -491,11 +492,11 @@ class _BatchDetailsState extends State<BatchDetails> {
               widget = Center(
                   child: Stack(
                       children: <Widget>[
-                        Opacity(
+                        const Opacity(
                           opacity: 1,
-                          child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                          child:  CircularProgressIndicator(backgroundColor: Colors.grey),
                         ),
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(top: 16),
                           child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
                         )

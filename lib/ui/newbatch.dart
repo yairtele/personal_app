@@ -10,6 +10,7 @@ import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/business_services.dart';
+import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 
@@ -79,8 +80,8 @@ class _NewBatchState extends State<NewBatch> {
                     Expanded(
                       child: Container(
 
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.only(left: 15, right: 15),
+                        margin: UIHelper.formFieldContainerMargin,
+                        padding: UIHelper.formFieldContainerPadding,
                         child: TextField(
                           autofocus: true,
                           keyboardType: TextInputType.text,
@@ -107,7 +108,7 @@ class _NewBatchState extends State<NewBatch> {
                     ),
                     Container(
                       width: 45,
-                      margin: const EdgeInsets.only(top: 8),
+                      margin: UIHelper.formFieldContainerMargin,
                       padding: const EdgeInsets.only(right: 10),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -130,8 +131,8 @@ class _NewBatchState extends State<NewBatch> {
                 ),
 
                 Container(
-                  margin: const EdgeInsets.only(top: 0),
-                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  margin: UIHelper.formFieldContainerMargin,
+                  padding: UIHelper.formFieldContainerPadding,
                   child: TextField(
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -156,8 +157,8 @@ class _NewBatchState extends State<NewBatch> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.only(top: 0  ),
-                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  margin: UIHelper.formFieldContainerMargin,
+                  padding: UIHelper.formFieldContainerPadding,
                   child: TextField(
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -213,7 +214,7 @@ class _NewBatchState extends State<NewBatch> {
                               pageConfig: NewReturnPageConfig));
                           //appState.returnWith(true);
                           _shouldRefreshParent = true;
-                          _showSnackBar('Nuevo batch creado con éxito');
+                          _showSnackBar('Nuevo lote creado con éxito');
                         }
                         on BusinessException catch (e){
                           _showSnackBar(e.message);
