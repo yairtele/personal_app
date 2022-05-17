@@ -36,10 +36,8 @@ class  ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   late Future<ScreenData<Product, ProductDetail>> _localData;
   ProductInfo? _productInfo;
-  //Map<String, PhotoDetail> _takenPictures = {};
   Map<String, ThumbPhoto> _takenPictures = {};
   var _referenceModified = false;
-  //final _modifiedPhotos =  ProductPhotos([]);
   late XFile _dummyPhoto;
   var _reference;
 
@@ -85,8 +83,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                 final descripcion = product.description;
                 final _descripcion = TextEditingController(text: descripcion);
 
-                //List<String> _modifiedPhotos = [];
-
                 widget = Scaffold(
                     appBar: AppBar(
                       elevation: 0,
@@ -99,13 +95,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                             color: Colors.white),
                       ),
                       actions: [
-                        /*IconButton(
-                          icon: const Icon(Icons.settings),
-                          onPressed: () =>
-                          appState.currentAction =
-                              PageAction(state: PageState.addPage,
-                                  pageConfig: SettingsPageConfig),
-                        ),*/
                         if (_batch.state == BatchStates.Draft)
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
@@ -126,8 +115,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                         child: ListView(
                             children: [
                               Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.all(15),
+                                //margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                                 child: TextField(
                                   autofocus: true,
                                   keyboardType: TextInputType.text,
@@ -153,8 +142,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 ),
                               ),
                               Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.all(15),
+                                //margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                                 child: TextField(
                                   autofocus: true,
                                   keyboardType: TextInputType.text,
@@ -186,7 +175,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   Expanded(
                                       child:
                                         Container(
-                                            margin: const EdgeInsets.only(top: 8),
+                                            //margin: const EdgeInsets.only(top: 8),
                                             padding: const EdgeInsets.fromLTRB(15, 0, 10, 0),
                                             child: TextField(
                                               autofocus: true,
@@ -221,7 +210,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   if (product.state==BatchStates.Draft)
                                     Container(
                                     width: 45,
-                                    margin: const EdgeInsets.only(top: 8),
+                                    //margin: const EdgeInsets.only(top: 8),
                                     padding: const EdgeInsets.only(right: 10),
                                     child: ElevatedButton(
                                       child: const Icon(FontAwesomeIcons.barcode),

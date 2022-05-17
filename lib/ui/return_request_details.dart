@@ -159,8 +159,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   child: ListView(
                     children: [
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        //margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           //enabled: false,
                           autofocus: false,
@@ -187,8 +187,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        //margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           //enabled: false,
                           autofocus: false,
@@ -215,8 +215,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        //margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           autofocus: false,
                           keyboardType: TextInputType.number,
@@ -246,8 +246,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           children: [
                             Expanded(
                               child: Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              padding: const EdgeInsets.all(15),
+                              //margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                               child: TextField(
                                 enabled: enabled_value,
                                 autofocus: false,
@@ -279,7 +279,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                             if (_batch.state==BatchStates.Draft)
                               Container(
                               width: 45,
-                              margin: const EdgeInsets.only(top: 8),
+                              //margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.only(right: 10),
                               child: ElevatedButton(
                                 child: const Icon(FontAwesomeIcons.barcode),
@@ -315,8 +315,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           ],
                         ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        //margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           enabled: false,
                           autofocus: false,
@@ -342,8 +342,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(15),
+                        //margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           enabled: enabled_value && !returnRequest.isAuditable,
                           autofocus: false,
@@ -370,7 +370,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           ),
                         ),
                       ),
-
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
                         child: Row(

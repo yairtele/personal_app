@@ -143,8 +143,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                               children: [
                                 Expanded(
                                     child: Container(
-                                      margin: UIHelper.formFieldContainerMargin,
-                                      padding: UIHelper.formFieldContainerPadding,
+                                      //margin: UIHelper.formFieldContainerMargin,
+                                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),//UIHelper.formFieldContainerPadding,
                                       child: TextField(
                                         autofocus: true,
                                         controller: _searchParamTextController,
@@ -158,7 +158,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     )),
                                 Container(
                                   width: 45,
-                                  margin: UIHelper.formFieldContainerMargin,
+                                  //margin: UIHelper.formFieldContainerMargin,
                                   padding: const EdgeInsets.only(left: 2, right: 2),
                                   child: ElevatedButton(
                                     child: const Icon(FontAwesomeIcons.barcode),
@@ -191,7 +191,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                 ),
                                 Container(
                                   width: 45,
-                                  margin: const EdgeInsets.only(top: 8),
+                                  //margin: const EdgeInsets.only(top: 8),
                                   padding: const EdgeInsets.only(left: 2, right: 2),
                                   child: ElevatedButton(
                                     child: const Icon(// Botón Buscar
@@ -208,14 +208,13 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
                             if (_product != null) ...[
                               Container(
-                                margin: const EdgeInsets.only(top: 8),
+                                //margin: const EdgeInsets.only(top: 8),
                                 padding: const EdgeInsets.all(15),
                                 child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Container(
-                                        margin:
-                                        const EdgeInsets.only(top: 8),
+                                        //margin: const EdgeInsets.only(top: 8),
                                         padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                                         child: TextField(
                                           controller: _descriptionTextController,
@@ -225,7 +224,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                           TextInputAction.send,
                                           readOnly: true,
                                           maxLength: 30,
-
                                           decoration: const InputDecoration(
                                               labelText: 'Descripción',
                                               border: InputBorder.none,
@@ -244,7 +242,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               TextInputAction.send,
                                               readOnly: true,
                                               maxLength: 30,
-
                                               decoration: const InputDecoration(
                                                   labelText: 'EAN',
                                                   border: InputBorder.none,
@@ -261,7 +258,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               TextInputAction.send,
                                               readOnly: true,
                                               maxLength: 30,
-
                                               decoration: const InputDecoration(
                                                   labelText: 'Código Comercial',
                                                   border: InputBorder.none,
@@ -282,7 +278,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                 TextInputAction.send,
                                                 readOnly: true,
                                                 maxLength: 30,
-
                                                 decoration: const InputDecoration(
                                                     labelText: 'Marca',
                                                     border: InputBorder.none,
@@ -299,7 +294,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                 TextInputAction.send,
                                                 readOnly: true,
                                                 maxLength: 30,
-
                                                 decoration: const InputDecoration(
                                                     labelText: 'Jurídica',
                                                     border: InputBorder.none,
@@ -417,7 +411,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                 ),
                                               ),
                                               Container(
-                                                padding: const EdgeInsets.fromLTRB(30,0,30,30),
+                                                padding: const EdgeInsets.fromLTRB(30,0,30,15),
                                                 child: TextField(
                                                   controller: _commentsTextController,
                                                   autofocus: true,
