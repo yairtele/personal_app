@@ -218,7 +218,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                             ),
                                           )
                                       ),
-                                  Container(
+                                  if (product.state==BatchStates.Draft)
+                                    Container(
                                     width: 45,
                                     margin: const EdgeInsets.only(top: 8),
                                     padding: const EdgeInsets.only(right: 10),

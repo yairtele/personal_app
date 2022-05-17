@@ -229,7 +229,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                             ),
                           )
                           ),
-                          Container( //Referencia Interna - Boton Codigo Barras
+                          if (batch.state==BatchStates.Draft)
+                            Container( //Referencia Interna - Boton Codigo Barras
                             width: 45,
                             margin: UIHelper.formFieldContainerMargin,
                             padding: const EdgeInsets.only(right: 10),

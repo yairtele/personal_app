@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/business/batch.dart';
@@ -275,7 +276,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               ),
                             )
                             ),
-                            Container(
+                            if (_batch.state==BatchStates.Draft)
+                              Container(
                               width: 45,
                               margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.only(right: 10),
@@ -346,6 +348,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           enabled: enabled_value && !returnRequest.isAuditable,
                           autofocus: false,
                           keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
                           textInputAction: TextInputAction.send,
                           maxLength: 4,
                           controller: _cantidad,
