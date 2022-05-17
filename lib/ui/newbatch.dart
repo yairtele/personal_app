@@ -186,7 +186,7 @@ class _NewBatchState extends State<NewBatch> {
                   margin: const EdgeInsets.only(top: 0),
                   padding: const EdgeInsets.only(left: 15, right: 15),
                   child: ElevatedButton(
-                      child: const Text('Crear lote'),
+                      child: const Text('Crear'),
                       onPressed: () async {
                         try{
                           var uuid;

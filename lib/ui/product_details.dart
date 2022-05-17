@@ -300,7 +300,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       .dismiss();
                                                 }
                                               },
-                                              child: const Text('Guardar'),
+                                              child: const Icon(Icons.save),
                                               style: ElevatedButton.styleFrom(
                                                 primary: Colors.green[400],
                                               )
@@ -329,7 +329,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       .dismiss();
                                                 }
                                               },
-                                              child: const Text('Eliminar'),
+                                              child: const Icon(Icons.delete),
                                               style: ElevatedButton.styleFrom(
                                                 primary: Colors.red[400],
                                               )

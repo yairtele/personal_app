@@ -333,7 +333,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   WorkingIndicatorDialog().dismiss();
                                 }
                               },
-                              child: const Text('Guardar'),
+                              child: const Icon(Icons.save),
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.green[400],
                               )
@@ -358,9 +358,9 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     WorkingIndicatorDialog().dismiss();
                                   }
                                 },
-                                child: const Text('Enviar Lote'),
+                                child: const Icon(Icons.send),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.grey,
+                                  primary: Colors.blueAccent,
                                 )
                             ),
                             if (batch.state==BatchStates.Draft)
@@ -403,7 +403,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   );
 
                                 },
-                                child: const Text('Borrar Lote'),
+                                child: const Icon(Icons.delete),
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.red,
                                 )

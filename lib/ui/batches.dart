@@ -102,12 +102,26 @@ class _BatchesState extends State<Batches> {
                                 color: Colors.white),
                           )),
                       IconButton(
-                        icon: const Icon(Icons.settings),
-                        onPressed: () =>
-                        appState.currentAction =
-                            PageAction(
-                                state: PageState.addPage,
-                                pageConfig: SettingsPageConfig),
+                        icon: const Icon(Icons.logout),
+                          onPressed: () {
+                            showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Alerta'),
+                              content: const Text('¿Está seguro que quiere Cerrar Sesión?'),
+                              actions: <Widget>[
+                              TextButton(
+                                  onPressed: () => { Navigator.of(context).pop() },
+                                  child: const Text('No'),
+                              ),
+                              TextButton(
+                              child: const Text('Si'),
+                              onPressed: () async {
+                                  await appState.logout();
+                              }),
+                            ]),
+                            );
+                          }
                       ),
                       IconButton(
                           icon: const Icon(Icons.add),

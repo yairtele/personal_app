@@ -347,7 +347,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           autofocus: false,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.send,
-                          maxLength: 50,
+                          maxLength: 4,
                           controller: _cantidad,
                           decoration: const InputDecoration(
                             hintText: 'Unidades',
@@ -394,7 +394,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 }
                               },
 
-                              child: const Text('Guardar'),
+                              child: const Icon(Icons.save),
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.green[400],
                               )
@@ -438,7 +438,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     ),
                                   );
                                 },
-                                child: const Text('Borrar Solicitud'),
+                                child: const Icon(Icons.delete),
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.red,
                                 )
