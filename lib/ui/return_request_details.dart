@@ -351,6 +351,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           controller: _cantidad,
                           decoration: const InputDecoration(
                             hintText: 'Unidades',
+                            counterText: '',
                             label: Text.rich(
                                 TextSpan(
                                   children: <InlineSpan>[
@@ -394,7 +395,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 }
                               },
 
-                              child: const Icon(Icons.save),
+                              child: const Icon(FontAwesomeIcons.save),//Text('Guardar'),
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.green[400],
                               )
@@ -438,7 +439,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     ),
                                   );
                                 },
-                                child: const Icon(Icons.delete),
+                                child: const Icon(FontAwesomeIcons.trash),//Text('Borrar Solicitud'),
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.red,
                                 )
