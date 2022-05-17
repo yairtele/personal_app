@@ -62,7 +62,7 @@ class _NewBatchState extends State<NewBatch> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.grey,
+          backgroundColor: const Color(0xFF741526),//Colors.grey,
           title: const Text(
             'Nuevo Lote',
             style: TextStyle(

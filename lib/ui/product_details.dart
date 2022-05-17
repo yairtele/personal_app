@@ -86,7 +86,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 widget = Scaffold(
                     appBar: AppBar(
                       elevation: 0,
-                      backgroundColor: Colors.grey,
+                      backgroundColor: const Color(0xFF741526),//Colors.grey,
                       title: Text(
                         'Producto ${product.retailReference}',
                         style: const TextStyle(
@@ -98,7 +98,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         if (_batch.state == BatchStates.Draft)
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.grey,
+                              primary: const Color(0xFF741526)//Colors.grey,
                             ),
                             onPressed: () {
                               launch(

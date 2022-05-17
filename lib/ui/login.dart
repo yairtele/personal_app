@@ -147,7 +147,9 @@ class _LoginState extends State<Login> {
                                       child: ElevatedButton(
                                         child: const Text('Iniciar sesión',
                                           style: TextStyle(
-                                              color: Colors.black),),
+                                              color: Color(0xFF741526)//Colors.black
+                                          ),
+                                        ),
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.grey,
                                           shape: RoundedRectangleBorder(
@@ -155,7 +157,8 @@ class _LoginState extends State<Login> {
                                                 4.0),
                                           ),
                                           side: const BorderSide(
-                                              color: Colors.black),
+                                              color: Colors.black
+                                          )
                                         ),
                                         onPressed: () async {
                                           try {

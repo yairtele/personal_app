@@ -92,7 +92,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
               widget = Scaffold(
                   appBar: AppBar(
                     elevation: 0,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: Color(0xFF741526), //Colors.grey,
                     title: const Text(
                       'Nueva Devolución',
                       style: TextStyle(

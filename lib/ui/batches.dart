@@ -83,7 +83,7 @@ class _BatchesState extends State<Batches> {
                 widget = Scaffold(
                   appBar: AppBar(
                     elevation: 0,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: const Color(0xFF741526),//Colors.grey,
                     title: const Text(
                       '',
                       style: TextStyle(
@@ -139,7 +139,7 @@ class _BatchesState extends State<Batches> {
                       ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
+                          primary: const Color(0xFF741526)//Colors.grey,
                         ),
                         onPressed: () {
                           launch(

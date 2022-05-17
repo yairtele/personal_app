@@ -104,7 +104,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
-                  backgroundColor: Colors.grey,
+                  backgroundColor: const Color(0xFF741526),//Colors.grey,
                   title: Text(
                     returnRequest.retailReference ??
                         returnRequest.requestNumber ?? 'Generando N° Solicitud...',
@@ -141,7 +141,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.grey,
+                        primary: const Color(0xFF741526)//Colors.grey,
                       ),
                       onPressed: () {
                         launch(
