@@ -209,26 +209,71 @@ class _LoginState extends State<Login> {
               ),
             );
           } else {
-            widget = Center(
-                child: Stack(
-                    children: <Widget>[
-                      const Opacity(
-                        opacity: 1,
-                        child: CircularProgressIndicator(
-                            backgroundColor: Colors.grey),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text(_progressText, style: const TextStyle(
-                            color: Colors.grey, height: 8, fontSize: 14)),
+            widget = Scaffold(
+                backgroundColor: const Color(0xFF741526),//Colors.black,
+                body: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  /// Loader Animation Widget
+                                  const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.grey),
+                                  ),
+                                  Text(_progressText,
+                                      style: const TextStyle(
+                                          color: Colors.grey,
+                                          height: 8,
+                                          fontSize: 14
+                                      )
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 30),
+                                    child: Column(
+                                      verticalDirection: VerticalDirection.up,
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Image.asset('assets/images/logo_negro.png',
+                                        width: 90,
+                                        height: 30,)
+                                    ]
+                                  )
+                                  )
+                                ],
+                              ),
+                            ),
+                          ]
                       )
                     ]
                 )
+/*                      const Opacity(
+                          opacity: 1,
+                          child: CircularProgressIndicator(
+                              backgroundColor: Colors.grey
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text(_progressText,
+                            style: const TextStyle(
+                                color: Colors.grey,
+                                height: 8,
+                                fontSize: 14
+                            )
+                        ),
+                      )
+                )*/
             );
           }
           return widget;
         }
-
     );
   }
 

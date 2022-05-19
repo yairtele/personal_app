@@ -491,19 +491,63 @@ class _BatchDetailsState extends State<BatchDetails> {
               );
             }
             else {
-              widget = Center(
-                  child: Stack(
-                      children: <Widget>[
-                        const Opacity(
-                          opacity: 1,
-                          child:  CircularProgressIndicator(backgroundColor: Colors.grey),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 16),
-                          child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+              widget = Scaffold(
+                  backgroundColor: const Color(0xFF741526),//Colors.black,
+                  body: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    /// Loader Animation Widget
+                                    const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.grey),
+                                    ),
+                                    const Text('Cargando...',
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            height: 8,
+                                            fontSize: 14
+                                        )
+                                    ),
+                                    Padding(
+                                        padding: const EdgeInsets.only(top: 30),
+                                        child: Column(
+                                            verticalDirection: VerticalDirection.up,
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            children: [
+                                              Image.asset('assets/images/logo_negro.png',
+                                                width: 90,
+                                                height: 30,)
+                                            ]
+                                        )
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ]
                         )
                       ]
                   )
+/*                widget = Center(
+                    child: Stack(
+                        children: <Widget>[
+                          const Opacity(
+                            opacity: 1,
+                            child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
+                          )
+                        ]
+                    )*/
               );
             }
             return widget;
