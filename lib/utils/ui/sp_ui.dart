@@ -44,7 +44,7 @@ class SpUI{
           children: [
             Expanded(
               child: GestureDetector(
-              child: Image.file(File(photo.photo.path), fit: BoxFit.fill),
+              child: Image.file(File(photo.photo.path), fit: BoxFit.fitWidth),
               onTap: () async {
                 FocusManager.instance.primaryFocus?.unfocus();
                 if (photo.isDummy){
