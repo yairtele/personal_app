@@ -79,7 +79,6 @@ class _NewBatchState extends State<NewBatch> {
                   children: [
                     Expanded(
                       child: Container(
-
                         margin: UIHelper.formFieldContainerMargin,
                         padding: UIHelper.formFieldContainerPadding,
                         child: TextField(

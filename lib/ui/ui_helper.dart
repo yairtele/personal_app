@@ -10,7 +10,7 @@ class UIHelper {
     });
   }
 
-  static EdgeInsets get  formFieldContainerPadding => const EdgeInsets.only(top: 15, bottom: 15, left: 15, right: 15) ;
+  static EdgeInsets get  formFieldContainerPadding => const EdgeInsets.only(top: 5, bottom: 0, left: 15, right: 15) ;
   static EdgeInsets get  formFieldContainerMargin => const EdgeInsets.only(top: 8) ;
 
 }

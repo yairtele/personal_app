@@ -430,7 +430,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   //},
                                                 ),
                                               ),
-                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _existingReturnRequest?.state ?? BatchStates.Draft),
+                                            SpUI.buildThumbnailsGridView(state: newReturnState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _existingReturnRequest?.state ?? BatchStates.Draft, context: context),
                                           ]),
                                     ]),
                                 //)
@@ -438,9 +438,26 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                               ),
                               Container(
                                 margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.all(15),
+                                padding: const EdgeInsets.fromLTRB(95,15,95,15),//all(15),
                                 child: ElevatedButton( // Botón Registrar
-                                  child: const Icon(FontAwesomeIcons.save),//Text('Registrar'),
+                                  child: Row(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                        child: Icon(FontAwesomeIcons.save)
+                                      ),
+                                      const Padding(
+                                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                              child: Text('Registrar devolución')
+                                      ),
+                                    ]
+                                  ),
+                                  /*child: Column(
+                                    children: [
+                                      const Icon(FontAwesomeIcons.save),
+                                      const Text('Registrar devolución')
+                                    ]
+                                  ),*/
                                   onPressed: () async {
                                     try{
                                       WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
