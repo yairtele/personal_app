@@ -182,10 +182,16 @@ class _NewBatchState extends State<NewBatch> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.only(top: 0),
-                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  //margin: const EdgeInsets.only(top: 0),
+                  padding: const EdgeInsets.fromLTRB(95,25,95,0),//const EdgeInsets.only(left: 15, right: 15),
                   child: ElevatedButton(
-                      child: const Text('Crear'),
+                      child: Row(
+                          children: [
+                            //const Icon(Icons.add_box_outlined),
+                            const Text('Crear')
+                          ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                      ),
                       onPressed: () async {
                         try{
                           var uuid;

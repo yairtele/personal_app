@@ -441,15 +441,18 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                 padding: const EdgeInsets.fromLTRB(95,15,95,15),//all(15),
                                 child: ElevatedButton( // Botón Registrar
                                   child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Padding(
+                                      const Icon(Icons.save),
+                                      const Text('Registrar')
+                                      /*const Padding(
                                         padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                        child: Icon(FontAwesomeIcons.save)
+                                        child: Icon(Icons.save)
                                       ),
                                       const Padding(
                                               padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                              child: Text('Registrar devolución')
-                                      ),
+                                              child: Text('Registrar')
+                                      ),*/
                                     ]
                                   ),
                                   /*child: Column(

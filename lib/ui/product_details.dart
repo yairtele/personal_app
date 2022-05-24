@@ -14,6 +14,7 @@ import 'package:navigation_app/services/business/product_detail.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
+import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
@@ -291,11 +292,19 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       .dismiss();
                                                 }
                                               },
-                                              child: const Icon(FontAwesomeIcons.save),//Text('Guardar'),
+                                              child: Row(
+                                                  children: [
+                                                    const Icon(Icons.save),
+                                                    const Text('Guardar')
+                                                  ]
+                                              ),
                                               style: ElevatedButton.styleFrom(
                                                 primary: Colors.green[400],
                                               )
                                           ),
+                                        Padding(
+                                          padding: UIHelper.buttonPadding
+                                        ),
                                         if (product.state == BatchStates.Draft)
                                           ElevatedButton(
                                               onPressed: () async {
@@ -320,7 +329,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       .dismiss();
                                                 }
                                               },
-                                              child: const Icon(FontAwesomeIcons.trash),//Text('Eliminar'),
+                                              child: Row(
+                                                  children: [
+                                                    const Icon(Icons.delete),
+                                                    const Text('Eliminar')
+                                                  ]
+                                              ),
                                               style: ElevatedButton.styleFrom(
                                                 primary: Colors.red[400],
                                               )

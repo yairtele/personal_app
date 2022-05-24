@@ -397,11 +397,19 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 }
                               },
 
-                              child: const Icon(FontAwesomeIcons.save),//Text('Guardar'),
+                              child: Row(
+                                  children: [
+                                    const Icon(Icons.save),
+                                    const Text('Guardar')
+                                  ]
+                              ),
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.green[400],
                               )
                           ),
+                            Padding(
+                              padding: UIHelper.buttonPadding
+                            ),
                             if (_batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
@@ -441,7 +449,12 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     ),
                                   );
                                 },
-                                child: const Icon(FontAwesomeIcons.trash),//Text('Borrar Solicitud'),
+                                child: Row(
+                                    children: [
+                                      const Icon(Icons.delete),
+                                      const Text('Eliminar')
+                                    ]
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.red,
                                 )

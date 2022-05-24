@@ -239,7 +239,7 @@ class _BatchesState extends State<Batches> {
                                       DataCell(ListTile(isThreeLine: true,
                                         leading: Icon(
                                             FontAwesomeIcons.archive,
-                                            color: _getStateColor(auditedBatches[index].state!)),//Colors.blue),
+                                            color: UIHelper.getStateColor(auditedBatches[index].state!)),//Colors.blue),
                                         title: Text(
                                             '${auditedBatches[index]
                                                 .batchNumber}',
@@ -364,17 +364,6 @@ class _BatchesState extends State<Batches> {
 
 
 
-  }
-
-  MaterialColor? _getStateColor(String state){
-    final colors = {
-      BatchStates.Enviado: Colors.blue,
-      BatchStates.EnProceso: Colors.deepOrange,
-      BatchStates.InfoPendiente: Colors.yellow,
-      BatchStates.InfoEnviada: Colors.deepOrange,
-    };
-
-    return colors[state];
   }
 
   Future<List<Batch>> _getBatchData(something) async{
