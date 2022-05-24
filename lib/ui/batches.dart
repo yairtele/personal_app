@@ -221,26 +221,25 @@ class _BatchesState extends State<Batches> {
                                   )
                               ),
                             ),
-                            const DataColumn(
+                            /*const DataColumn(
                               label: Text('Estado',
                                   style: TextStyle(fontSize: 18.0,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black
                                   )
                               ),
-                            ),
+                            ),*/
                           ],
                             rows: List<DataRow>.generate (
                               auditedBatches.length,
                                   (int index) =>
                                   DataRow(
-                                    color: UIHelper.getAuditItemBackgroundColor(
-                                        auditedBatches[index].state!),
+                                    //color: UIHelper.getAuditItemBackgroundColor(auditedBatches[index].state!),
                                     cells: <DataCell>[
                                       DataCell(ListTile(isThreeLine: true,
-                                        leading: const Icon(
+                                        leading: Icon(
                                             FontAwesomeIcons.archive,
-                                            color: Colors.blue),
+                                            color: _getStateColor(auditedBatches[index].state!)),//Colors.blue),
                                         title: Text(
                                             '${auditedBatches[index]
                                                 .batchNumber}',
@@ -266,8 +265,8 @@ class _BatchesState extends State<Batches> {
                                               }
                                             });
                                           }),
-                                      DataCell(
-                                          Text(auditedBatches[index].state!))
+                                      /*DataCell(
+                                          Text(auditedBatches[index].state!))*/
                                     ],
                                     //selected: selected[index],
                                   ),
@@ -365,6 +364,17 @@ class _BatchesState extends State<Batches> {
 
 
 
+  }
+
+  MaterialColor? _getStateColor(String state){
+    final colors = {
+      BatchStates.Enviado: Colors.blue,
+      BatchStates.EnProceso: Colors.deepOrange,
+      BatchStates.InfoPendiente: Colors.yellow,
+      BatchStates.InfoEnviada: Colors.deepOrange,
+    };
+
+    return colors[state];
   }
 
   Future<List<Batch>> _getBatchData(something) async{
