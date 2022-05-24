@@ -324,11 +324,14 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                           ]),
                                       if(_dateWarning != '')
                                         const Icon(FontAwesomeIcons.exclamationTriangle),
-                                      Text(_dateWarning,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.red
-                                          )),
+                                        const Padding(
+                                          padding: EdgeInsets.only(top: 5)
+                                        ),
+                                        Text(_dateWarning,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red
+                                            )),
                                       Row(
                                         children:[
                                           Expanded(
@@ -445,14 +448,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                     children: [
                                       const Icon(Icons.save),
                                       const Text('Registrar')
-                                      /*const Padding(
-                                        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                        child: Icon(Icons.save)
-                                      ),
-                                      const Padding(
-                                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                              child: Text('Registrar')
-                                      ),*/
                                     ]
                                   ),
                                   /*child: Column(
