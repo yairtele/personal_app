@@ -251,7 +251,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       state: newProductDetailsState,
                                       photos: _takenPictures,
                                       dummyPhoto: _dummyPhoto,
-                                      photoParentState: product.state!)
+                                      photoParentState: product.state!,
+                                      context: context),
                               ),
                               Padding(
                                   padding: const EdgeInsets.only(top: 16.0),

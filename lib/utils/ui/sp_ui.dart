@@ -12,7 +12,7 @@ import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto, required String photoParentState}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto, required String photoParentState, required BuildContext context}) {
 
     return GridView.count(
         primary: false,
@@ -23,12 +23,12 @@ class SpUI{
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
-            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto, photoParentState)
+            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto, photoParentState, context)
         ]
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto, photoParentState) {
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto, photoParentState, BuildContext context) {
     final photo = photos[photoName]!;
 
     return Container(
@@ -42,20 +42,36 @@ class SpUI{
         ),
         child: Column(
           children: [
-            Expanded( // Show photo or icon
-                child: ((){
-                  //if (photo != null) {
-                    return Image.file(File(photo.photo.path));
-                  //}
-                  //else {
-                  //  if(dummyPhoto != null){
-                  //    return Image.file(File(dummyPhoto.path));
-                  //  }
-                  //  else {
-                  //    return const Icon(FontAwesomeIcons.camera);
-                  //  }
-                  //}
-                })()
+            Expanded(
+              child: GestureDetector(
+              child: Image.file(File(photo.photo.path), fit: BoxFit.fill),
+              onTap: () async {
+                FocusManager.instance.primaryFocus?.unfocus();
+                if (photo.isDummy){
+                  final pickedPhoto = await _getPhotoFromCamera();
+                  state.setState(() {
+                    photo.photo = pickedPhoto ?? dummyPhoto;
+                    photo.isDummy = pickedPhoto == null;
+                    photo.hasChanged = true;
+                  });
+                } else {
+                  await showDialog(
+                      context: context,
+                      builder: (_) {
+                      return Dialog(
+                        child: InteractiveViewer(
+                            maxScale: 5,
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: Image.file(File(photo.photo.path))
+                            )
+                        ),
+                      );
+                    }
+                );
+    }
+              }
+            ),
             ),
             Row(
               children: [

@@ -497,7 +497,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     else
                       Container(
                         //child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
-                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: returnRequest.state!)
+                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: returnRequest.state!, context: context)
 
                       )
                     ],
