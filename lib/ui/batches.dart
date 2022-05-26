@@ -240,9 +240,8 @@ class _BatchesState extends State<Batches> {
                                         leading: Icon(
                                             FontAwesomeIcons.archive,
                                             color: UIHelper.getStateColor(auditedBatches[index].state!)),//Colors.blue),
-                                        title: Text(
-                                            '${auditedBatches[index]
-                                                .batchNumber}',
+                                        title: Text(auditedBatches[index].batchNumber != null?
+                                            '${auditedBatches[index].batchNumber}' : 'Generando Nº Lote...',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
                                                 fontWeight: FontWeight.bold,
