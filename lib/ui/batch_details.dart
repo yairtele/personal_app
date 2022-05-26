@@ -436,14 +436,20 @@ class _BatchDetailsState extends State<BatchDetails> {
                       Container(
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
                         child: DataTable(// Lista de solicitudes del lote
+                          columnSpacing: 10,
 
+                          horizontalMargin: 0,
                           columns:  <DataColumn>[
                             const DataColumn(
                               label: Text('Solicitudes'),
                             ),
                             //if (shouldShowStateColumn)
-                              //const DataColumn(label: Text('Estado'))
+                              const DataColumn(label: Text('Cod.Com')),
+                              const DataColumn(label: Text('Unidades'))
+
                           ],
 
                           rows: List<DataRow>.generate(
@@ -452,9 +458,14 @@ class _BatchDetailsState extends State<BatchDetails> {
                               final returnRequest = returns[index];
                               final title = _getReturnTitle(returnRequest);
                               final subtitle = _getReturnSubTitle(returnRequest);
+                              final subtitle2 = _getReturnSubTitle2(returnRequest);
+
                               return DataRow(
                                 //color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
                                 cells: <DataCell>[
+                                   DataCell(
+                                       ListTile(
+                                    //leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
                                    DataCell(ListTile(
                                     leading: Icon( Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),//Colors.grey,),
                                     // leading: Container(width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
@@ -463,7 +474,14 @@ class _BatchDetailsState extends State<BatchDetails> {
                                         style: const TextStyle(fontSize: 14.0,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black)),
-                                    subtitle: Text(subtitle),
+                                    //subtitle: Text(subtitle),
+                                     subtitle: Column(
+                                       children: [
+                                         //Text(subtitle),
+                                         //Text(subtitle2),
+                                       ],
+                                     ),
+
                                   ), onTap: () {
                                     appState.waitCurrentAction<bool>(PageAction(
                                         state: PageState.addWidget,
@@ -480,12 +498,14 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     });
                                   }),
                                   //if (shouldShowStateColumn)
-                                    //DataCell(Text(returns[index].state!))
+                                    DataCell(Text(subtitle2)),
+                                  DataCell(Text(subtitle))
                                 ],
                               );
                             },
-                          ),
+                           ),
                           //onTap: () {
+                          ),
                         ),
                       ),
                     ],
@@ -606,7 +626,11 @@ class _BatchDetailsState extends State<BatchDetails> {
   }
 
   String _getReturnSubTitle(ReturnRequest returnRequest) {
-    return returnRequest.quantity != null ? 'Unidades: ${returnRequest.quantity}' : '';
+    return returnRequest.quantity != null ? ' ${returnRequest.quantity}' : '';
+  }
+
+  String _getReturnSubTitle2(ReturnRequest returnRequest) {
+    return returnRequest.commercialCode != null ? '${returnRequest.commercialCode}' : '';
   }
 }
 
