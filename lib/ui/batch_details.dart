@@ -334,11 +334,19 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   WorkingIndicatorDialog().dismiss();
                                 }
                               },
-                              child: const Icon(Icons.save),
+                                child: Row(
+                                    children: [
+                                      const Icon(Icons.save),
+                                      const Text('Guardar')
+                                    ]
+                                ),
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.green[400],
+                                primary: Colors.green[400]
                               )
                           ),
+                            Padding(
+                                padding: UIHelper.buttonPadding
+                            ),
                             if (batch.state==BatchStates.Draft)
                             ElevatedButton(
                                 onPressed: () async {
@@ -359,10 +367,18 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     WorkingIndicatorDialog().dismiss();
                                   }
                                 },
-                                child: const Icon(Icons.send),
+                                child: Row(
+                                    children: [
+                                      const Icon(Icons.send),
+                                      const Text('Enviar')
+                                    ]
+                                ),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.blueAccent,
+                                  primary: Colors.blueAccent
                                 )
+                            ),
+                            Padding(
+                              padding: UIHelper.buttonPadding
                             ),
                             if (batch.state==BatchStates.Draft)
                             ElevatedButton(
@@ -404,9 +420,14 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   );
 
                                 },
-                                child: const Icon(Icons.delete),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.delete),
+                                    const Text('Eliminar')
+                                  ]
+                                ),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
+                                  primary: Colors.red
                                 )
                             ),
                           ],
@@ -440,11 +461,13 @@ class _BatchDetailsState extends State<BatchDetails> {
                               final subtitle2 = _getReturnSubTitle2(returnRequest);
 
                               return DataRow(
-                                color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
+                                //color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
                                 cells: <DataCell>[
                                    DataCell(
                                        ListTile(
                                     //leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
+                                   DataCell(ListTile(
+                                    leading: Icon( Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),//Colors.grey,),
                                     // leading: Container(width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
                                     title: Text(
                                         title,

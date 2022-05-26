@@ -48,12 +48,16 @@ class SpUI{
               onTap: () async {
                 FocusManager.instance.primaryFocus?.unfocus();
                 if (photo.isDummy){
-                  final pickedPhoto = await _getPhotoFromCamera();
-                  state.setState(() {
-                    photo.photo = pickedPhoto ?? dummyPhoto;
-                    photo.isDummy = pickedPhoto == null;
-                    photo.hasChanged = true;
-                  });
+                  if(! _shouldDisablePhotoButton(photoParentState, photo.state)) {
+                        () async {
+                      final pickedPhoto = await _getPhotoFromCamera();
+                      state.setState(() {
+                        photo.photo = pickedPhoto ?? dummyPhoto;
+                        photo.isDummy = pickedPhoto == null;
+                        photo.hasChanged = true;
+                      });
+                    }();
+                  }
                 } else {
                   await showDialog(
                       context: context,
