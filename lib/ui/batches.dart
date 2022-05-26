@@ -159,7 +159,9 @@ class _BatchesState extends State<Batches> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         children: [
-                          DataTable(columns: <DataColumn>[
+                          DataTable(
+                            dataRowHeight: 65,
+                            columns: <DataColumn>[
                             const DataColumn(
                               label: Text('Lotes en Draft',
                                   style: TextStyle(fontSize: 18.0,
@@ -180,7 +182,7 @@ class _BatchesState extends State<Batches> {
                                                 FontAwesomeIcons.archive,
                                                 color: Colors.grey),
                                             title: Text(
-                                                '${draftBatches[index]
+                                                '\n${draftBatches[index]
                                                     .batchNumber}',
                                                 style: const TextStyle(
                                                     fontSize: 14.0,
@@ -212,7 +214,9 @@ class _BatchesState extends State<Batches> {
                             ),
                           ),
 
-                          DataTable(columns: <DataColumn>[
+                          DataTable(
+                            dataRowHeight: 65,
+                            columns: <DataColumn>[
                             const DataColumn(
                               label: Text('Lotes en Auditoria',
                                   style: TextStyle(fontSize: 18.0,
@@ -241,7 +245,7 @@ class _BatchesState extends State<Batches> {
                                             FontAwesomeIcons.archive,
                                             color: UIHelper.getStateColor(auditedBatches[index].state!)),//Colors.blue),
                                         title: Text(auditedBatches[index].batchNumber != null?
-                                            '${auditedBatches[index].batchNumber}' : 'Generando Nº Lote...',
+                                            '\n${auditedBatches[index].batchNumber}' : 'Generando Nº Lote...',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
                                                 fontWeight: FontWeight.bold,

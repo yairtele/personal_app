@@ -464,6 +464,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       ),
                       if(returnRequest.isAuditable)
                         DataTable(
+                          dataRowHeight: 65,
                         columns: <DataColumn>[
                           const DataColumn(
                             label: Text('Productos:'),

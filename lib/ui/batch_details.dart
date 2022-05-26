@@ -439,16 +439,16 @@ class _BatchDetailsState extends State<BatchDetails> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                         child: DataTable(// Lista de solicitudes del lote
-                          columnSpacing: 10,
-
+                          columnSpacing: 0,
+                          dataRowHeight: 90,
                           horizontalMargin: 0,
                           columns:  <DataColumn>[
                             const DataColumn(
                               label: Text('Solicitudes'),
                             ),
                             //if (shouldShowStateColumn)
-                              const DataColumn(label: Text('Cod.Com')),
-                              const DataColumn(label: Text('Unidades'))
+                              //const DataColumn(label: Text('Cod.Com')),
+                              //const DataColumn(label: Text('Unidades'))
 
                           ],
 
@@ -466,18 +466,18 @@ class _BatchDetailsState extends State<BatchDetails> {
                               DataCell(
                                 ListTile(
                                 //leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
-                                leading: Icon(Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),//Colors.grey,),
-                                    // leading: Container(width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
-                                    title: Text(
+                                //leading: ,//Colors.grey,),
+                                    leading: Container( child:Icon(Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
+                                    title: Container (child:Text(
                                     title,
                                     style: const TextStyle(fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black)),
+                                    color: Colors.black)), padding: const EdgeInsets.all(15), margin: const EdgeInsets.all(0)),
                                     //subtitle: Text(subtitle),
                                     subtitle: Column(
                                     children: [
-                                    //Text(subtitle),
-                                    //Text(subtitle2),
+                                    Text(subtitle),
+                                    Text(subtitle2),
                                     ],
                                     ),
 
@@ -497,8 +497,8 @@ class _BatchDetailsState extends State<BatchDetails> {
                                       });
                                     }),
                                   //if (shouldShowStateColumn)
-                                    DataCell(Text(subtitle2)),
-                                  DataCell(Text(subtitle))
+                                    //DataCell(Text(subtitle2)),
+                                  //DataCell(Text(subtitle))
                                 ],
                               );
                             },
@@ -621,15 +621,15 @@ class _BatchDetailsState extends State<BatchDetails> {
   String _getReturnTitle(ReturnRequest  returnRequest) {
     //return returnRequest.retailReference ?? returnRequest.description
     final returnRetailReference = returnRequest.retailReference ?? '';
-    return returnRetailReference != '' ? returnRetailReference : (returnRequest.description ?? '(sin descripción)') ;
+    return returnRetailReference != '' ? returnRetailReference : (returnRequest.description ?? '\n(sin descripción)') ;
   }
 
   String _getReturnSubTitle(ReturnRequest returnRequest) {
-    return returnRequest.quantity != null ? ' ${returnRequest.quantity}' : '';
+    return returnRequest.quantity != null ? 'Unidades: ${returnRequest.quantity}' : '';
   }
 
   String _getReturnSubTitle2(ReturnRequest returnRequest) {
-    return returnRequest.commercialCode != null ? '${returnRequest.commercialCode}' : '';
+    return returnRequest.commercialCode != null ? 'Cod.Com: ${returnRequest.commercialCode}' : '';
   }
 }
 
