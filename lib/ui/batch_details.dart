@@ -418,13 +418,15 @@ class _BatchDetailsState extends State<BatchDetails> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                         child: DataTable(// Lista de solicitudes del lote
+                          columnSpacing: 10,
 
+                          horizontalMargin: 0,
                           columns:  <DataColumn>[
                             const DataColumn(
                               label: Text('Solicitudes'),
                             ),
                             //if (shouldShowStateColumn)
-                              const DataColumn(label: Text('Cod.Comercial')),
+                              const DataColumn(label: Text('Cod.Com')),
                               const DataColumn(label: Text('Unidades'))
 
                           ],
@@ -601,7 +603,7 @@ class _BatchDetailsState extends State<BatchDetails> {
   }
 
   String _getReturnSubTitle(ReturnRequest returnRequest) {
-    return returnRequest.quantity != null ? 'Unidades: ${returnRequest.quantity}' : '';
+    return returnRequest.quantity != null ? ' ${returnRequest.quantity}' : '';
   }
 
   String _getReturnSubTitle2(ReturnRequest returnRequest) {
