@@ -462,41 +462,40 @@ class _BatchDetailsState extends State<BatchDetails> {
 
                               return DataRow(
                                 //color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
-                                cells: <DataCell>[
-                                   DataCell(
-                                       ListTile(
-                                    //leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
-                                   DataCell(ListTile(
-                                    leading: Icon( Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),//Colors.grey,),
+                                  cells: <DataCell>[
+                              DataCell(
+                                ListTile(
+                                //leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
+                                leading: Icon(Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),//Colors.grey,),
                                     // leading: Container(width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
                                     title: Text(
-                                        title,
-                                        style: const TextStyle(fontSize: 14.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
+                                    title,
+                                    style: const TextStyle(fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black)),
                                     //subtitle: Text(subtitle),
-                                     subtitle: Column(
-                                       children: [
-                                         //Text(subtitle),
-                                         //Text(subtitle2),
-                                       ],
-                                     ),
+                                    subtitle: Column(
+                                    children: [
+                                    //Text(subtitle),
+                                    //Text(subtitle2),
+                                    ],
+                                    ),
 
-                                  ), onTap: () {
-                                    appState.waitCurrentAction<bool>(PageAction(
-                                        state: PageState.addWidget,
-                                        widget: ReturnRequestDetails(batch: this.widget.batch,
-                                            returnRequest: returns[index]),
-                                        pageConfig: DetailsReturnPageConfig))
-                                    .then((shouldRefresh) {
-                                      if(shouldRefresh!){
-                                        setState(() {
-                                          _shouldRefreshParent = shouldRefresh;
-                                          _localData = getScreenData();
-                                        });
-                                      }
-                                    });
-                                  }),
+                                    ), onTap: () {
+                                      appState.waitCurrentAction<bool>(PageAction(
+                                          state: PageState.addWidget,
+                                          widget: ReturnRequestDetails(batch: this.widget.batch,
+                                              returnRequest: returns[index]),
+                                          pageConfig: DetailsReturnPageConfig))
+                                      .then((shouldRefresh) {
+                                        if(shouldRefresh!){
+                                          setState(() {
+                                            _shouldRefreshParent = shouldRefresh;
+                                            _localData = getScreenData();
+                                          });
+                                        }
+                                      });
+                                    }),
                                   //if (shouldShowStateColumn)
                                     DataCell(Text(subtitle2)),
                                   DataCell(Text(subtitle))
