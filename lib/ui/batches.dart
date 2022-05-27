@@ -160,7 +160,7 @@ class _BatchesState extends State<Batches> {
                       child: Column(
                         children: [
                           DataTable(
-                            dataRowHeight: 65,
+                            dataRowHeight: 55,
                             columns: <DataColumn>[
                             const DataColumn(
                               label: Text('Lotes en Draft',
@@ -215,7 +215,7 @@ class _BatchesState extends State<Batches> {
                           ),
 
                           DataTable(
-                            dataRowHeight: 65,
+                            dataRowHeight: 55,
                             columns: <DataColumn>[
                             const DataColumn(
                               label: Text('Lotes en Auditoria',
