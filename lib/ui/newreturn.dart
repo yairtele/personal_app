@@ -1,5 +1,6 @@
 //import 'dart:html';
 
+import 'package:flutter/services.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/return_photo.dart';
 import 'package:navigation_app/ui/ui_helper.dart';
@@ -208,7 +209,6 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
                             if (_product != null) ...[
                               Container(
-                                //margin: const EdgeInsets.only(top: 8),
                                 padding: const EdgeInsets.all(15),
                                 child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -401,8 +401,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                                   autofocus: true,
                                                   keyboardType:
                                                   TextInputType.number,
-                                                  textInputAction:
-                                                  TextInputAction.send,
+                                                  inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                                                  textInputAction: TextInputAction.send,
                                                   maxLength: 10,
                                                   decoration:
                                                   const InputDecoration(

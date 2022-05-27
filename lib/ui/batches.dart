@@ -225,14 +225,6 @@ class _BatchesState extends State<Batches> {
                                   )
                               ),
                             ),
-                            /*const DataColumn(
-                              label: Text('Estado',
-                                  style: TextStyle(fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black
-                                  )
-                              ),
-                            ),*/
                           ],
                             rows: List<DataRow>.generate (
                               auditedBatches.length,
@@ -268,14 +260,11 @@ class _BatchesState extends State<Batches> {
                                               }
                                             });
                                           }),
-                                      /*DataCell(
-                                          Text(auditedBatches[index].state!))*/
                                     ],
                                     //selected: selected[index],
                                   ),
                             ),
                           ),
-
                         ],
                       ),
                     ),
@@ -346,27 +335,11 @@ class _BatchesState extends State<Batches> {
                         )
                       ]
                   )
-/*                widget = Center(
-                    child: Stack(
-                        children: <Widget>[
-                          const Opacity(
-                            opacity: 1,
-                            child: CircularProgressIndicator(backgroundColor: Colors.grey),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
-                          )
-                        ]
-                    )*/
                 );
               }
               return widget;
             }
         );
-
-
-
   }
 
   Future<List<Batch>> _getBatchData(something) async{
