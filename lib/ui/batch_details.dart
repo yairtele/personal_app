@@ -93,6 +93,8 @@ class _BatchDetailsState extends State<BatchDetails> {
       enabled_value = false;
     }
 
+    final _mediaQuery = MediaQuery.of(context).size;
+
     return WillPopScope(
       onWillPop: () {
 
@@ -112,6 +114,12 @@ class _BatchDetailsState extends State<BatchDetails> {
               final data = snapshot.data!;
               final returns = data.data!;
               final shouldShowStateColumn =batch.state != 'Draft';
+              final b1Width = (_mediaQuery.width - 75) / 3 + 1.5;
+              final b2Width = (_mediaQuery.width - 75) / 3;
+              final b3Width = (_mediaQuery.width - 75) / 3 + 2.5;
+              final buttonFontSizeMultiplier = _mediaQuery.width > 380? 14 : 12;
+              final buttonFontSize = (_mediaQuery.width / 390) * buttonFontSizeMultiplier;
+              final borderPadding = (_mediaQuery.width - b1Width - b2Width - b3Width - 40) / 2;
               widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -165,7 +173,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                   ],
                 ),
                 body: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.fromLTRB(borderPadding, 16.0, borderPadding, 16.0),
                   child: ListView(
                     children: [
                       Container( //Nro Lote
@@ -312,11 +320,13 @@ class _BatchDetailsState extends State<BatchDetails> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
-                        child: Row(
+                          child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (batch.state==BatchStates.Draft)
-                            ElevatedButton(
+                            SizedBox(
+                                width: b1Width,
+                                child: ElevatedButton(
                               onPressed: () async {
                                 try{
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
@@ -341,47 +351,57 @@ class _BatchDetailsState extends State<BatchDetails> {
                                     ]
                                 ),
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.green[400]
+                                primary: Colors.green[400],
+                                textStyle: TextStyle(
+                                    fontSize: buttonFontSize
+                                )
                               )
-                          ),
+                          )),
                             Padding(
                                 padding: UIHelper.buttonPadding
                             ),
                             if (batch.state==BatchStates.Draft)
-                            ElevatedButton(
-                                onPressed: () async {
-                                  try{
-                                    WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
-                                    await _updateBatchState(batch);
-                                    //appState.currentAction = PageAction(state: PageState.pop);
-                                    _showSnackBar('Lote enviado con éxito');
-                                    appState.returnWith(true);
-                                  }
-                                  on BusinessException catch (e){
-                                    _showSnackBar(e.message);
-                                  }
-                                  on Exception catch (e){
-                                    _showSnackBar('Ha ocurrido un error inesperado al enviar el lote: $e');
-                                  }
-                                  finally{
-                                    WorkingIndicatorDialog().dismiss();
-                                  }
-                                },
-                                child: Row(
-                                    children: [
-                                      const Icon(Icons.send),
-                                      const Text('Enviar')
-                                    ]
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.blueAccent
-                                )
-                            ),
+                              SizedBox(
+                                  width: b2Width,
+                                  child: ElevatedButton(
+                                      onPressed: () async {
+                                        try{
+                                          WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
+                                          await _updateBatchState(batch);
+                                          //appState.currentAction = PageAction(state: PageState.pop);
+                                          _showSnackBar('Lote enviado con éxito');
+                                          appState.returnWith(true);
+                                        }
+                                        on BusinessException catch (e){
+                                          _showSnackBar(e.message);
+                                        }
+                                        on Exception catch (e){
+                                          _showSnackBar('Ha ocurrido un error inesperado al enviar el lote: $e');
+                                        }
+                                        finally{
+                                          WorkingIndicatorDialog().dismiss();
+                                        }
+                                      },
+                                      child: Row(
+                                          children: [
+                                            const Icon(Icons.send),
+                                            const Text('Enviar')
+                                          ]
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.blueAccent,
+                                        textStyle: TextStyle(
+                                          fontSize: buttonFontSize
+                                        )
+                                      )
+                                  )),
                             Padding(
                               padding: UIHelper.buttonPadding
                             ),
                             if (batch.state==BatchStates.Draft)
-                            ElevatedButton(
+                            SizedBox(
+                                width: b3Width,
+                                child: ElevatedButton(
                                 onPressed: () async {
                                   showDialog<String>(
                                     context: context,
@@ -427,9 +447,12 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   ]
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.red
+                                  primary: Colors.red,
+                                  textStyle: TextStyle(
+                                      fontSize: buttonFontSize
+                                  )
                                 )
-                            ),
+                            )),
                           ],
                         ),
                       ),

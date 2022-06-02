@@ -213,7 +213,8 @@ class _BatchesState extends State<Batches> {
                                   ),
                             ),
                           ),
-
+                          if(draftBatches.length == 0)
+                            const Text('No hay lotes en draft para mostrar'),
                           DataTable(
                             dataRowHeight: 55,
                             columns: <DataColumn>[
@@ -226,7 +227,8 @@ class _BatchesState extends State<Batches> {
                               ),
                             ),
                           ],
-                            rows: List<DataRow>.generate (
+                            rows:
+                            List<DataRow>.generate (
                               auditedBatches.length,
                                   (int index) =>
                                   DataRow(
@@ -265,6 +267,8 @@ class _BatchesState extends State<Batches> {
                                   ),
                             ),
                           ),
+                          if(auditedBatches.length == 0)
+                            const Text('No hay lotes en auditoría para mostrar'),
                         ],
                       ),
                     ),

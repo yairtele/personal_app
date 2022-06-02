@@ -241,7 +241,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               textInputAction:
                                               TextInputAction.send,
                                               readOnly: true,
-                                              maxLength: 30,
+                                              maxLength: 13,
                                               decoration: const InputDecoration(
                                                   labelText: 'EAN',
                                                   border: InputBorder.none,
@@ -458,6 +458,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   ),*/
                                   onPressed: () async {
                                     try{
+                                      validateProductData();
                                       WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
 
                                       final photosToSave = _takenPictures.map(
@@ -704,6 +705,15 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
     } else {
       return '';
     }
+  }
+
+  void validateProductData(){
+      const pattern = r'^\d{13}$';
+      final regex = RegExp(pattern);
+      final result = regex.hasMatch(_product!.EAN);
+
+      if(!result)
+        throw BusinessException('Debe ingresar datos válidos para la carga de la solicitud.');
   }
 }
 
