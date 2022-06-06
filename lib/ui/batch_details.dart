@@ -460,7 +460,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                         height: 500.0, // Change as you wish
                         width: 500.0, // Change as you wish
                         child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
+                          scrollDirection: Axis.vertical,
                         child: DataTable(// Lista de solicitudes del lote
                           columnSpacing: 0,
                           dataRowHeight: 90,

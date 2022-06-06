@@ -463,7 +463,10 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       if(returnRequest.isAuditable)
-                        DataTable(
+                         Container(
+                        child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: DataTable(
                           dataRowHeight: 65,
                         columns: <DataColumn>[
                           const DataColumn(
@@ -507,8 +510,9 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               ],
                             ),
                         ),
-                        )
-                    else
+                        ),
+                        ),
+                        )else
                       Container(
                         //child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
                           child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: returnRequest.state!, context: context)

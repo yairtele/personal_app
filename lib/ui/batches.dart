@@ -215,7 +215,10 @@ class _BatchesState extends State<Batches> {
                           ),
                           if(draftBatches.length == 0)
                             const Text('No hay lotes en draft para mostrar'),
-                          DataTable(
+                          Container( // Change as you wish
+                              child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                          child: DataTable(
                             dataRowHeight: 55,
                             columns: <DataColumn>[
                             const DataColumn(
@@ -265,7 +268,9 @@ class _BatchesState extends State<Batches> {
                                     ],
                                     //selected: selected[index],
                                   ),
-                            ),
+                               ),
+                              ),
+                             ),
                           ),
                           if(auditedBatches.length == 0)
                             const Text('No hay lotes en auditoría para mostrar'),
