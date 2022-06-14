@@ -40,6 +40,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../app_state.dart';
+import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 
 class Batches extends StatefulWidget{
@@ -143,7 +144,7 @@ class _BatchesState extends State<Batches> {
                         ),
                         onPressed: () {
                           launch(
-                              'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                              Configuration.athentoAPIBaseURL + '/accounts/login/?next=/dashboard/');
                         }
                         ,
                         icon: Image.asset(

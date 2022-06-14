@@ -24,6 +24,7 @@ import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
+import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 import 'newreturn.dart';
 
@@ -145,7 +146,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                       ),
                       onPressed: () {
                         launch(
-                            'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                            Configuration.athentoAPIBaseURL + '/accounts/login/?next=/dashboard/');
                       }
                       , icon: Image.asset(
                       'assets/images/boton_athento.png',

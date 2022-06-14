@@ -33,6 +33,7 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
@@ -163,7 +164,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                       ),
                       onPressed: () {
                         launch(
-                            'https://newsan.athento.com/accounts/login/?next=/dashboard/');
+                            Configuration.athentoAPIBaseURL + '/accounts/login/?next=/dashboard/');
                       }
                       , icon: Image.asset(
                       'assets/images/boton_athento.png',
