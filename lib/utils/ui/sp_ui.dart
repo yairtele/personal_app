@@ -48,16 +48,26 @@ class SpUI{
               onTap: () async {
                 FocusManager.instance.primaryFocus?.unfocus();
                 if (photo.isDummy){
-                  if(! _shouldDisablePhotoButton(photoParentState, photo.state)) {
-                        () async {
-                      final pickedPhoto = await _getPhotoFromCamera();
-                      state.setState(() {
-                        photo.photo = pickedPhoto ?? dummyPhoto;
-                        photo.isDummy = pickedPhoto == null;
-                        photo.hasChanged = true;
-                      });
-                    }();
-                  }
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                          title: const Text('Cargar foto'),
+                          content: const Text('Seleccionar tipo de carga'),
+                          actions: [
+                            TextButton(
+                                child: const Text('Cámara'),
+                                onPressed: () {
+                                  _getPhotoFromSource(state, photoParentState, photo, dummyPhoto, _getPhotoFromCamera);
+                                  Navigator.pop(context);
+                                }
+                            ),
+                            TextButton(
+                                child: const Text('Galería'),
+                                onPressed: () {
+                                  _getPhotoFromSource(state, photoParentState, photo, dummyPhoto, _getPhotoFromGallery);
+                                  Navigator.pop(context);
+                                }),
+                          ]));
                 } else {
                   await showDialog(
                       context: context,
@@ -98,22 +108,42 @@ class SpUI{
                     },
                   )
                 else
-                  ElevatedButton( // Take photo
-                    child: const Icon(FontAwesomeIcons.camera),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: const EdgeInsets.all(4),
-                    ),
-                    onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
-                      //if(cameraOn) {
-                        final pickedPhoto = await _getPhotoFromCamera();
-                        state.setState(() {
-                          photo.photo = pickedPhoto ?? dummyPhoto;
-                          photo.isDummy = pickedPhoto == null;
-                          photo.hasChanged = true;
-                        });
-                      //}
-                    },
+                  Row(
+                    children: [
+                      if(Platform.isAndroid)
+                        ElevatedButton( // Take photo
+                          child: const Icon(FontAwesomeIcons.camera),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: const EdgeInsets.all(4),
+                          ),
+                          onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
+                            //if(cameraOn) {
+                            final pickedPhoto = await _getPhotoFromCamera();
+                            state.setState(() {
+                              photo.photo = pickedPhoto ?? dummyPhoto;
+                              photo.isDummy = pickedPhoto == null;
+                              photo.hasChanged = true;
+                            });
+                          },
+                        ),
+                      ElevatedButton( // Take photo
+                        child: const Icon(FontAwesomeIcons.folder),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.all(4),
+                        ),
+                        onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
+                          //if(cameraOn) {
+                          final pickedPhoto = await _getPhotoFromGallery();
+                          state.setState(() {
+                            photo.photo = pickedPhoto ?? dummyPhoto;
+                            photo.isDummy = pickedPhoto == null;
+                            photo.hasChanged = true;
+                          });
+                        },
+                      )
+                    ],
                   )
               ],
             )
@@ -321,8 +351,16 @@ class SpUI{
 */
 
   static Future<XFile?> _getPhotoFromCamera() async {
+    return _getPhoto(ImageSource.camera);
+  }
+
+  static Future<XFile?> _getPhotoFromGallery() async {
+    return _getPhoto(ImageSource.gallery);
+  }
+
+  static Future<XFile?> _getPhoto(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.camera,
+      source: source,
       maxWidth: 1800,
       maxHeight: 1800,
     );
@@ -378,5 +416,18 @@ class SpUI{
   static bool _shouldDisablePhotoButton(String photoParentState, String photoState) {
     return !(photoParentState == BatchStates.Draft ||
         (photoParentState == BatchStates.InfoPendiente && photoState == BatchStates.InfoPendiente));
+  }
+
+  static void _getPhotoFromSource (State state, String photoParentState, ThumbPhoto photo, XFile dummyPhoto, Future<XFile?> getPhotoFunction ()){
+    if(! _shouldDisablePhotoButton(photoParentState, photo.state)) {
+      () async {
+        final pickedPhoto = await getPhotoFunction();
+        state.setState(() {
+          photo.photo = pickedPhoto ?? dummyPhoto;
+          photo.isDummy = pickedPhoto == null;
+          photo.hasChanged = true;
+        });
+      }();
+    }
   }
 }

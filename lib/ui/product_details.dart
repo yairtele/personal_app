@@ -88,7 +88,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 widget = Scaffold(
                     appBar: AppBar(
                       elevation: 0,
-                      backgroundColor: const Color(0xFF741526),//Colors.grey,
+                      backgroundColor: Configuration.customerPrimaryColor,
                       title: Text(
                         'Producto ${product.retailReference}',
                         style: const TextStyle(
@@ -100,7 +100,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         if (_batch.state == BatchStates.Draft)
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              primary: const Color(0xFF741526)//Colors.grey,
+                              primary: Configuration.customerPrimaryColor
                             ),
                             onPressed: () {
                               launch(
@@ -364,7 +364,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 );
               } else {
                 widget = Scaffold(
-                    backgroundColor: const Color(0xFF741526),//Colors.black,
+                    backgroundColor: Configuration.customerPrimaryColor,
                     body: Stack(
                         fit: StackFit.expand,
                         children: [
@@ -377,13 +377,13 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       /// Loader Animation Widget
-                                      const CircularProgressIndicator(
+                                      CircularProgressIndicator(
                                         valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.grey),
+                                            Configuration.customerSecondaryColor),
                                       ),
-                                      const Text('Cargando...',
+                                      Text('Cargando...',
                                           style: TextStyle(
-                                              color: Colors.grey,
+                                              color: Configuration.customerSecondaryColor,
                                               height: 8,
                                               fontSize: 14
                                           )
@@ -407,19 +407,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                           )
                         ]
                     )
-/*                widget = Center(
-                    child: Stack(
-                        children: <Widget>[
-                          const Opacity(
-                            opacity: 1,
-                            child: CircularProgressIndicator(backgroundColor: Colors.grey),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
-                          )
-                        ]
-                    )*/
                 );
               }
               return widget;

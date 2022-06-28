@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
 
 import '../app_state.dart';
+import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 import 'newreturn.dart';
 
@@ -62,7 +63,7 @@ class _NewBatchState extends State<NewBatch> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color(0xFF741526),//Colors.grey,
+          backgroundColor: Configuration.customerPrimaryColor,
           title: const Text(
             'Nuevo Lote',
             style: TextStyle(

@@ -124,7 +124,7 @@ class _BatchDetailsState extends State<BatchDetails> {
               widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
-                  backgroundColor: const Color(0xFF741526),//Colors.grey,
+                  backgroundColor: Configuration.customerPrimaryColor,
                   title: Text(
                     batch.retailReference ?? batch.batchNumber ?? '(Generando N° Lote...)',
                     style: const TextStyle(
@@ -160,7 +160,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF741526)//Colors.grey,
+                        primary: Configuration.customerPrimaryColor
                       ),
                       onPressed: () {
                         launch(
@@ -489,8 +489,6 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   cells: <DataCell>[
                               DataCell(
                                 ListTile(
-                                //leading: const Icon( Icons.art_track_sharp, color: Colors.grey,),
-                                //leading: ,//Colors.grey,),
                                     leading: Container( child:Icon(Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
                                     title: Container (child:Text(
                                     title,
@@ -556,7 +554,7 @@ class _BatchDetailsState extends State<BatchDetails> {
             }
             else {
               widget = Scaffold(
-                  backgroundColor: const Color(0xFF741526),//Colors.black,
+                  backgroundColor: Configuration.customerPrimaryColor,
                   body: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -569,13 +567,13 @@ class _BatchDetailsState extends State<BatchDetails> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     /// Loader Animation Widget
-                                    const CircularProgressIndicator(
+                                    CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.grey),
+                                          Configuration.customerSecondaryColor),
                                     ),
-                                    const Text('Cargando...',
+                                    Text('Cargando...',
                                         style: TextStyle(
-                                            color: Colors.grey,
+                                            color: Configuration.customerSecondaryColor,
                                             height: 8,
                                             fontSize: 14
                                         )
@@ -599,19 +597,6 @@ class _BatchDetailsState extends State<BatchDetails> {
                         )
                       ]
                   )
-/*                widget = Center(
-                    child: Stack(
-                        children: <Widget>[
-                          const Opacity(
-                            opacity: 1,
-                            child: CircularProgressIndicator(backgroundColor: Colors.grey),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
-                          )
-                        ]
-                    )*/
               );
             }
             return widget;

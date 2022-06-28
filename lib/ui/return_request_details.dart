@@ -105,7 +105,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
-                  backgroundColor: const Color(0xFF741526),//Colors.grey,
+                  backgroundColor: Configuration.customerPrimaryColor,
                   title: Text(
                     returnRequest.retailReference ??
                         returnRequest.requestNumber ?? 'Generando N° Solicitud...',
@@ -142,7 +142,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF741526)//Colors.grey,
+                        primary: Configuration.customerPrimaryColor,
                       ),
                       onPressed: () {
                         launch(
@@ -483,8 +483,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                 color: UIHelper.getAuditItemBackgroundColor(products[index].state!),
                                 cells: <DataCell>[DataCell(
                                     ListTile(isThreeLine: true,
-                                      leading: const Icon(Icons.workspaces_filled,
-                                        color: Colors.grey,),
+                                      leading: Icon(Icons.workspaces_filled,
+                                        color: Configuration.customerSecondaryColor),
                                       title: Text(
                                           'Ref: ${products[index].retailReference ??
                                               '(sin referencia interna)' }'),
@@ -542,7 +542,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
               );
             } else {
               widget = Scaffold(
-                  backgroundColor: const Color(0xFF741526),//Colors.black,
+                  backgroundColor: Configuration.customerPrimaryColor,
                   body: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -555,13 +555,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     /// Loader Animation Widget
-                                    const CircularProgressIndicator(
+                                    CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.grey),
+                                          Configuration.customerSecondaryColor),
                                     ),
-                                    const Text('Cargando...',
+                                    Text('Cargando...',
                                         style: TextStyle(
-                                            color: Colors.grey,
+                                            color: Configuration.customerSecondaryColor,
                                             height: 8,
                                             fontSize: 14
                                         )
@@ -585,19 +585,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         )
                       ]
                   )
-/*                widget = Center(
-                    child: Stack(
-                        children: <Widget>[
-                          const Opacity(
-                            opacity: 1,
-                            child: CircularProgressIndicator(backgroundColor: Colors.grey),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: Text('Cargando...',style: TextStyle(color: Colors.grey,height: 4, fontSize: 9)),
-                          )
-                        ]
-                    )*/
               );
             }
             return widget;

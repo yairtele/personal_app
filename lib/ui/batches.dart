@@ -84,7 +84,7 @@ class _BatchesState extends State<Batches> {
                 widget = Scaffold(
                   appBar: AppBar(
                     elevation: 0,
-                    backgroundColor: const Color(0xFF741526),//Colors.grey,
+                    backgroundColor: Configuration.customerPrimaryColor,
                     title: const Text(
                       '',
                       style: TextStyle(
@@ -140,7 +140,7 @@ class _BatchesState extends State<Batches> {
                       ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          primary: const Color(0xFF741526)//Colors.grey,
+                          primary: Configuration.customerPrimaryColor
                         ),
                         onPressed: () {
                           launch(
@@ -151,7 +151,6 @@ class _BatchesState extends State<Batches> {
                           'assets/images/boton_athento.png',
                           height: 40.0, width: 40.0,),
                         label: const Text(''),
-                        //color: Colors.grey,
                       ),
                     ],
                   ),
@@ -179,9 +178,9 @@ class _BatchesState extends State<Batches> {
                                       DataCell(
                                           ListTile(
                                             isThreeLine: true,
-                                            leading: const Icon(
+                                            leading: Icon(
                                                 FontAwesomeIcons.archive,
-                                                color: Colors.grey),
+                                                color: Configuration.customerSecondaryColor),
                                             title: Text(
                                                 '\n${draftBatches[index]
                                                     .batchNumber}',
@@ -302,7 +301,7 @@ class _BatchesState extends State<Batches> {
                 );
               } else {
                 widget = Scaffold(
-                  backgroundColor: const Color(0xFF741526),//Colors.black,
+                  backgroundColor: Configuration.customerPrimaryColor,
                   body: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -315,13 +314,13 @@ class _BatchesState extends State<Batches> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     /// Loader Animation Widget
-                                    const CircularProgressIndicator(
+                                    CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.grey),
+                                          Configuration.customerSecondaryColor),
                                     ),
-                                    const Text('Cargando...',
+                                    Text('Cargando...',
                                         style: TextStyle(
-                                            color: Colors.grey,
+                                            color: Configuration.customerSecondaryColor,
                                             height: 8,
                                             fontSize: 14
                                         )

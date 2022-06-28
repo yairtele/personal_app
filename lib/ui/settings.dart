@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../config/configuration.dart';
 
 class Settings extends StatelessWidget {
   @override
@@ -39,7 +40,7 @@ class Settings extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.grey,
+        backgroundColor: Configuration.customerSecondaryColor,
         title: const Text(
           'Settings',
           style: TextStyle(
@@ -53,7 +54,7 @@ class Settings extends StatelessWidget {
             children: [
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                  primary: Colors.grey, // background
+                  primary: Configuration.customerSecondaryColor, // background
               ),
                onPressed: () async {
                   await appState.logout();

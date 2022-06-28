@@ -26,6 +26,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
 import 'package:intl/intl.dart';
 
+import '../config/configuration.dart';
+
 //T extends StatefulWidget
 class NewReturnScreen extends StatefulWidget {
   final ReturnRequest? returnRequest; //TODO: Precargar datos si returnRequest no es nulo
@@ -93,7 +95,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
               widget = Scaffold(
                   appBar: AppBar(
                     elevation: 0,
-                    backgroundColor: Color(0xFF741526), //Colors.grey,
+                    backgroundColor: Configuration.customerPrimaryColor,
                     title: const Text(
                       'Nueva Devolución',
                       style: TextStyle(

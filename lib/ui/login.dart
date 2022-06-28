@@ -39,6 +39,8 @@ import 'package:provider/provider.dart';
 import '../app_state.dart';
 import 'package:dio/dio.dart';
 
+import '../config/configuration.dart';
+
 //import 'package:keycloak_flutter/keycloak_flutter.dart';
 
 class Login extends StatefulWidget {
@@ -75,7 +77,7 @@ class _LoginState extends State<Login> {
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
-                backgroundColor: Colors.grey,
+                backgroundColor: Configuration.customerSecondaryColor,
                 title: Image.asset(
                   'assets/images/logo_blanco.png', height: 120, width: 160,),
               ),
@@ -145,13 +147,13 @@ class _LoginState extends State<Login> {
                                     ),
                                     Expanded(
                                       child: ElevatedButton(
-                                        child: const Text('Iniciar sesión',
+                                        child: Text('Iniciar sesión',
                                           style: TextStyle(
-                                              color: Color(0xFF741526)//Colors.black
+                                              color: Configuration.customerPrimaryColor
                                           ),
                                         ),
                                         style: ElevatedButton.styleFrom(
-                                          primary: Colors.grey,
+                                          primary: Configuration.customerSecondaryColor,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                                 4.0),
@@ -210,7 +212,7 @@ class _LoginState extends State<Login> {
             );
           } else {
             widget = Scaffold(
-                backgroundColor: const Color(0xFF741526),//Colors.black,
+                backgroundColor: Configuration.customerPrimaryColor,
                 body: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -223,13 +225,13 @@ class _LoginState extends State<Login> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   /// Loader Animation Widget
-                                  const CircularProgressIndicator(
+                                  CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.grey),
+                                        Configuration.customerSecondaryColor),
                                   ),
                                   Text(_progressText,
-                                      style: const TextStyle(
-                                          color: Colors.grey,
+                                      style: TextStyle(
+                                          color: Configuration.customerSecondaryColor,
                                           height: 8,
                                           fontSize: 14
                                       )
@@ -253,23 +255,6 @@ class _LoginState extends State<Login> {
                       )
                     ]
                 )
-/*                      const Opacity(
-                          opacity: 1,
-                          child: CircularProgressIndicator(
-                              backgroundColor: Colors.grey
-                          ),
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text(_progressText,
-                            style: const TextStyle(
-                                color: Colors.grey,
-                                height: 8,
-                                fontSize: 14
-                            )
-                        ),
-                      )
-                )*/
             );
           }
           return widget;
