@@ -473,18 +473,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           const DataColumn(
                             label: Text('Productos:'),
                           ),
-                          if(shouldShowStateColumn)
-                            const DataColumn(label: Text('Estado'))
                         ],
                         rows: List<DataRow>.generate(
                           products.length,
                               (int index) =>
                               DataRow(
-                                color: UIHelper.getAuditItemBackgroundColor(products[index].state!),
                                 cells: <DataCell>[DataCell(
                                     ListTile(isThreeLine: true,
                                       leading: Icon(Icons.workspaces_filled,
-                                        color: Configuration.customerSecondaryColor),
+                                        color: UIHelper.getStateColor(products[index].state!)),
                                       title: Text(
                                           'Ref: ${products[index].retailReference ??
                                               '(sin referencia interna)' }'),
@@ -506,8 +503,8 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     });
                                   });
                                 }),
-                                if(shouldShowStateColumn)
-                                  DataCell(Text(products[index].state!))
+                                /*if(shouldShowStateColumn)
+                                  DataCell(Text(products[index].state!))*/
                               ],
                             ),
                         ),
