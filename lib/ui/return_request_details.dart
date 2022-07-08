@@ -82,7 +82,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
             Widget widget;
             if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
               final data = snapshot.data!;
-              final shouldShowStateColumn = returnRequest.state != 'Draft';
+              final shouldShowStateColumn = _batch.state != 'Draft';
               _takenPictures = data.data!.optionalPhotos;
               final products = data.data!.products;
               if(!_referenceModified){
@@ -377,7 +377,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             //TODO: chequear estado de la solicitud y no del lote.
-                            if (returnRequest.isAuditable == false && (returnRequest.state==BatchStates.Draft || returnRequest.state==BatchStates.InfoPendiente))
+                            if (returnRequest.isAuditable == false && (_batch.state==BatchStates.Draft || returnRequest.state==BatchStates.InfoPendiente))
                             ElevatedButton(
                               onPressed: () async {
                                 try{
@@ -513,7 +513,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         )else
                       Container(
                         //child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
-                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: returnRequest.state!, context: context)
+                          child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _batch.state!, context: context)
 
                       )
                     ],

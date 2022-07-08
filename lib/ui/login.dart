@@ -285,7 +285,7 @@ class _LoginState extends State<Login> {
 
     // Check if the products file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
-    const productsFileName = 'products_db.csv';
+    const productsFileName = Configuration.productsFileName;// 'products_db.csv';
     final productsFile = File('${productsFolderPath.path}/$productsFileName');
     const productsFileURL = '$filesFolderURL/$productsFileName';
     if (!productsFile.existsSync()) {
@@ -321,7 +321,7 @@ class _LoginState extends State<Login> {
 
     // Check if the sales file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
-    const salesFileName = 'sales_db.csv';
+    const salesFileName = Configuration.salesFileName;
     const salesFileURL = '$filesFolderURL/$salesFileName';
     final salesFile = File('${productsFolderPath.path}/$salesFileName');
     if (!salesFile.existsSync()) {
@@ -356,7 +356,7 @@ class _LoginState extends State<Login> {
     }
     // Check if the rules file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
-    const rulesFileName = 'rules_db.csv';
+    const rulesFileName = Configuration.rulesFileName;
     const rulesFileURL = '$filesFolderURL/$rulesFileName';
     final rulesFile = File('${productsFolderPath.path}/$rulesFileName');
     if (!rulesFile.existsSync()) {

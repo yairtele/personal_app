@@ -253,7 +253,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       state: newProductDetailsState,
                                       photos: _takenPictures,
                                       dummyPhoto: _dummyPhoto,
-                                      photoParentState: product.state!,
+                                      photoParentState: _batch.state!, //product.state!,
                                       context: context),
                               ),
                               Padding(
@@ -262,7 +262,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       mainAxisAlignment: MainAxisAlignment
                                           .center,
                                       children: [
-                                        if (product.state ==
+                                        if (_batch.state ==
                                             BatchStates.Draft || product
                                             .state == BatchStates.InfoPendiente)
                                           ElevatedButton(
@@ -306,7 +306,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                         Padding(
                                           padding: UIHelper.buttonPadding
                                         ),
-                                        if (product.state == BatchStates.Draft)
+                                        if (_batch.state == BatchStates.Draft)
                                           ElevatedButton(
                                               onPressed: () async {
                                                 try {

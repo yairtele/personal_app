@@ -10,4 +10,7 @@ class Configuration{
   static String get authenticationType => 'bearer_token'; // 'bearer_token' | 'basic'
   static Color get customerPrimaryColor => const Color(0xFF741526);
   static MaterialColor get customerSecondaryColor => Colors.grey;
+  static const String productsFileName = 'products_db.csv';
+  static const String salesFileName = 'sales_db.csv';
+  static const String rulesFileName = 'rules_db.csv';
 }

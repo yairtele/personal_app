@@ -214,7 +214,7 @@ class SpUI{
 
   static bool _shouldDisablePhotoButton(String photoParentState, String photoState) {
     return !(photoParentState == BatchStates.Draft ||
-        (photoParentState == BatchStates.InfoPendiente && photoState == BatchStates.InfoPendiente));
+        (photoParentState == BatchStates.InfoPendiente && photoState == BatchStates.InfoPendiente)); //TODO: para que preguntar por estado del batch en el término derecho del ||?
   }
 
   static void _getPhotoFromSource (State state, String photoParentState, ThumbPhoto photo, XFile dummyPhoto, Future<XFile?> getPhotoFunction ()){
