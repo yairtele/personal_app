@@ -460,7 +460,7 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                   ),*/
                                   onPressed: () async {
                                     try{
-                                      validateProductData();
+                                      //validateProductData();
                                       WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
 
                                       final photosToSave = _takenPictures.map(

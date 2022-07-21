@@ -181,9 +181,8 @@ class _BatchesState extends State<Batches> {
                                             leading: Icon(
                                                 FontAwesomeIcons.archive,
                                                 color: Configuration.customerSecondaryColor),
-                                            title: Text(
-                                                '\n${draftBatches[index]
-                                                    .batchNumber}',
+                                            title: Text(draftBatches[index].batchNumber != null?
+                                            '\n${draftBatches[index].batchNumber}' : 'Generando Nº Lote...',
                                                 style: const TextStyle(
                                                     fontSize: 14.0,
                                                     fontWeight: FontWeight.bold,
