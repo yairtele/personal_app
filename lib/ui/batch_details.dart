@@ -114,7 +114,7 @@ class _BatchDetailsState extends State<BatchDetails> {
               final batch = this.widget.batch;
               final data = snapshot.data!;
               final returns = data.data!;
-              final shouldShowStateColumn =batch.state != 'Draft';
+              //final shouldShowStateColumn =batch.state != 'Draft';
               final b1Width = (_mediaQuery.width - 75) / 3 + 1.5;
               final b2Width = (_mediaQuery.width - 75) / 3;
               final b3Width = (_mediaQuery.width - 75) / 3 + 2.5;
@@ -238,7 +238,7 @@ class _BatchDetailsState extends State<BatchDetails> {
                             ),
                           )
                           ),
-                          if (batch.state==BatchStates.Draft)
+                          if (batch.state==BatchStates.Draft && Platform.isAndroid)
                             Container( //Referencia Interna - Boton Codigo Barras
                             width: 45,
                             margin: UIHelper.formFieldContainerMargin,
@@ -250,14 +250,13 @@ class _BatchDetailsState extends State<BatchDetails> {
                               ),
                               child: const Icon(FontAwesomeIcons.barcode),
                               onPressed: () async {
-                                if (Platform.isAndroid || Platform.isIOS) {
                                   FocusManager.instance.primaryFocus?.unfocus();
                                   final barcode = await BarcodeScanner.scan();
-                                  setState(() {
-                                    _reference.text = barcode.rawContent;
-                                    _referenceModified = true;
-                                  });
-                                }
+                                  if (barcode.type.value == 0)
+                                    setState(() {
+                                      _reference.text = barcode.rawContent;
+                                      _referenceModified = true;
+                                    });
                               },
                             ),
                           )
@@ -319,142 +318,40 @@ class _BatchDetailsState extends State<BatchDetails> {
                           ),
                         ),
                       ),
-                      Padding(
+                      if(batch.state == BatchStates.Draft)
+                        Padding(
                         padding: const EdgeInsets.only(top: 16.0),
                           child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (batch.state==BatchStates.Draft)
-                            SizedBox(
-                                width: b1Width,
-                                child: ElevatedButton(
-                              onPressed: () async {
-                                try{
-                                  WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
-                                  await _updateBatch(batch,_reference.text,_description.text,_observation.text);
-                                  _shouldRefreshParent = true;
-                                  _showSnackBar('Lote actualizado con éxito');
-                                }
-                                on BusinessException catch (e){
-                                  _showSnackBar(e.message);
-                                }
-                                on Exception catch (e){
-                                  _showSnackBar('Ha ocurrido un error inesperado al actualizar el lote: $e');
-                                }
-                                finally{
-                                  WorkingIndicatorDialog().dismiss();
-                                }
-                              },
-                                child: Row(
-                                    children: [
-                                      const Icon(Icons.save),
-                                      const Text('Guardar')
-                                    ]
-                                ),
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.green[400],
-                                textStyle: TextStyle(
-                                    fontSize: buttonFontSize
-                                )
-                              )
-                          )),
-                            Padding(
-                                padding: UIHelper.buttonPadding
-                            ),
-                            if (batch.state==BatchStates.Draft)
-                              SizedBox(
-                                  width: b2Width,
-                                  child: ElevatedButton(
-                                      onPressed: () async {
-                                        try{
-                                          WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
-                                          await _updateBatchState(batch);
-                                          //appState.currentAction = PageAction(state: PageState.pop);
-                                          _showSnackBar('Lote enviado con éxito');
-                                          appState.returnWith(true);
-                                        }
-                                        on BusinessException catch (e){
-                                          _showSnackBar(e.message);
-                                        }
-                                        on Exception catch (e){
-                                          _showSnackBar('Ha ocurrido un error inesperado al enviar el lote: $e');
-                                        }
-                                        finally{
-                                          WorkingIndicatorDialog().dismiss();
-                                        }
-                                      },
-                                      child: Row(
-                                          children: [
-                                            const Icon(Icons.send),
-                                            const Text('Enviar')
-                                          ]
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Colors.blueAccent,
-                                        textStyle: TextStyle(
-                                          fontSize: buttonFontSize
-                                        )
-                                      )
-                                  )),
-                            Padding(
-                              padding: UIHelper.buttonPadding
-                            ),
-                            if (batch.state==BatchStates.Draft)
-                            SizedBox(
-                                width: b3Width,
-                                child: ElevatedButton(
-                                onPressed: () async {
-                                  showDialog<String>(
-                                    context: context,
-                                    builder: (BuildContext context) => AlertDialog(
-                                      title: const Text('Alerta'),
-                                      content: const Text('¿Seguro quiere eliminar este Lote?'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () => { Navigator.of(context).pop() },
-                                          child: const Text('Cancelar'),
-                                        ),
-                                        TextButton(
-                                            child: const Text('Borrar'),
-                                            onPressed: () async {
-                                              try {
-                                                WorkingIndicatorDialog().show(
-                                                    context,
-                                                    text: 'Eliminando lote...');
-                                                await _deleteBatch(batch);
-                                                _showSnackBar('El lote ha sido eliminado exitosamente');
-                                                appState.returnWith(true);
-                                              }
-                                              on BusinessException catch (e){
-                                                _showSnackBar(e.message);
-                                              }
-                                              on Exception catch (e){
-                                                _showSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
-                                              }
-                                              finally{
-                                                WorkingIndicatorDialog().dismiss();
-                                              }
-                                            }
-                                        ),
-                                      ],
-                                    ),
-                                  );
-
-                                },
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.delete),
-                                    const Text('Eliminar')
-                                  ]
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  textStyle: TextStyle(
-                                      fontSize: buttonFontSize
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if(Platform.isAndroid)
+                                  SizedBox(
+                                    width: b1Width,
+                                    child: _getSaveButton(batch, _description, _observation, buttonFontSize)
                                   )
-                                )
-                            )),
-                          ],
+                                else
+                                  _getSaveButton(batch, _description, _observation, 14.0),
+                                Padding(
+                                    padding: UIHelper.buttonPadding
+                                ),
+                                if(Platform.isAndroid)
+                                  SizedBox(
+                                      width: b2Width,
+                                      child: _getSendButton(batch, buttonFontSize, appState)
+                                  )
+                                else
+                                  _getSendButton(batch, 14.0, appState),
+                                Padding(
+                                  padding: UIHelper.buttonPadding
+                                ),
+                                if(Platform.isAndroid)
+                                  SizedBox(
+                                    width: b3Width,
+                                    child: _getDeleteButton(batch, buttonFontSize, appState)
+                                  )
+                                else
+                                  _getDeleteButton(batch, 14.0, appState)
+                              ],
                         ),
                       ),
                       Container(
@@ -470,10 +367,6 @@ class _BatchDetailsState extends State<BatchDetails> {
                             const DataColumn(
                               label: Text('Solicitudes'),
                             ),
-                            //if (shouldShowStateColumn)
-                              //const DataColumn(label: Text('Cod.Com')),
-                              //const DataColumn(label: Text('Unidades'))
-
                           ],
 
                           rows: List<DataRow>.generate(
@@ -485,24 +378,44 @@ class _BatchDetailsState extends State<BatchDetails> {
                               final subtitle2 = _getReturnSubTitle2(returnRequest);
 
                               return DataRow(
-                                //color: UIHelper.getAuditItemBackgroundColor(returnRequest.state!),
                                   cells: <DataCell>[
                               DataCell(
                                 ListTile(
-                                    leading: Container( child:Icon(Icons.art_track_sharp, color: UIHelper.getStateColor(returnRequest.state!)),width: 1, padding: const EdgeInsets.all(0), margin: const EdgeInsets.all(0)),
-                                    title: Container (child:Text(
-                                    title,
-                                    style: const TextStyle(fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black)), padding: const EdgeInsets.all(15), margin: const EdgeInsets.all(0)),
-                                    //subtitle: Text(subtitle),
-                                    subtitle: Column(
-                                    children: [
-                                    Text(subtitle),
-                                    Text(subtitle2),
-                                    ],
+                                    leading: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,//y
+                                      crossAxisAlignment: CrossAxisAlignment.start,//x
+                                      children:[
+                                        Icon(
+                                          Icons.art_track_sharp,
+                                          color: UIHelper.getStateColor(returnRequest.state!)
+                                        )
+                                      ]
                                     ),
-
+                                    title: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,//y
+                                      crossAxisAlignment: CrossAxisAlignment.start,//x
+                                      children: [
+                                        Text(
+                                          title,
+                                          style: const TextStyle(
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black
+                                          ),
+                                        ),
+                                        Text(subtitle,
+                                          style: const TextStyle(
+                                            fontSize: 12.0,
+                                            color: Colors.grey
+                                          )
+                                        ),
+                                      Text(subtitle2,
+                                        style: const TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.grey
+                                        )
+                                      ),
+                                  ]
                                     ), onTap: () {
                                       appState.waitCurrentAction<bool>(PageAction(
                                           state: PageState.addWidget,
@@ -518,14 +431,10 @@ class _BatchDetailsState extends State<BatchDetails> {
                                         }
                                       });
                                     }),
-                                  //if (shouldShowStateColumn)
-                                    //DataCell(Text(subtitle2)),
-                                  //DataCell(Text(subtitle))
-                                ],
+                              )],
                               );
                             },
                            ),
-                          //onTap: () {
                           ),
                         ),
                       ),
@@ -622,13 +531,18 @@ class _BatchDetailsState extends State<BatchDetails> {
     await BusinessServices.sendBatchToAudit(batch);
   }
 
-  void _showSnackBar(String message){
+  void _showErrorSnackBar(String message) {
+    _showSnackBar(message, Colors.red);
+  }
+  void _showSuccessfulSnackBar(String message) {
+    _showSnackBar(message, Colors.green);
+  }
+  void _showSnackBar(String message, MaterialColor bgColor) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(content: Text(message), backgroundColor: bgColor),
     );
   }
   String _getReturnTitle(ReturnRequest  returnRequest) {
-    //return returnRequest.retailReference ?? returnRequest.description
     final returnRetailReference = returnRequest.retailReference ?? '';
     return returnRetailReference != '' ? returnRetailReference : (returnRequest.description ?? '\n(sin descripción)') ;
   }
@@ -639,6 +553,130 @@ class _BatchDetailsState extends State<BatchDetails> {
 
   String _getReturnSubTitle2(ReturnRequest returnRequest) {
     return returnRequest.commercialCode != null ? 'Cod.Com: ${returnRequest.commercialCode}' : '';
+  }
+
+  Widget _getSaveButton(batch, description, observation, buttonFontSize){
+    return ElevatedButton(
+        onPressed: () async {
+          try{
+            WorkingIndicatorDialog().show(context, text: 'Actualizando lote...');
+            await _updateBatch(batch, _reference.text, description.text, observation.text);
+            _shouldRefreshParent = true;
+            _showSuccessfulSnackBar('Lote actualizado con éxito');
+          }
+          on BusinessException catch (e){
+            _showErrorSnackBar(e.message);
+          }
+          on Exception catch (e){
+            _showErrorSnackBar('Ha ocurrido un error inesperado al actualizar el lote: $e');
+          }
+          finally{
+            WorkingIndicatorDialog().dismiss();
+          }
+        },
+        child: Row(
+            children: [
+              const Icon(Icons.save),
+              const Text('Guardar')
+            ]
+        ),
+        style: ElevatedButton.styleFrom(
+            primary: Colors.green[400],
+            textStyle: TextStyle(
+                fontSize: buttonFontSize
+            )
+        )
+    );
+  }
+
+  Widget _getSendButton(batch, buttonFontSize, appState){
+    return ElevatedButton(
+        onPressed: () async {
+          try{
+            WorkingIndicatorDialog().show(context, text: 'Enviando lote...');
+            await _updateBatchState(batch);
+            //appState.currentAction = PageAction(state: PageState.pop);
+            _showSuccessfulSnackBar('Lote enviado con éxito');
+            appState.returnWith(true);
+          }
+          on BusinessException catch (e){
+            _showErrorSnackBar(e.message);
+          }
+          on Exception catch (e){
+            _showErrorSnackBar('Ha ocurrido un error inesperado al enviar el lote: $e');
+          }
+          finally{
+            WorkingIndicatorDialog().dismiss();
+          }
+        },
+        child: Row(
+            children: [
+              const Icon(Icons.send),
+              const Text('Enviar')
+            ]
+        ),
+        style: ElevatedButton.styleFrom(
+            primary: Colors.blueAccent,
+            textStyle: TextStyle(
+                fontSize: buttonFontSize
+            )
+        )
+    );
+  }
+
+  Widget _getDeleteButton(batch, buttonFontSize, appState){
+    return ElevatedButton(
+        onPressed: () async {
+          showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Alerta'),
+              content: const Text('¿Seguro quiere eliminar este Lote?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => { Navigator.of(context).pop() },
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                    child: const Text('Borrar'),
+                    onPressed: () async {
+                      try {
+                        WorkingIndicatorDialog().show(
+                            context,
+                            text: 'Eliminando lote...');
+                        await _deleteBatch(batch);
+                        _showSuccessfulSnackBar('El lote ha sido eliminado exitosamente');
+                        appState.returnWith(true);
+                      }
+                      on BusinessException catch (e){
+                        _showErrorSnackBar(e.message);
+                      }
+                      on Exception catch (e){
+                        _showErrorSnackBar('Ha ocurrido un error inesperado eliminando el lote: $e');
+                      }
+                      finally{
+                        WorkingIndicatorDialog().dismiss();
+                      }
+                    }
+                ),
+              ],
+            ),
+          );
+
+        },
+        child: Row(
+            children: [
+              const Icon(Icons.delete),
+              const Text('Eliminar')
+            ]
+        ),
+        style: ElevatedButton.styleFrom(
+            primary: Colors.red,
+            textStyle: TextStyle(
+                fontSize: buttonFontSize
+            )
+        )
+    );
   }
 }
 

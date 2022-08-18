@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:barcode_scan2/barcode_scan2.dart';
@@ -18,7 +17,6 @@ import '../app_state.dart';
 import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 import 'newreturn.dart';
-
 
 class NewBatch extends StatefulWidget {
   const NewBatch({Key? key}) : super(key: key);
@@ -106,27 +104,27 @@ class _NewBatchState extends State<NewBatch> {
                         ),
                       ),
                     ),
-                    Container(
-                      width: 45,
-                      margin: UIHelper.formFieldContainerMargin,
-                      padding: const EdgeInsets.only(right: 10),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.only(left: 0, right: 0),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    if(Platform.isAndroid)
+                      Container(
+                        width: 45,
+                        margin: UIHelper.formFieldContainerMargin,
+                        padding: const EdgeInsets.only(right: 10),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.only(left: 0, right: 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Icon(FontAwesomeIcons.barcode),
+                          onPressed: () async {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                final barcode = await BarcodeScanner.scan();
+                                if (barcode.type.value == 0)
+                                  setState(() {
+                                    referenceTextController.text = barcode.rawContent;
+                                  });
+                          },
                         ),
-                        child: const Icon(FontAwesomeIcons.barcode),
-                        onPressed: () async {
-                            if (Platform.isAndroid || Platform.isIOS) {
-                              FocusManager.instance.primaryFocus?.unfocus();
-                              final barcode = await BarcodeScanner.scan();
-                              setState(() {
-                                referenceTextController.text = barcode.rawContent;
-                              });
-                            }
-                        },
-                      ),
-                    )
+                      )
                   ],
                 ),
 
@@ -182,10 +180,13 @@ class _NewBatchState extends State<NewBatch> {
                     controller: observationTextController,
                   ),
                 ),
-                Container(
+                Padding(
                   //margin: const EdgeInsets.only(top: 0),
-                  padding: const EdgeInsets.fromLTRB(95,25,95,0),//const EdgeInsets.only(left: 15, right: 15),
-                  child: ElevatedButton(
+                  padding: EdgeInsets.only(top: 16.0),//const EdgeInsets.fromLTRB(95,25,95,0),//const EdgeInsets.only(left: 15, right: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
                       child: Row(
                           children: [
                             //const Icon(Icons.add_box_outlined),
@@ -218,24 +219,22 @@ class _NewBatchState extends State<NewBatch> {
                                 observation:observationTextController.text,
                               )),
                               pageConfig: NewReturnPageConfig));
-                          //appState.returnWith(true);
                           _shouldRefreshParent = true;
-                          _showSnackBar('Nuevo lote creado con éxito');
+                          _showSuccessfulSnackBar('Nuevo lote creado con éxito');
                         }
                         on BusinessException catch (e){
-                          _showSnackBar(e.message);
+                          _showErrorSnackBar(e.message);
                         }
                         on Exception catch (e){
-                          _showSnackBar('Ha ocurrido un error inesperado guardardo el nuevo lote: $e');
+                          _showErrorSnackBar('Ha ocurrido un error inesperado guardardo el nuevo lote: $e');
                         }
                         finally{
                           WorkingIndicatorDialog().dismiss();
                         }
-
-                        //_makePostRequest(appState.description,appState.reference,appState.emailAddress,appState.password,userInfo.idNumber,appState.companyName);
                       }
                   ),
-                )
+                ]
+                ))
               ],
             ),
           ),
@@ -259,11 +258,15 @@ class _NewBatchState extends State<NewBatch> {
     return response;
   }
 
-  void _showSnackBar(String message){
+  void _showErrorSnackBar(String message) {
+    _showSnackBar(message, Colors.red);
+  }
+  void _showSuccessfulSnackBar(String message) {
+    _showSnackBar(message, Colors.green);
+  }
+  void _showSnackBar(String message, MaterialColor bgColor) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(content: Text(message), backgroundColor: bgColor),
     );
   }
 }
-
-

@@ -115,14 +115,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         color: Colors.white),
                   ),
                   actions: [
-                    /*
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () =>
-                      appState.currentAction =
-                          PageAction(
-                              state: PageState.addPage, pageConfig: SettingsPageConfig),
-                    ),*/
                     if (_batch.state==BatchStates.Draft)
                     IconButton(
                       icon: const Icon(Icons.add),
@@ -160,7 +152,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                   child: ListView(
                     children: [
                       Container(
-                        //margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           //enabled: false,
@@ -247,7 +238,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                           children: [
                             Expanded(
                               child: Container(
-                              //margin: const EdgeInsets.only(top: 8),
                               padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                               child: TextField(
                                 enabled: enabled_value,
@@ -277,7 +267,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               ),
                             )
                             ),
-                            if (_batch.state==BatchStates.Draft)
+                            if (_batch.state==BatchStates.Draft && Platform.isAndroid )
                               Container(
                               width: 45,
                               //margin: const EdgeInsets.only(top: 8),
@@ -289,34 +279,21 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 onPressed: () async {
-                                  if (kIsWeb) {
-                                    /*final tmpFile = await getImage(1);
-                                                  setState(() async {
-                                                    imageFile = tmpFile;
-                                                    var fileBytes = await imageFile.readAsBytes();
-                                                    //print('Path: ' + imageFile.files.single.path);
-                                                    //metodo no soportado en Flutter web, buscar otra libreria
-                                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
-                                                    print('Barcode: ' + results[0].toString());
-                                                    _controller.text = results[0].toString();
-                                                  });*/
-                                  } else {
-                                    if (Platform.isAndroid || Platform.isIOS) {
+                                    //if (Platform.isAndroid || Platform.isIOS) {
                                       FocusManager.instance.primaryFocus?.unfocus();
                                       final barcode = await BarcodeScanner.scan();
-                                      setState(() {
-                                        _reference.text = barcode.rawContent;
-                                        _referenceModified = true;
-                                      });
-                                    }
-                                  }
+                                      if (barcode.type.value == 0)
+                                        setState(() {
+                                          _reference.text = barcode.rawContent;
+                                          _referenceModified = true;
+                                        });
+                                    //}
                                 },
                               ),
                             )
                           ],
                         ),
                       Container(
-                        //margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           enabled: false,
@@ -343,7 +320,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                       ),
                       Container(
-                        //margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.fromLTRB(15,0,15,0),//all(15),
                         child: TextField(
                           enabled: enabled_value && !returnRequest.isAuditable,
@@ -384,14 +360,13 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                   WorkingIndicatorDialog().show(context, text: 'Actualizando Solicitud...');
                                   await _updateReqReturn(returnRequest,_eanTextController.text,_reference.text,_descripcion.text,_cantidad.text, _takenPictures);
                                   appState.returnWith(true);
-                                  //_shouldRefreshParent = true;
-                                  _showSnackBar('Solicitud actualizada con éxito');
+                                  _showSuccessfulSnackBar('Solicitud actualizada con éxito');
                                 }
                                 on BusinessException catch (e){
-                                  _showSnackBar(e.message);
+                                  _showErrorSnackBar(e.message);
                                 }
                                 on Exception catch (e){
-                                  _showSnackBar('Ha ocurrido un error inesperado al actualizar la solicitud: $e');
+                                  _showErrorSnackBar('Ha ocurrido un error inesperado al actualizar la solicitud: $e');
                                 }
                                 finally{
                                   WorkingIndicatorDialog().dismiss();
@@ -432,14 +407,14 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                                     context,
                                                     text: 'Eliminando Solicitud...');
                                                 await _deleteReqReturn(returnRequest);
-                                                _showSnackBar('La Solicitud ha sido eliminada exitosamente');
+                                                _showSuccessfulSnackBar('La Solicitud ha sido eliminada exitosamente');
                                                 appState.returnWith(true);
                                               }
                                               on BusinessException catch (e){
-                                                _showSnackBar(e.message);
+                                                _showErrorSnackBar(e.message);
                                               }
                                               on Exception catch (e){
-                                                _showSnackBar('Ha ocurrido un error inesperado eliminando la solicitud: $e');
+                                                _showErrorSnackBar('Ha ocurrido un error inesperado eliminando la solicitud: $e');
                                               }
                                               finally{
                                                 WorkingIndicatorDialog().dismiss();
@@ -479,13 +454,27 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                               (int index) =>
                               DataRow(
                                 cells: <DataCell>[DataCell(
-                                    ListTile(isThreeLine: true,
-                                      leading: Icon(Icons.workspaces_filled,
-                                        color: UIHelper.getStateColor(products[index].state!)),
-                                      title: Text(
-                                          'Ref: ${products[index].retailReference ??
-                                              '(sin referencia interna)' }'),
-                                      subtitle: const Text(''),
+                                    ListTile(
+                                      //isThreeLine: true,
+                                      leading: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,//y
+                                          crossAxisAlignment: CrossAxisAlignment.start,//x
+                                          children: [
+                                            Icon(
+                                                Icons.workspaces_filled,
+                                                color: UIHelper.getStateColor(products[index].state!)
+                                            )
+                                          ]
+                                      ),
+                                      title: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,//y
+                                          crossAxisAlignment: CrossAxisAlignment.start,//x
+                                          children: [
+                                            Text(
+                                              'Ref: ${products[index].retailReference ?? '(sin referencia interna)' }'
+                                            ),
+                                          ])
+                                      //subtitle: const Text(''),
                                     ), onTap: () {
                                   appState.waitCurrentAction<bool>(PageAction(
                                       state: PageState.addWidget,
@@ -503,8 +492,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                                     });
                                   });
                                 }),
-                                /*if(shouldShowStateColumn)
-                                  DataCell(Text(products[index].state!))*/
                               ],
                             ),
                         ),
@@ -512,9 +499,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
                         ),
                         )else
                       Container(
-                        //child: SpUI.buildReturnRequestThumbnailsGridView(state: newReturnRequestDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch:_batch)
                           child: SpUI.buildThumbnailsGridView(state: newReturnRequestDetailsState, photos:  _takenPictures, dummyPhoto: _dummyPhoto, photoParentState: _batch.state!, context: context)
-
                       )
                     ],
                   ),
@@ -588,7 +573,6 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
           }
       ),
     );
-
   }
 
   Future<ReturnRequestDetail> _getReturnRequestDetail(String? returnRequestUUID) async {
@@ -639,7 +623,7 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
         )
     )
     );
-    await BusinessServices.updateReqReturn(
+    await BusinessServices.updateRequestReturn(
         req_return, EAN, reference, description, unities, photosToUpdate);
   }
 
@@ -647,10 +631,15 @@ class  _ReturnRequestDetailsState extends State<ReturnRequestDetails> {
     return BusinessServices.getPhotosByProductUUID(returnRequestUUID);
   }
 
-  void _showSnackBar(String message) {
+  void _showErrorSnackBar(String message) {
+    _showSnackBar(message, Colors.red);
+  }
+  void _showSuccessfulSnackBar(String message) {
+    _showSnackBar(message, Colors.green);
+  }
+  void _showSnackBar(String message, MaterialColor bgColor) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(content: Text(message), backgroundColor: bgColor),
     );
   }
 }
-

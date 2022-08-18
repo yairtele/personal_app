@@ -27,7 +27,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import 'dart:convert';
+//import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -38,10 +38,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../app_state.dart';
 import 'package:dio/dio.dart';
-
 import '../config/configuration.dart';
-
-//import 'package:keycloak_flutter/keycloak_flutter.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -171,10 +168,10 @@ class _LoginState extends State<Login> {
                                             await appState.login();
                                           }
                                           on InvalidLoginException catch (e) {
-                                            _showSnackBar(e.message);
+                                            _showErrorSnackBar(e.message);
                                           }
                                           on Exception {
-                                            _showSnackBar(
+                                            _showErrorSnackBar(
                                                 'Ha ocurrido un error inesperado autenticando al usuario.');
                                           }
                                         },
@@ -262,9 +259,15 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _showSnackBar(String message) {
+  void _showErrorSnackBar(String message) {
+    _showSnackBar(message, Colors.red);
+  }
+  void _showSuccessfulSnackBar(String message) {
+    _showSnackBar(message, Colors.green);
+  }
+  void _showSnackBar(String message, MaterialColor bgColor) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(content: Text(message), backgroundColor: bgColor),
     );
   }
 
@@ -283,77 +286,6 @@ class _LoginState extends State<Login> {
       await productsFolderPath.create();
     }
 
-    // Check if the products file exists in the local app products folder. If not, retrieve it
-    //TODO: check if file needs update
-    const productsFileName = Configuration.productsFileName;// 'products_db.csv';
-    final productsFile = File('${productsFolderPath.path}/$productsFileName');
-    const productsFileURL = '$filesFolderURL/$productsFileName';
-    if (!productsFile.existsSync()) {
-      // If products file does not exist, download file to local folder
-      final response = await Dio().download(productsFileURL, productsFile.path,
-          onReceiveProgress: (value1, value2) {
-            setState(() {
-              _progressText = 'Descargando 1/3: ${(value1 / value2).toStringAsFixed(2)}';
-            });
-          }
-      );
-      //productsFile.writeAsStringSync(productsFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
-    }
-    else {
-      // If products file does exist, check if it is outdated and update it in such a case
-      // Get last modified date
-      final response = await http.head(Uri.parse(productsFileURL));
-      final lastModifiedHeader = response.headers[HttpHeaders.lastModifiedHeader];
-
-      // If cached date is different than the file date, download the file and overwrite the old one
-      final cachedLastModifiedDate = (await Cache.getProductsFileLastModifiedDate()) ?? '';
-      if(cachedLastModifiedDate != lastModifiedHeader){
-        final response = await Dio().download(productsFileURL, productsFile.path,
-            onReceiveProgress: (value1, value2) {
-              setState(() {
-                _progressText = 'Actualizando maestro de productos: ${(value1 / value2).toStringAsFixed(2)}';
-              });
-            }
-        );
-        await Cache.saveProductsFileLastModifiedDate(lastModifiedHeader!);
-      }
-    }
-
-    // Check if the sales file exists in the local app products folder. If not, retrieve it
-    //TODO: check if file needs update
-    const salesFileName = Configuration.salesFileName;
-    const salesFileURL = '$filesFolderURL/$salesFileName';
-    final salesFile = File('${productsFolderPath.path}/$salesFileName');
-    if (!salesFile.existsSync()) {
-      // Write file to local folder
-      final response = await Dio().download(salesFileURL, salesFile.path,
-          onReceiveProgress: (value1, value2) {
-            setState(() {
-              _progressText = 'Descargando 2/3: ${(value1 / value2).toStringAsFixed(2)}';
-            });
-          }
-      );
-      //salesFile.writeAsStringSync(salesFileContents, mode: FileMode.write, encoding: Encoding.getByName('UTF-8'));
-    }
-    else {
-      // If sales file does exist, check if it is outdated and update it in such a case
-      // Get last modified date
-      final response = await http.head(Uri.parse(salesFileURL));
-      final lastModifiedHeader = response.headers[HttpHeaders.lastModifiedHeader];
-
-      // If cached date is different than the file date, download the file and overwrite the old one
-      final cachedLastModifiedDate = (await Cache.getSalesFileLastModifiedDate()) ?? '';
-      if(cachedLastModifiedDate != lastModifiedHeader){
-        final response = await Dio().download(salesFileURL, salesFile.path,
-            onReceiveProgress: (value1, value2) {
-              setState(() {
-                _progressText = 'Actualizando registros de ventas: ${(value1 / value2).toStringAsFixed(2)}';
-              });
-            }
-        );
-        await Cache.saveSalesFileLastModifiedDate(lastModifiedHeader!);
-      }
-    }
     // Check if the rules file exists in the local app products folder. If not, retrieve it
     //TODO: check if file needs update
     const rulesFileName = Configuration.rulesFileName;
@@ -365,7 +297,7 @@ class _LoginState extends State<Login> {
       final response = await Dio().download(rulesFileURL, rulesFile.path,
           onReceiveProgress: (value1, value2) {
             setState(() {
-              _progressText = 'Descargando 3/3: ${(value1 / value2).toStringAsFixed(2)}';
+              _progressText = 'Descargando 1/1: ${(value1 / value2).toStringAsFixed(2)}';//YAYO: Modificó de 3/3 a 1/1
             });
           }
       );

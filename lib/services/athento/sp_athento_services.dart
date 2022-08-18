@@ -310,8 +310,8 @@ class SpAthentoServices {
 
     final headers = configProvider.getHttpHeaders();
 
-    //print("headers: " + JSON.stringify(headers));
-    //print("request body: " + JSON.stringify(jsonRequestBody));
+    //print(headers);
+    //print(jsonRequestBody);
 
     final response = await SpWS.post(
         configProvider.getEndpointUrl(AthentoEndpoint.getDocument),

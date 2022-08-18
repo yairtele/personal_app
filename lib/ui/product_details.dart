@@ -16,7 +16,6 @@ import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
-import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
@@ -24,7 +23,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../config/configuration.dart';
-import '../router/ui_pages.dart';
 
 class  ProductDetails extends StatefulWidget {
   final Product product;
@@ -36,7 +34,7 @@ class  ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  late Future<ScreenData<Product, ProductDetail>> _localData;
+  late Future<ScreenData<Product, ProductDetail?>> _localData;
   ProductInfo? _productInfo;
   Map<String, ThumbPhoto> _takenPictures = {};
   var _referenceModified = false;
@@ -46,7 +44,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   void initState(){
     super.initState();
-    _localData = ScreenData<Product, ProductDetail>(dataGetter: _getProductDetail).getScreenData(dataGetterParam: widget.product);
+   _localData = ScreenData<Product, ProductDetail?>(dataGetter: _getProductDetail).getScreenData(dataGetterParam: widget.product);
   }
 
   @override
@@ -71,12 +69,12 @@ class _ProductDetailsState extends State<ProductDetails> {
           //we need to return a future
           return Future.value(false);
         },
-        child: FutureBuilder<ScreenData<Product, ProductDetail>>(
+        child: FutureBuilder<ScreenData<Product, ProductDetail?>>(
             future: _localData,
             builder: (BuildContext context,
-                AsyncSnapshot<ScreenData<Product, ProductDetail>> snapshot) {
+                AsyncSnapshot<ScreenData<Product, ProductDetail?>> snapshot) {
               Widget widget;
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data!.data != null) {
                 final data = snapshot.data!;
                 _takenPictures = data.data!.productPhotos;
                 _productInfo = data.data!.productInfo;
@@ -177,7 +175,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   Expanded(
                                       child:
                                         Container(
-                                            //margin: const EdgeInsets.only(top: 8),
                                             padding: const EdgeInsets.fromLTRB(15, 0, 10, 0),
                                             child: TextField(
                                               autofocus: true,
@@ -209,10 +206,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                                             ),
                                           )
                                       ),
-                                  if (product.state==BatchStates.Draft)
+                                  if (product.state==BatchStates.Draft && Platform.isAndroid)
                                     Container(
                                     width: 45,
-                                    //margin: const EdgeInsets.only(top: 8),
                                     padding: const EdgeInsets.only(right: 10),
                                     child: ElevatedButton(
                                       child: const Icon(FontAwesomeIcons.barcode),
@@ -221,50 +217,32 @@ class _ProductDetailsState extends State<ProductDetails> {
                                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       onPressed: () async {
-                                        if (kIsWeb) {
-                                          /*final tmpFile = await getImage(1);
-                                                  setState(() async {
-                                                    imageFile = tmpFile;
-                                                    var fileBytes = await imageFile.readAsBytes();
-                                                    //print('Path: ' + imageFile.files.single.path);
-                                                    //metodo no soportado en Flutter web, buscar otra libreria
-                                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
-                                                    print('Barcode: ' + results[0].toString());
-                                                    _controller.text = results[0].toString();
-                                                  });*/
-                                        } else {
-                                          if (Platform.isAndroid || Platform.isIOS) {
                                             FocusManager.instance.primaryFocus?.unfocus();
                                             final barcode = await BarcodeScanner.scan();
-                                            setState(() {
-                                              _reference.text = barcode.rawContent;
-                                              _referenceModified = true;
-                                            });
-                                          }
-                                        }
+                                            if (barcode.type.value == 0)
+                                              setState(() {
+                                                _reference.text = barcode.rawContent;
+                                                _referenceModified = true;
+                                              });
                                       },
                                     ),
                                   )
                                 ],
                               ),
                               Container(
-                                //child: SpUI.buildProductThumbnailsGridView(state: newProductDetails, photos:  _takenPictures, context: context, modifiedPhotos: _modifiedPhotos,batch: _batch)
                                   child: SpUI.buildThumbnailsGridView(
                                       state: newProductDetailsState,
                                       photos: _takenPictures,
                                       dummyPhoto: _dummyPhoto,
-                                      photoParentState: _batch.state!, //product.state!,
+                                      photoParentState: _batch.state!,
                                       context: context),
                               ),
                               Padding(
-                                  padding: const EdgeInsets.only(top: 16.0),
+                                  padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 10.0),
                                   child: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        if (_batch.state ==
-                                            BatchStates.Draft || product
-                                            .state == BatchStates.InfoPendiente)
+                                        if (_batch.state == BatchStates.Draft || product.state == BatchStates.InfoPendiente)
                                           ElevatedButton(
                                               onPressed: () async {
                                                 try {
@@ -278,14 +256,14 @@ class _ProductDetailsState extends State<ProductDetails> {
 
                                                   appState.returnWith(true);
 
-                                                  _showSnackBar(
+                                                  _showSuccessfulSnackBar(
                                                       'Producto actualizado con éxito');
                                                 }
                                                 on BusinessException catch (e) {
-                                                  _showSnackBar(e.message);
+                                                  _showErrorSnackBar(e.message);
                                                 }
                                                 on Exception catch (e) {
-                                                  _showSnackBar(
+                                                  _showErrorSnackBar(
                                                       'Ha ocurrido un error inesperado al actualizar el producto: $e');
                                                 }
                                                 finally {
@@ -315,14 +293,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       text: 'Eliminando producto...');
                                                   await _deleteProduct(product);
                                                   appState.returnWith(true);
-                                                  _showSnackBar(
+                                                  _showSuccessfulSnackBar(
                                                       'Producto eliminado con éxito');
                                                 }
                                                 on BusinessException catch (e) {
-                                                  _showSnackBar(e.message);
+                                                  _showErrorSnackBar(e.message);
                                                 }
                                                 on Exception catch (e) {
-                                                  _showSnackBar(
+                                                  _showErrorSnackBar(
                                                       'Ha ocurrido un error inesperado al eliminar el producto: $e');
                                                 }
                                                 finally {
@@ -345,7 +323,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                               )
                             ]
                         )));
-              } else if (snapshot.hasError) {
+              }
+              else if (snapshot.hasError) {
                 widget = Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -362,7 +341,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ],
                   ),
                 );
-              } else {
+              }
+              else {
                 widget = Scaffold(
                     backgroundColor: Configuration.customerPrimaryColor,
                     body: Stack(
@@ -415,71 +395,53 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 
-  Future<ProductDetail> _getProductDetail(Product? product) async {
+  Future<ProductDetail?> _getProductDetail(Product? product) async {
     _dummyPhoto = await SpAssetUtils.getImageXFileFromAssets('images/img_not_found.jpg');
-    _productInfo = await BusinessServices.getProductInfoByEAN(product!.EAN);
-    final productExistingPhotos = await BusinessServices.getPhotosByProductUUID(product.uuid!);
-    //final productPhotos = (await _getFullPhotosInfo(productExistingPhotos))
-    //  .map((key, photoDetail) => MapEntry(key, ThumbPhoto(uuid: photoDetail.uuid, photo: photoDetail.content!, isDummy: photoDetail.isDummy)));
-    final productPhotos = productExistingPhotos
-      .map((key, photoDetail) => MapEntry(
-        key,
-        ThumbPhoto(
-          uuid: photoDetail.uuid,
-          photo: photoDetail.content,
-          isDummy: photoDetail.isDummy,
-          hasChanged: false,
-          state: photoDetail.state!
-        )
-      )
-    );
-
-    return ProductDetail(productInfo: _productInfo!, productPhotos: productPhotos);
-  }
-
-  void _showSnackBar(String message){
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  bool _doesNotContainPhoto(Map<String,PhotoDetail> existingPhotos, String photoName){
-    return !existingPhotos.containsKey(photoName);
-  }
-
-  /*
-  Future<Map<String,PhotoDetail>> _getFullPhotosInfo(Map<String, PhotoDetail> existingPhotoDetails) async {
-
-      //var existingPhotos = _getPhotoContents(existingPhotoDetails);
-
-      if (_productInfo!.auditRules.photos.length == 0 && !existingPhotoDetails.containsKey('otra')){
-        existingPhotoDetails['otra'] = PhotoDetail(uuid: null, content: null);
-      }
-      else{
-        final missingPhotos = _productInfo!.auditRules.photos.where((p) => _doesNotContainPhoto(existingPhotoDetails, p.name)).toList();
-
-        for(final photoAuditInfo in missingPhotos){
-          existingPhotoDetails[photoAuditInfo.name] = PhotoDetail(uuid: null, content: null);
-        }
-      }
-
-      return existingPhotoDetails;
-  }
-*/
-/*  Map<String, XFile?> _getPhotoContents(Map<String, PhotoDetail> photoDetails) {
-    var photos = <String, XFile?>{};
-
-    for (var key in photoDetails.keys){
-      photos[key] = photoDetails[key]!.content;
+    var _canGetProductInfo = true;
+    try{
+      _productInfo = await BusinessServices.getProductInfoByEAN(product!.EAN);
+    } on Exception catch (e) {
+      _canGetProductInfo = false;
+      Future.delayed(const Duration(seconds: 1)).then((_) {
+        Navigator.of(context).pop();
+        _showErrorSnackBar(e.toString());
+      });
     }
+    if (_canGetProductInfo){
+      final productExistingPhotos = await BusinessServices.getPhotosByProductUUID(product!.uuid!);
+      final productPhotos = productExistingPhotos
+        .map((key, photoDetail) => MapEntry(
+          key,
+          ThumbPhoto(
+            uuid: photoDetail.uuid,
+            photo: photoDetail.content,
+            isDummy: photoDetail.isDummy,
+            hasChanged: false,
+            state: photoDetail.state!
+          )
+        )
+      );
 
-    return photos;
-  }*/
+      return ProductDetail(productInfo: _productInfo!, productPhotos: productPhotos);
+    } else {
+      return null;
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    _showSnackBar(message, Colors.red);
+  }
+  void _showSuccessfulSnackBar(String message) {
+    _showSnackBar(message, Colors.green);
+  }
+  void _showSnackBar(String message, MaterialColor bgColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: bgColor),
+    );
+  }
 
   Future<void> _updateProduct(bool referenceModified, String reference,  Map<String, ThumbPhoto> photos, Product product) async {
-    //final changedPhotos = photos.entries.where((element) => element.value.hasChanged == true);
 
-    //final photosToUpdate = Map<String, ThumbPhoto>.fromEntries(changedPhotos)
     final photosToUpdate = photos
         .map((key, thumbPhoto) => MapEntry(
         key,

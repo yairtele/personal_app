@@ -28,10 +28,12 @@
  * THE SOFTWARE..
  */
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:window_size/window_size.dart';
 
 import 'app_state.dart';
 import 'router/back_dispatcher.dart';
@@ -40,6 +42,13 @@ import 'router/shopping_parser.dart';
 import 'router/ui_pages.dart';
 
 void main() {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows) {
+    setWindowMinSize(const Size(500, 600));
+  }
+
   runApp(MyApp());
 }
 
@@ -92,7 +101,7 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider<AppState>(
       create: (_) => appState,
       child: MaterialApp.router(
-        title: 'Newsan App',
+        title: 'Desarrollo Newsan',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

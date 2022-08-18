@@ -50,8 +50,6 @@ class Batches extends StatefulWidget{
   _BatchesState createState() => _BatchesState();
 }
 
-
-
 class _BatchesState extends State<Batches> {
 
   late Future<ScreenData<dynamic, List<Batch>>> _localData;
@@ -177,18 +175,26 @@ class _BatchesState extends State<Batches> {
                                     cells: <DataCell>[
                                       DataCell(
                                           ListTile(
-                                            isThreeLine: true,
-                                            leading: Icon(
+                                            //isThreeLine: true,
+                                            leading: const Icon(
                                                 FontAwesomeIcons.archive,
                                                 color: Configuration.customerSecondaryColor),
-                                            title: Text(draftBatches[index].batchNumber != null?
-                                            '\n${draftBatches[index].batchNumber}' : 'Generando Nº Lote...',
+                                            title: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,//y
+                                              crossAxisAlignment: CrossAxisAlignment.start,//x
+                                                children:[
+                                              Text(draftBatches[index].batchNumber != null?
+                                              '${draftBatches[index].batchNumber}' : 'Generando Nº Lote...',
                                                 style: const TextStyle(
                                                     fontSize: 14.0,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black)),
-                                            subtitle: Text('${_getBatchSubTitle(
-                                                draftBatches[index])}\n\n\n'),
+                                              Text('${_getBatchSubTitle(
+                                                  draftBatches[index])}',
+                                                  style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      color: Colors.grey))
+                                            ]),
                                           ),
                                           onTap: () {
                                             appState.waitCurrentAction<bool>(
@@ -207,8 +213,6 @@ class _BatchesState extends State<Batches> {
                                           }
                                       )
                                     ],
-
-                                    //selected: selected[index],
                                   ),
                             ),
                           ),
@@ -234,20 +238,27 @@ class _BatchesState extends State<Batches> {
                               auditedBatches.length,
                                   (int index) =>
                                   DataRow(
-                                    //color: UIHelper.getAuditItemBackgroundColor(auditedBatches[index].state!),
                                     cells: <DataCell>[
-                                      DataCell(ListTile(isThreeLine: true,
+                                      DataCell(ListTile(
                                         leading: Icon(
                                             FontAwesomeIcons.archive,
                                             color: UIHelper.getStateColor(auditedBatches[index].state!)),//Colors.blue),
-                                        title: Text(auditedBatches[index].batchNumber != null?
-                                            '\n${auditedBatches[index].batchNumber}' : 'Generando Nº Lote...',
-                                            style: const TextStyle(
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black)),
-                                        subtitle: Text('${_getBatchSubTitle(
-                                            auditedBatches[index])}\n\n\n'),
+                                        title: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,//y
+                                            crossAxisAlignment: CrossAxisAlignment.start,//x
+                                            children:[
+                                              Text(auditedBatches[index].batchNumber != null?
+                                              '${auditedBatches[index].batchNumber}' : 'Generando Nº Lote...',
+                                                  style: const TextStyle(
+                                                      fontSize: 14.0,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black)),
+                                              Text('${_getBatchSubTitle(
+                                                  auditedBatches[index])}',
+                                                  style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      color: Colors.grey))
+                                            ]),
                                       ),
                                           onTap: () {
                                             appState.waitCurrentAction<bool>(
@@ -265,7 +276,6 @@ class _BatchesState extends State<Batches> {
                                             });
                                           }),
                                     ],
-                                    //selected: selected[index],
                                   ),
                                ),
                               ),
@@ -356,16 +366,6 @@ class _BatchesState extends State<Batches> {
     return batches;
   }
 
-
-  String _getBatchTitle(Batch batch) {
-
-    final batchRetailReference = (batch.retailReference ?? '').trim();
-    final batchDescription = (batch.description ?? '').trim();
-    if((batchRetailReference + batchDescription).length == 0){
-      return '(sin referencia interna)';
-    }
-    return batchRetailReference != '' ? batchRetailReference : batchDescription;
-  }
   String _getBatchSubTitle(Batch batch) {
     var batchDescription = (batch.description ?? '' ).trim();
     if (batchDescription.length==0){

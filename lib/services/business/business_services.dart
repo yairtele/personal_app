@@ -6,7 +6,7 @@ import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/athento_field_name.dart';
 import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
 import 'package:navigation_app/services/athento/bearer_auth_config_provider.dart';
-import 'package:navigation_app/services/athento/binary_file_info.dart';
+//import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/athento/config_provider.dart';
 import 'package:navigation_app/services/athento/sp_athento_services.dart';
 import 'package:navigation_app/services/business/batch.dart';
@@ -18,11 +18,12 @@ import 'package:navigation_app/services/business/return_request.dart';
 import 'package:navigation_app/services/business/business_exception.dart';
 import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/utils/sp_file_utils.dart';
+import 'package:navigation_app/utils/sp_functions_utils.dart';
 import 'package:navigation_app/utils/sp_product_utils.dart';
 import '../newsan_services.dart';
 import 'new_return.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:collection/collection.dart';
+//import 'package:collection/collection.dart';
 
 import 'photo_detail.dart';
 
@@ -136,60 +137,41 @@ class BusinessServices {
 
 
   static Future<ProductInfo> getProductInfoByEAN(String eanCode) async {
-    //TODO: Consultar Athento o servicio de Newsan
-    //return getProductInfoByEANfromArray(eanCode);
     return getProductInfoByEANfromFile(eanCode);
   }
 
   static Future<ProductInfo> getProductInfoByEANfromFile(String eanCode) async {
-    const EAN_INDEX = 3;
-    return _getProductInfoByEANorCodefromFile(EAN_INDEX, eanCode);
+    const productFileSearchKey = 'codigoEan';
+    return _getProductInfoByEANorCodefromFile(productFileSearchKey, eanCode);
 
   }
 
   static Future<ProductInfo> getProductInfoByCommercialCode(String commercialCode) async {
-    //TODO: Consultar Athento
     //return getProductInfoByCommercialCodeFromArray(commercialCode);
     return _getProductInfoByCommercialCodefromFile(commercialCode);
   }
 
   static Future<ProductInfo> _getProductInfoByCommercialCodefromFile(String commercialCode) async {
-    const COMMERCIAL_CODE_INDEX = 1;
-    return _getProductInfoByEANorCodefromFile(COMMERCIAL_CODE_INDEX, commercialCode);
+    const productFileSearchKey = 'codigoComercial';
+    return _getProductInfoByEANorCodefromFile(productFileSearchKey, commercialCode);
 
   }
 
-  static Future<ProductInfo> _getProductInfoByEANorCodefromFile(int productFileSearchColumnIndex, String productFileSearchKey) async {
-    //TODO: Consultar Athento
+  static Future<ProductInfo> _getProductInfoByEANorCodefromFile(String productFileSearchKey, String productFileSearchValue) async {
     const chunkSize = 32 * 1024;
     final searchPattern = RegExp(r'[^A-Z0-9-]', caseSensitive: false);
     const replaceString = '-';
 
+    productFileSearchValue = productFileSearchValue.replaceAll(searchPattern, replaceString);
 
-    productFileSearchKey = productFileSearchKey.replaceAll(searchPattern, replaceString);
+    final productFullInfo = await NewsanServices.getProductFullInfo(productFileSearchKey, productFileSearchValue);
+    final productMasterInfo = productFullInfo['productMasterInfo'];
 
-    final producMasterInfo = await _getRowAsObjectFromFile(
-        fileName: Configuration.productsFileName,
-        chunkSize: chunkSize,
-        lineSeparator: '\r\n',
-        columnSeparator: '\t',
-        equals: (List<String> row) => equalsIgnoreAsciiCase(row[productFileSearchColumnIndex].replaceAll(searchPattern, replaceString), productFileSearchKey),
-        objectBuilder: _createProductMasterInfo);
-
-    if(producMasterInfo == null){
-      throw BusinessException('No se ha podido encontrar un producto con el código "$productFileSearchKey" en el maestro de productos.');
+    if(productMasterInfo == null){
+      throw BusinessException('No se ha podido encontrar un producto con el código "$productFileSearchValue" en el maestro de productos.');
     }
 
-    const SKU_INDEX = 1;
-    const CUIT_INDEX = 4;
-    final retailCUIT = (await Cache.getUserInfo())!.idNumber;
-    final producSalesInfo = await _getRowAsObjectFromFile(
-        fileName: Configuration.salesFileName, //'sales_db.csv' ,
-        chunkSize: chunkSize,
-        lineSeparator: '\r\n',
-        columnSeparator: '\t',
-        equals: (List<String> row) => row[SKU_INDEX] == producMasterInfo.sku && row[CUIT_INDEX] == retailCUIT,
-        objectBuilder: _createProductSalesInfo);
+    final productSalesInfo = productFullInfo['productSalesInfo'];
 
     const BUSINESS_UNIT_INDEX = 0;
     final productAuditRules = await _getRowAsObjectFromFile(
@@ -197,25 +179,34 @@ class BusinessServices {
         chunkSize: chunkSize,
         lineSeparator: '\r\n',
         columnSeparator: '\t',
-        equals: (List<String> row) => row[BUSINESS_UNIT_INDEX] == producMasterInfo.businessUnit,
+        equals: (List<String> row) => row[BUSINESS_UNIT_INDEX] == productMasterInfo.businessUnit,
         objectBuilder: _createProductAuditRules);
 
-
     return ProductInfo.create(
-        EAN: producMasterInfo.ean,
-        commercialCode: producMasterInfo.commercialCode,
-        sku: producMasterInfo.sku,
-        description: producMasterInfo.description,
-        brand: producMasterInfo.brand,
-        legalEntity: producMasterInfo.legalEntity,
-        businessUnit: producMasterInfo.businessUnit,
-        salesInfo: producSalesInfo,
+        EAN: productMasterInfo.ean,
+        commercialCode: productMasterInfo.commercialCode,
+        sku: productMasterInfo.sku,
+        description: productMasterInfo.description,
+        brand: productMasterInfo.brand,
+        legalEntity: productMasterInfo.legalEntity,
+        businessUnit: productMasterInfo.businessUnit,
+        salesInfo: productSalesInfo,
         auditRules: productAuditRules,
     );
+  }
 
-    //return getProductInfoByEANfromArray(eanCode);
+  static Future<ProductAuditRules?> productAuditRules(String businessUnit) async {
+    const chunkSize = 32 * 1024;
 
-
+    const BUSINESS_UNIT_INDEX = 0;
+    return _getRowAsObjectFromFile(
+      fileName: 'rules_db.csv' ,
+      chunkSize: chunkSize,
+      lineSeparator: '\r\n',
+      columnSeparator: '\t',
+      equals: (List<String> row) => row[BUSINESS_UNIT_INDEX] == businessUnit,
+      objectBuilder: _createProductAuditRules
+    );
   }
 
   static Future<TRowObject?> _getRowAsObjectFromFile<TRowObject>({required String fileName, required int chunkSize,
@@ -264,11 +255,11 @@ class BusinessServices {
 
   static ProductMasterInfo _createProductMasterInfo(List<String> row){
     return ProductMasterInfo.fromCsvRow(row);
-  }
+  }//TODO: YAYO: Comentar cuando se habilite ws
 
   static ProductSalesInfo _createProductSalesInfo(List<String> row){
     return ProductSalesInfo.fromCsvRow(row);
-  }
+  }//TODO: YAYO: Comentar cuando se habilite ws
 
   static ProductAuditRules _createProductAuditRules(List<String> row){
     return ProductAuditRules.fromCsvRow(row);
@@ -671,9 +662,7 @@ class BusinessServices {
   }
 
   //TODO: los parámetros String returnEAN,String returnreference,String returndescr,String returnunities ya están en el ReturnRequest
-  //TODO: no abreviar nombres de métodos como este.
-  //TODO: Usar camelCase para los parámetros y variables.
-  static Future <void> updateReqReturn (ReturnRequest req_return, String returnEAN, String returnReference, String returnDescr, String returnunities,  Map<String, PhotoDetail> photos) async{
+  static Future <void> updateRequestReturn (ReturnRequest requestReturn, String returnEAN, String returnReference, String returnDescr, String returnunities,  Map<String, PhotoDetail> photos) async{
     final configProvider = await  _createConfigProvider();
     final fieldValues = {
       '${ReturnRequestAthentoFieldName.EAN}': '${returnEAN}',
@@ -682,12 +671,12 @@ class BusinessServices {
       '${ReturnRequestAthentoFieldName.quantity}': '${returnunities}',
     };
     //TODO:Armado con orden correcto del titulo para la solicitud.
-    await SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: req_return.uuid!, fieldValues: fieldValues);
+    await SpAthentoServices.updateDocument(configProvider: configProvider, documentUUID: requestReturn.uuid!, fieldValues: fieldValues);
 
     await _updatePhotos(configProvider, photos);
 
     // Delete cached images
-    await _deletePhotoCacheDirectory(req_return.uuid!);
+    await _deletePhotoCacheDirectory(requestReturn.uuid!);
   }
 
   static Future<void> _deletePhotoCacheDirectory(String directoryName) async {
@@ -795,6 +784,16 @@ class ProductMasterInfo{
   String businessUnit;
   String legalEntity; //Persona jurídica
 
+  ProductMasterInfo.create({
+    required this.ean,
+    required this.commercialCode,
+    required this.sku,
+    required this.description,
+    required this.brand,
+    required this.businessUnit,
+    required this.legalEntity //Persona jurídica
+  }){}
+
   ProductMasterInfo({ required this.ean, required this.commercialCode,
     required this.sku,required this.description, required this.brand,
     required this.businessUnit, required this.legalEntity});
@@ -815,40 +814,19 @@ class ProductSalesInfo{
   double price;
   String retailAccount;
 
+  ProductSalesInfo.create({
+    required this.lastSellDate,
+    required this.price,
+    required this.retailAccount}){}
+
   ProductSalesInfo({ required this.lastSellDate, required this.price, required this.retailAccount});
 
   ProductSalesInfo.fromCsvRow(List<String> row) : this(
-      lastSellDate: _parseDate(row[0]),
-      price: _parsePrice(row[5]),
+      lastSellDate: SpFunctionsUtils.parseLastSellDate(row[0]),
+      price: SpFunctionsUtils.parseProductPrice(row[5]),
       retailAccount: row[2],
-  );
+  );//TODO: YAYO: Comentar cuando se habilite ws
 
-  static double  _parsePrice(String priceString) {
-    var cleanedPriceString = priceString;
-    final decimalSeparatorRx = RegExp(r'([,\.])\d+$');
-    final matches = decimalSeparatorRx.allMatches(priceString);
-    final decimalSeparator = matches.length > 0 ? matches.first.group(1) : null;
-    if(decimalSeparator != null){
-      if(priceString.split(decimalSeparator).length == 2){
-        cleanedPriceString = priceString.replaceAll(RegExp('[^0-9$decimalSeparator]'), '').replaceAll(',', '.');
-      }
-      else {
-        cleanedPriceString = priceString.replaceAll(RegExp('[^0-9]'), '');
-      }
-    }
-
-    return double.parse(cleanedPriceString);
-    //print('$priceString: $cleanedPriceString');
-  }
-  static DateTime _parseDate(String dateString){
-    final rx = RegExp(r'(\d+)/(\d+)\/(\d+)');
-    final match = rx.firstMatch(dateString);
-    if(match != null) { //Formato dd/mm/yyyy
-      dateString = '${match.group(3)}-${match.group(2)}-${match.group(1)}';
-    }
-
-    return DateTime.parse(dateString);
-  }
 }
 
 class ProductAuditRules{

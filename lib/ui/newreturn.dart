@@ -1,9 +1,9 @@
-//import 'dart:html';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/return_photo.dart';
-import 'package:navigation_app/ui/ui_helper.dart';
+import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
 import 'package:navigation_app/utils/sp_asset_utils.dart';
 import 'package:navigation_app/utils/ui/sp_ui.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:barcode_scan2/barcode_scan2.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import '../app_state.dart';
 import 'package:intl/intl.dart';
 
@@ -159,7 +158,8 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                             helperText: 'Ej: 939482'),
                                       ),
                                     )),
-                                Container(
+                                if(Platform.isAndroid)
+                                  Container(
                                   width: 45,
                                   //margin: UIHelper.formFieldContainerMargin,
                                   padding: const EdgeInsets.only(left: 2, right: 2),
@@ -170,25 +170,13 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     ),
                                     onPressed: () async {
-                                      if (kIsWeb) {
-                                        /*final tmpFile = await getImage(1);
-                                    setState(() async {
-                                      imageFile = tmpFile;
-                                      var fileBytes = await imageFile.readAsBytes();
-                                      //print('Path: ' + imageFile.files.single.path);
-                                      //metodo no soportado en Flutter web, buscar otra libreria
-                                      List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
-                                      print('Barcode: ' + results[0].toString());
-                                      _controller.text = results[0].toString();
-                                    });*/
-                                      } else {
-                                        if (Platform.isAndroid ||
-                                            Platform.isIOS) {
+                                      //if (Platform.isAndroid || Platform.isIOS) {
                                           FocusManager.instance.primaryFocus?.unfocus();
                                           final barcode = await BarcodeScanner.scan();
-                                          _lookForProduct(barcode);
-                                        }
-                                      }
+                                          if (barcode.type.value == 0) //la lectura fue exitosa
+                                            _lookForProduct(barcode);
+                                        //}
+                                      //}
                                     },
                                   ),
                                 ),
@@ -354,41 +342,29 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                               ),
                                             ),
                                           )),
-                                          Container(
-                                            width: 45,
-                                            margin: const EdgeInsets.only(top: 8),
-                                            padding: const EdgeInsets.only(left: 2, right: 2),
-                                            child: ElevatedButton(
-                                              child: const Icon(FontAwesomeIcons.barcode),
-                                              style: ElevatedButton.styleFrom(
-                                                padding: const EdgeInsets.only(left: 0, right: 0),
-                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          if (Platform.isAndroid)
+                                            Container(
+                                              width: 45,
+                                              margin: const EdgeInsets.only(top: 8),
+                                              padding: const EdgeInsets.only(left: 2, right: 2),
+                                              child: ElevatedButton(
+                                                child: const Icon(FontAwesomeIcons.barcode),
+                                                style: ElevatedButton.styleFrom(
+                                                  padding: const EdgeInsets.only(left: 0, right: 0),
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                ),
+                                                onPressed: () async {
+                                                    //if (Platform.isAndroid || Platform.isIOS) {
+                                                      FocusManager.instance.primaryFocus?.unfocus();
+                                                      final barcode = await BarcodeScanner.scan();
+                                                      if (barcode.type.value == 0)
+                                                        setState(() {
+                                                          _retailReferenceTextController.text = barcode.rawContent;
+                                                        });
+                                                    //}
+                                                },
                                               ),
-                                              onPressed: () async {
-                                                if (kIsWeb) {
-                                                  /*final tmpFile = await getImage(1);
-                                                  setState(() async {
-                                                    imageFile = tmpFile;
-                                                    var fileBytes = await imageFile.readAsBytes();
-                                                    //print('Path: ' + imageFile.files.single.path);
-                                                    //metodo no soportado en Flutter web, buscar otra libreria
-                                                    List<BarcodeResult> results = await _barcodeReader.decodeFileBytes(fileBytes);
-                                                    print('Barcode: ' + results[0].toString());
-                                                    _controller.text = results[0].toString();
-                                                  });*/
-                                                } else {
-                                                  if (Platform.isAndroid ||
-                                                      Platform.isIOS) {
-                                                    FocusManager.instance.primaryFocus?.unfocus();
-                                                    final barcode = await BarcodeScanner.scan();
-                                                    setState(() {
-                                                      _retailReferenceTextController.text = barcode.rawContent;
-                                                    });
-                                                  }
-                                                }
-                                              },
-                                            ),
-                                          )]
+                                            )]
                                       ),
                                       Column(
                                       mainAxisAlignment:
@@ -441,75 +417,72 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
                                 //)
                                 //)
                               ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.fromLTRB(95,15,95,15),//all(15),
-                                child: ElevatedButton( // Botón Registrar
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.save),
-                                      const Text('Registrar')
-                                    ]
-                                  ),
-                                  /*child: Column(
-                                    children: [
-                                      const Icon(FontAwesomeIcons.save),
-                                      const Text('Registrar devolución')
-                                    ]
-                                  ),*/
-                                  onPressed: () async {
-                                    try{
-                                      //validateProductData();
-                                      WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
+                              Padding(
+                                //margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.fromLTRB(0,8,0,8),//all(15),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton( // Botón Registrar
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.save),
+                                          const Text('Registrar')
+                                        ]
+                                      ),
+                                      onPressed: () async {
+                                        try{
+                                          WorkingIndicatorDialog().show(context, text: 'Registrando nueva devolución...');
+                                          //validateProductData();
 
-                                      final photosToSave = _takenPictures.map(
-                                              (key, thumbPhoto) => MapEntry(key, ReturnPhoto(path: thumbPhoto.photo.path, isDummy: thumbPhoto.isDummy))
-                                      );
+                                          final photosToSave = _takenPictures.map(
+                                                  (key, thumbPhoto) => MapEntry(key, ReturnPhoto(path: thumbPhoto.photo.path, isDummy: thumbPhoto.isDummy))
+                                          );
 
-                                      final product = _product!;
-                                      final newReturn = NewReturn(
-                                        EAN: product.EAN,
-                                        sku: product.sku,
-                                        retailReference: _retailReferenceTextController.text,
-                                        commercialCode: product.commercialCode,
-                                        brand: product.brand,
-                                        description: product.description,
-                                        lastSell: _productLastSell,
-                                        price: _lastSellPrice,
-                                        legalEntity: product.legalEntity,
-                                        businessUnit: product.businessUnit,
-                                        quantity: _getQuantity(),
-                                        isAuditable: _isAuditableProduct,
-                                        photos: photosToSave,
-                                        observations: _commentsTextController.text,
-                                        customer_account: product.salesInfo != null? product.salesInfo!.retailAccount : '(No disponible)'
-                                      );
-                                      //print('GLOBAL BATCH: ' + batch.batchNumber!);
-                                      await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
+                                          final product = _product!;
+                                          final newReturn = NewReturn(
+                                            EAN: product.EAN,
+                                            sku: product.sku,
+                                            retailReference: _retailReferenceTextController.text,
+                                            commercialCode: product.commercialCode,
+                                            brand: product.brand,
+                                            description: product.description,
+                                            lastSell: _productLastSell,
+                                            price: _lastSellPrice,
+                                            legalEntity: product.legalEntity,
+                                            businessUnit: product.businessUnit,
+                                            quantity: _getQuantity(),
+                                            isAuditable: _isAuditableProduct,
+                                            photos: photosToSave,
+                                            observations: _commentsTextController.text,
+                                            customer_account: product.salesInfo != null? product.salesInfo!.retailAccount : '(No disponible)'
+                                          );
+                                          //print('GLOBAL BATCH: ' + batch.batchNumber!);
+                                          await BusinessServices.registerNewProductReturn(batch: batch, existingReturnRequest: _existingReturnRequest, newReturn:  newReturn);
 
-                                      _shouldRefreshParent = true;
-                                      _showSnackBar('La nueva devolución fue registrada con éxito');
-                                      _clearProductFields();
-                                      setState(() {
+                                          _shouldRefreshParent = true;
+                                          _showSuccessfulSnackBar('La nueva devolución fue registrada con éxito');
+                                          _clearProductFields();
+                                          setState(() {
 
-                                      });
-                                    }
-                                    on BusinessException catch(e){
-                                      _showSnackBar(e.message);
-                                    }
-                                    catch (e){
-                                      //TODO: EN GENRERAL: los errores inesperados se deben loguear o reportar al equipo de soporte atomáticamente
-                                      //TODO: EN GENERAL: Detectar si los errores se deben a falta de conexión a internet, y ver como se loguean o reportan estos casos
-                                      _showSnackBar('Ha ocurrido un error al guardar la nueva devolución. Error: ${e}');
-                                    }
-                                    finally{
-                                      WorkingIndicatorDialog().dismiss();
-                                    }
-                                  },
-
+                                          });
+                                        }
+                                        on BusinessException catch(e){
+                                          _showErrorSnackBar(e.message);
+                                        }
+                                        catch (e){
+                                          //TODO: EN GENRERAL: los errores inesperados se deben loguear o reportar al equipo de soporte atomáticamente
+                                          //TODO: EN GENERAL: Detectar si los errores se deben a falta de conexión a internet, y ver como se loguean o reportan estos casos
+                                          _showErrorSnackBar('Ha ocurrido un error al guardar la nueva devolución. Error: ${e}');
+                                        }
+                                        finally{
+                                          WorkingIndicatorDialog().dismiss();
+                                        }
+                                      },
                                 ),
-                              ),
+                              ]
+                              )),
                             ],
                           ],
                         ),
@@ -555,17 +528,19 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
 
   }
 
-/*  Future<ProductInfo> _getProductInfoByEAN(String eanCode) {
-    return BusinessServices.getProductInfoByEAN(eanCode);
-  }*/
-
   Future<ProductInfo> _getProductInfoByCommercialCode(String commercialCode) {
     return BusinessServices.getProductInfoByCommercialCode(commercialCode);
   }
 
-  void _showSnackBar(String message){
+  void _showErrorSnackBar(String message) {
+    _showSnackBar(message, Colors.red);
+  }
+  void _showSuccessfulSnackBar(String message) {
+    _showSnackBar(message, Colors.green);
+  }
+  void _showSnackBar(String message, MaterialColor bgColor) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(content: Text(message), backgroundColor: bgColor),
     );
   }
 
@@ -638,55 +613,77 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
       if(barcode != null){
         _searchParamTextController.text = barcode.rawContent;
       }
-
+      WorkingIndicatorDialog().show(context, text: 'Buscando información de producto...');
       // Buscar info del producto y actualizar el Future del FutureBuilder.
       late ProductInfo productInfo;
-      if (_productSearchBy == ProductSearchBy.EAN) {
-        productInfo = await BusinessServices.getProductInfoByEAN(_searchParamTextController.text);
-      } else {
-        productInfo = await _getProductInfoByCommercialCode(_searchParamTextController.text);
+      try {
+        if (_productSearchBy == ProductSearchBy.EAN) {
+          productInfo = await BusinessServices.getProductInfoByEAN(
+              _searchParamTextController.text);
+        } else {
+          productInfo = await _getProductInfoByCommercialCode(
+              _searchParamTextController.text);
+        }
+      } on WebServiceException catch(e) {
+        var message = 'No fue posible hallar el producto indicado.';
+        try{
+          if (e.response != null) {
+            final responseMessage = const Utf8Decoder().convert(e.response!.bodyBytes);
+            final regexp = RegExp(r'error=(.+?)\)');
+            final match = regexp.firstMatch(responseMessage);
+            if(match != null) {
+              message = match.group(1)!;
+            }
+          }
+        }catch(err){}
+
+        throw BusinessException(message);
+      } catch(e){
+        throw BusinessException('No fue posible hallar el producto indicado.');
       }
+        // Cargar datos del producto
+        _descriptionTextController.text = productInfo.description;
+        final formatter = DateFormat('dd/MM/yyyy');
+        _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
+        //_priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
+        _brandTextController.text = productInfo.brand;
+        _legalEntityTextController.text = productInfo.legalEntity;
+        _eanTextController.text = productInfo.EAN;
+        _commercialCodeTextController.text = productInfo.commercialCode;
+        _productLastSell = productInfo.salesInfo?.lastSellDate;
+        final dateWarning = _dateValidation(productInfo);
 
-      // Cargar datos del producto
-      _descriptionTextController.text = productInfo.description;
-      final formatter = DateFormat('dd/MM/yyyy');
-      _dateTextController.text = productInfo.salesInfo != null ? formatter.format(productInfo.salesInfo!.lastSellDate).toString() : '(No diponible)';
-      //_priceTextController.text = productInfo.salesInfo != null ? productInfo.salesInfo!.price.toString() : '(No diponible)';
-      _brandTextController.text = productInfo.brand;
-      _legalEntityTextController.text = productInfo.legalEntity;
-      _eanTextController.text = productInfo.EAN;
-      _commercialCodeTextController.text = productInfo.commercialCode;
-      _productLastSell = productInfo.salesInfo?.lastSellDate;
-      final dateWarning = _dateValidation(productInfo);
 
+        if (productInfo.auditRules.photos.length == 0){
+          _takenPictures['otra'] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
+        }
+        else{
+          productInfo.auditRules.photos.forEach((photoAuditInfo) {
+            _takenPictures[photoAuditInfo.name] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
+          });
+        }
 
-      if (productInfo.auditRules.photos.length == 0){
-        _takenPictures['otra'] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
-      }
-      else{
-        productInfo.auditRules.photos.forEach((photoAuditInfo) {
-          _takenPictures[photoAuditInfo.name] = ThumbPhoto(photo: _dummyPhoto, isDummy: true, hasChanged: true, state: BatchStates.Draft);
+        //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
+        final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: _globalBatch, productInfo: productInfo);
+
+        setState(() {
+          _isAuditableProduct = productInfo.isAuditable;
+          _existingReturnRequest = existingReturnRequest;
+          _product = productInfo;
+          _dateWarning = dateWarning;
         });
-      }
-
-      //TODO: Mostrar advertecia de que ya existe una solicitud con el mismo EAN en caso de que el producto NO SEA auditable
-      final existingReturnRequest = await _getExistingReturnRequestInBatch(batch: _globalBatch, productInfo: productInfo);
-
-      setState(() {
-        _isAuditableProduct = productInfo.isAuditable;
-        _existingReturnRequest = existingReturnRequest;
-        _product = productInfo;
-        _dateWarning = dateWarning;
-      });
     }
     on BusinessException catch (e) {
-      _showSnackBar(
+      _showErrorSnackBar(
           'Error recuperando información del producto: ${e
               .message}');
     }
     on Exception catch (e) {
-      _showSnackBar(
+      _showErrorSnackBar(
           'Ha ocurrido un error inesperado: $e');
+    }
+    finally{
+      WorkingIndicatorDialog().dismiss();
     }
   }
 
@@ -710,12 +707,15 @@ class _NewReturnScreenState extends State<NewReturnScreen> {
   }
 
   void validateProductData(){
-      const pattern = r'^\d{13}$';
-      final regex = RegExp(pattern);
-      final result = regex.hasMatch(_product!.EAN);
 
-      if(!result)
-        throw BusinessException('Debe ingresar datos válidos para la carga de la solicitud.');
+      try {
+        const eanPattern = r'^[\w]{6,14}$';
+        final eanRegex = RegExp(eanPattern);
+        if (!eanRegex.hasMatch(_product!.EAN))
+          throw BusinessException('EAN');
+      } catch(e){
+        throw BusinessException('Debe ingresar datos válidos para la carga de la solicitud. Error en el dato: ' + e.toString());
+      }
   }
 }
 

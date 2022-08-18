@@ -14,8 +14,6 @@ class Product {
                           // Lo mismo para los demás autonuméricos en cada formulario de Athento
   String description;
 
-
-  // TODO: hacer requeridos los parámetros necesarios
   Product({
     this.uuid,
     this.state,

@@ -3,23 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
-import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
-import 'package:navigation_app/services/business/photo_detail.dart';
-import 'package:navigation_app/utils/sp_product_utils.dart';
 import 'package:navigation_app/utils/ui/thumb_photo.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 
 import '../sp_file_utils.dart';
 
 class SpUI{
   static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto, required String photoParentState, required BuildContext context}) {
 
+    final _mediaQuery = MediaQuery.of(context).size;
+    final  desktopCrossAxisElements = _mediaQuery.width < 300? 1 : (_mediaQuery.width / 300).floor();
+
     return GridView.count(
         primary: false,
         padding: const EdgeInsets.all(20),
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        crossAxisCount: 2,
+        crossAxisCount: Platform.isAndroid? 2 : desktopCrossAxisElements,
         shrinkWrap: true,
         children: <Widget>[
           for(final photoName in  photos.keys)
@@ -32,7 +33,7 @@ class SpUI{
     final photo = photos[photoName]!;
 
     return Container(
-        padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 0),
+        padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 4),
         decoration: BoxDecoration(
           border: Border.all(
               color: photo.state == BatchStates.InfoPendiente ?  Colors.yellow : Colors.blueGrey,
@@ -48,26 +49,38 @@ class SpUI{
               onTap: () async {
                 FocusManager.instance.primaryFocus?.unfocus();
                 if (photo.isDummy){
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Cargar foto'),
-                          content: const Text('Seleccionar tipo de carga'),
-                          actions: [
-                            TextButton(
-                                child: const Text('Cámara'),
-                                onPressed: () {
-                                  _getPhotoFromSource(state, photoParentState, photo, dummyPhoto, _getPhotoFromCamera);
-                                  Navigator.pop(context);
-                                }
-                            ),
-                            TextButton(
-                                child: const Text('Galería'),
-                                onPressed: () {
-                                  _getPhotoFromSource(state, photoParentState, photo, dummyPhoto, _getPhotoFromGallery);
-                                  Navigator.pop(context);
-                                }),
-                          ]));
+                  if(Platform.isAndroid) {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            AlertDialog(
+                                title: const Text('Cargar foto'),
+                                content: const Text(
+                                    'Seleccionar tipo de carga'),
+                                actions: [
+                                  TextButton(
+                                      child: const Text('Cámara'),
+                                      onPressed: () {
+                                        _getPhotoFromSource(
+                                            state, photoParentState, photo,
+                                            dummyPhoto, _getPhotoFromCamera);
+                                        Navigator.pop(context);
+                                      }
+                                  ),
+                                  TextButton(
+                                      child: const Text('Galería'),
+                                      onPressed: () {
+                                        _getPhotoFromSource(
+                                            state, photoParentState, photo,
+                                            dummyPhoto, _getPhotoFromGallery);
+                                        Navigator.pop(context);
+                                      }),
+                                ]));
+                  } else {
+                    _getPhotoFromSource(
+                        state, photoParentState, photo,
+                        dummyPhoto, _getPhotoFromGallery);
+                  }
                 } else {
                   await showDialog(
                       context: context,
@@ -97,7 +110,8 @@ class SpUI{
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(4),
                     ),
-                    onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null : () async {
+                    onPressed: _shouldDisablePhotoButton(
+                        photoParentState, photo.state) ? null : () async {
                       //TODO: ver si se debe borrar el archivo donde estaba la foto
                       state.setState(() {
                         photo.isDummy = true;
@@ -154,7 +168,36 @@ class SpUI{
   }
 
   static Future<XFile?> _getPhotoFromGallery() async {
-    return _getPhoto(ImageSource.gallery);
+    if(Platform.isAndroid)
+      return _getPhoto(ImageSource.gallery);
+    else
+      return _getPhotoFromDesktopLocalStorage();
+  }
+
+  static Future<XFile?> _getPhotoFromDesktopLocalStorage() async {
+    final file_picked = await FilePickerCross.importFromStorage(
+        type: FileTypeCross.image,
+        fileExtension: 'png, jpg, jpeg'
+    ).onError((error, _) {
+      throw Error();
+      /*
+      String _exceptionData = error.reason();
+      print('REASON: ${_exceptionData}');
+      if (_exceptionData == 'read_external_storage_denied') {
+        print('Permission was denied');
+      } else if (_exceptionData == 'selection_canceled') {
+        print('User canceled operation');
+      }
+    */
+    });
+
+    return _filePickerCross2XFile(file_picked);
+  }
+
+  static XFile? _filePickerCross2XFile(FilePickerCross filePicked) {
+    final fileBytes = filePicked.toUint8List();
+
+    return XFile.fromData(fileBytes, path: filePicked.path, mimeType: filePicked.fileExtension);
   }
 
   static Future<XFile?> _getPhoto(ImageSource source) async {
