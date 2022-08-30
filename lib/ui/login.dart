@@ -46,7 +46,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController emailTextController = TextEditingController();
+  TextEditingController userTextController = TextEditingController();
   TextEditingController passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late Future<bool> _localData;
@@ -57,15 +57,12 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     _localData = updateLocalFiles();
-    //updateLocalFiles();
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    //emailTextController.text = 'adrian.scotto.newsan';
-    //passwordTextController.text = r'N$ju7ilo9#4791AS';
     return FutureBuilder<bool>(
         future: _localData,
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -75,8 +72,15 @@ class _LoginState extends State<Login> {
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Configuration.customerSecondaryColor,
-                title: Image.asset(
-                  'assets/images/logo_blanco.png', height: 120, width: 160,),
+                title: const Center(
+                    child: Text(
+                      'Marie y Yayo',
+                      style: TextStyle(
+                          fontFamily: 'ComicSans',
+                          fontWeight: FontWeight.w700,
+                          color: Configuration.customerPrimaryColor
+                          ),
+                    ))
               ),
               body: SafeArea(
                   child: LayoutBuilder(builder: (context, constraints) {
@@ -96,10 +100,10 @@ class _LoginState extends State<Login> {
                                         child: TextFormField(
                                             decoration: const InputDecoration(
                                                 border: UnderlineInputBorder(),
-                                                hintText: 'Email'),
-                                            onChanged: (email) =>
-                                            appState.emailAddress = email,
-                                            controller: emailTextController),
+                                                hintText: 'User'),
+                                            onChanged: (user) =>
+                                            appState.username = user,
+                                            controller: userTextController),
                                       ),
                                     ],
                                   ),
@@ -161,8 +165,8 @@ class _LoginState extends State<Login> {
                                         ),
                                         onPressed: () async {
                                           try {
-                                            appState.emailAddress =
-                                                emailTextController.text;
+                                            appState.username =
+                                                userTextController.text;
                                             appState.password =
                                                 passwordTextController.text;
                                             await appState.login();
@@ -232,18 +236,6 @@ class _LoginState extends State<Login> {
                                           height: 8,
                                           fontSize: 14
                                       )
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    child: Column(
-                                      verticalDirection: VerticalDirection.up,
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: [
-                                        Image.asset('assets/images/logo_negro.png',
-                                        width: 90,
-                                        height: 30,)
-                                    ]
-                                  )
                                   )
                                 ],
                               ),
@@ -272,7 +264,7 @@ class _LoginState extends State<Login> {
   }
 
   Future<bool> updateLocalFiles() async {
-    emailTextController.text = (await Cache.getUserName()) ?? '';
+    userTextController.text = (await Cache.getUserName()) ?? '';
     passwordTextController.text = (await Cache.getUserPassword()) ?? '';
 
     // Check and create (if necesary) local folders where the products and sales files will reside.
@@ -287,7 +279,6 @@ class _LoginState extends State<Login> {
     }
 
     // Check if the rules file exists in the local app products folder. If not, retrieve it
-    //TODO: check if file needs update
     const rulesFileName = Configuration.rulesFileName;
     const rulesFileURL = '$filesFolderURL/$rulesFileName';
     final rulesFile = File('${productsFolderPath.path}/$rulesFileName');

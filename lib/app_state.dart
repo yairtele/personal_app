@@ -38,7 +38,7 @@ class AppState extends ChangeNotifier {
   final cartItems = [];
 
   //TODO: inicializar correctamente con null safety. O mejor, remover del AppState y pasar al Cache
-  String emailAddress = '';
+  String username = '';
   String password = '';
   String description = '';
   String reference = '';
@@ -72,26 +72,21 @@ class AppState extends ChangeNotifier {
 
   void setSplashFinished() {
     _splashFinished = true;
-    //logout();
-    //if (_loggedIn) {
-    //  _currentAction = PageAction(state: PageState.replaceAll, page: ListItemsPageConfig);
-    //} else {
-      _currentAction = PageAction(state: PageState.replaceAll, pageConfig: LoginPageConfig);
-    //}
+
+    _currentAction = PageAction(state: PageState.replaceAll, pageConfig: LoginPageConfig);
     notifyListeners();
   }
 
   Future<bool> login() async{
-    await UserServices.login(emailAddress, password);
 
+    _loggedIn = await UserServices.login(username, password);
 
-    await Cache.saveUserName(emailAddress); //TODO: usar o no await?
-    await Cache.saveUserPassword(password); //TODO: usar o no await?
+    await Cache.saveUserName(username);
+    await Cache.saveUserPassword(password);
 
-    _loggedIn = true;
-    Cache.saveLoginState(loggedIn);//TODO: usar o no await? En el código original no lo usaba
+    Cache.saveLoginState(loggedIn);
     if(_loggedIn){
-      _currentAction = PageAction(state: PageState.replaceAll, pageConfig: BatchesPageConfig);
+      _currentAction = PageAction(state: PageState.replaceAll, pageConfig: PresentationPageConfig);
       notifyListeners();
     }
 
@@ -101,7 +96,7 @@ class AppState extends ChangeNotifier {
   Future<void> logout() async {
     _loggedIn = false;
     await Cache.clearAll();
-    await Cache.saveLoginState(loggedIn); //TODO: usar o no await? En el código original no lo usaba
+    await Cache.saveLoginState(loggedIn);
     _currentAction = PageAction(state: PageState.replaceAll, pageConfig: LoginPageConfig);
     notifyListeners();
   }

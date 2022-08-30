@@ -32,11 +32,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:navigation_app/ui/newbatch.dart';
-import '../ui/newbatch.dart';
 import '../app_state.dart';
-import '../ui/batches.dart';
 import '../ui/login.dart';
+import '../ui/movie_part_1.dart';
+import '../ui/movie_part_2.dart';
+import '../ui/presentation.dart';
 import '../ui/settings.dart';
 import '../ui/splash.dart';
 import 'back_dispatcher.dart';
@@ -172,36 +172,17 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case PageEnum.Login:
           _addPageData(Login(), LoginPageConfig);
           break;
-        case PageEnum.Batches:
-          _addPageData(const Batches(), BatchesPageConfig);
+        case PageEnum.Presentation:
+          _addPageData(const Presentation(), PresentationPageConfig);
+          break;
+        case PageEnum.MoviePart1:
+          _addPageData(const MoviePart1(), MoviePart1PageConfig);
+          break;
+        case PageEnum.MoviePart2:
+          _addPageData(const MoviePart2(), MoviePart2PageConfig);
           break;
         case PageEnum.Settings:
           _addPageData(Settings(), SettingsPageConfig);
-          break;
-        case PageEnum.NewBatch:
-          //_addPageData(NewBatch(returnValueCompleter: Completer<bool>()), NewBatchPageConfig);
-          _addPageData(const NewBatch(), NewBatchPageConfig);
-          break;
-        case PageEnum.NewReturn:
-          _addPageData(const NewBatch(), NewReturnPageConfig);
-          if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
-          }
-          break;
-        case PageEnum.DetailsReturn:
-          if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
-          }
-          break;
-        case PageEnum.DetailProduct:
-          if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
-          }
-          break;
-        case PageEnum.Details:
-          if (pageConfig.currentPageAction != null) {
-            _addPageData(pageConfig.currentPageAction!.widget!, pageConfig);
-          }
           break;
         default:
           break;
@@ -260,26 +241,17 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
       case PageEnum.Login:
         LoginPageConfig.currentPageAction = action;
         break;
-      case PageEnum.Batches:
-        BatchesPageConfig.currentPageAction = action;
+      case PageEnum.Presentation:
+        PresentationPageConfig.currentPageAction = action;
         break;
       case PageEnum.Settings:
         SettingsPageConfig.currentPageAction = action;
         break;
-      case PageEnum.Details:
-        DetailsPageConfig.currentPageAction = action;
+      case PageEnum.MoviePart1:
+        MoviePart1PageConfig.currentPageAction = action;
         break;
-      case PageEnum.NewBatch:
-        NewBatchPageConfig.currentPageAction = action;
-        break;
-      case PageEnum.NewReturn:
-        NewReturnPageConfig.currentPageAction = action;
-        break;
-      case PageEnum.DetailsReturn:
-        DetailsReturnPageConfig.currentPageAction = action;
-        break;
-      case PageEnum.DetailProduct:
-        DetailProductPageConfig.currentPageAction = action;
+      case PageEnum.MoviePart2:
+        MoviePart2PageConfig.currentPageAction = action;
         break;
       default:
         break;
@@ -343,27 +315,26 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case 'login':
           replaceAll(LoginPageConfig);
           break;
-        case 'Batches':
-          replaceAll(BatchesPageConfig);
+        case 'presentation':
+          replaceAll(PresentationPageConfig);
           break;
         case 'settings':
           setPath([
-            _createPage(Batches(), BatchesPageConfig),
             _createPage(Settings(), SettingsPageConfig)
           ]);
           break;
-        case 'newbatch':
+        case 'movie_part_1':
           setPath([
-            _createPage(Batches(), BatchesPageConfig),
-            _createPage(NewBatch(), NewBatchPageConfig)
+            _createPage(const Presentation(), PresentationPageConfig),
+            _createPage(const MoviePart1(), MoviePart1PageConfig)
           ]);
           break;
-        case 'newreturn':
-          throw Exception('Parseo de ruta para newreturn no implementada.');
-          //setPath([
-          //  _createPage(Batches(), ListItemsPageConfig),
-          //  _createPage(NewReturnScreen(), NewBatchPageConfig)
-          //]);
+        case 'movie_part_2':
+          setPath([
+            _createPage(const Presentation(), PresentationPageConfig),
+            _createPage(const MoviePart2(), MoviePart1PageConfig)
+          ]);
+          break;
       }
     }
   }

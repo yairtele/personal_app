@@ -11,7 +11,6 @@ class Cache{
   static const _USERINFO_KEY = 'UserInfo';
   static const _USERNAME_KEY = 'UserName';
   static const _USERPWD_KEY = 'UserPwd';
-  static const _COMPANYNAME_KEY = 'CompanyName';
   static const _PRODUCTS_FILE_LAST_MODIFIED_DATE_KEY = 'ProductsFileLastModifiedDate';
   static const _SALES_FILE_LAST_MODIFIED_DATE_KEY = 'SalesFileLastModifiedDate';
   static const _RULES_FILE_LAST_MODIFIED_DATE_KEY = 'RulesFileLastModifiedDate';
@@ -23,7 +22,6 @@ class Cache{
     _USERINFO_KEY,
     _USERNAME_KEY,
     _USERPWD_KEY,
-    _COMPANYNAME_KEY
   ];
 
 
@@ -39,17 +37,6 @@ class Cache{
   static Future<bool?> getLoggedInState() async {
     final prefs = await _getRepo();
     return  prefs.getBool(_LOGGEDIN_KEY);
-  }
-
-  static Future<void> saveTokenInfo(TokenInfo tokenInfo) async{
-    final prefs = await _getRepo();
-    prefs.setString(_TOKENINFO_KEY, tokenInfo.toJSONString());
-  }
-
-  static Future<TokenInfo?> getTokenInfo() async {
-    final prefs = await _getRepo();
-    final tokenInfoJsonString = prefs.getString(_TOKENINFO_KEY);
-    return  tokenInfoJsonString != null ? TokenInfo.fromJSONString(tokenInfoJsonString) : null;
   }
 
   static Future<void> saveUserInfo(UserInfo userInfo) async{
@@ -82,17 +69,6 @@ class Cache{
   static Future<String?> getUserPassword() async{
     final prefs = await _getRepo();
     return  prefs.getString(_USERPWD_KEY);
-  }
-
-
-  static Future<void> saveCompanyName(String companyName) async{
-    final prefs = await _getRepo();
-    prefs.setString(_COMPANYNAME_KEY, companyName);
-  }
-
-  static Future<String?> getCompanyName() async{
-    final prefs = await _getRepo();
-    return  prefs.getString(_COMPANYNAME_KEY);
   }
 
   static Future<void> clearAll() async {

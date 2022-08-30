@@ -34,6 +34,10 @@ import '../app_state.dart';
 
 const String SplashPath = '/splash';
 const String LoginPath = '/login';
+const String PresentationPath = '/presentation';
+const String CariloPath = '/carilo';
+const String MoviePart1Path = '/movie_part_1';
+const String MoviePart2Path = '/movie_part_2';
 const String BatchesPath = '/batches';
 const String DetailsPath = '/details';
 const String SettingsPath = '/settings';
@@ -44,6 +48,9 @@ const String DetailProductPath = '/detailproduct';
 enum PageEnum {
   Splash,
   Login,
+  Presentation,
+  MoviePart1,
+  MoviePart2,
   CreateAccount,
   Batches,
   Details,
@@ -70,6 +77,15 @@ PageConfiguration SplashPageConfig =
     PageConfiguration(key: 'Splash', path: SplashPath, uiPage: PageEnum.Splash, currentPageAction: null);
 PageConfiguration LoginPageConfig =
     PageConfiguration(key: 'Login', path: LoginPath, uiPage: PageEnum.Login, currentPageAction: null);
+PageConfiguration PresentationPageConfig =
+PageConfiguration(
+    key: 'Presentation', path: PresentationPath, uiPage: PageEnum.Presentation, currentPageAction: null);
+PageConfiguration MoviePart1PageConfig =
+PageConfiguration(
+    key: 'MoviePart1', path: MoviePart1Path, uiPage: PageEnum.MoviePart1, currentPageAction: null);
+PageConfiguration MoviePart2PageConfig =
+PageConfiguration(
+    key: 'MoviePart2', path: MoviePart2Path, uiPage: PageEnum.MoviePart2, currentPageAction: null);
 PageConfiguration BatchesPageConfig = PageConfiguration(
     key: 'Batches', path: BatchesPath, uiPage: PageEnum.Batches);
 PageConfiguration DetailsPageConfig =

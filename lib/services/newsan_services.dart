@@ -1,17 +1,11 @@
 import 'dart:convert';
 
 import 'package:navigation_app/config/cache.dart';
-import 'package:navigation_app/config/configuration.dart';
-import 'package:navigation_app/services/athento/config_provider.dart';
 import 'package:navigation_app/services/business/business_services.dart';
-import 'package:navigation_app/services/business/product_info.dart';
 import 'package:navigation_app/services/sp_ws/sp_ws.dart';
 import 'package:navigation_app/utils/sp_functions_utils.dart';
 
 class NewsanServices {
-  static Future<String> getCompanyInfo(String cuit) async{
-    return '';
-  }
 
   static Future<Map<String, dynamic>> getProductFullInfo(String productFileSearchKey, String productFileSearchValue) async {
 
@@ -22,7 +16,7 @@ class NewsanServices {
       'Connection': 'keep-alive',
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'auth-key': Configuration.ebsWSToken
+      'auth-key': ''//Configuration.ebsWSToken
     };
 
     final jsonRequestBody=<String, dynamic>{};
@@ -32,7 +26,7 @@ class NewsanServices {
     jsonRequestBody['cuit'] = userInfo!.idNumber;
 
     final response = await SpWS.post(
-        Configuration.ebsWSUrl,
+        '',//Configuration.ebsWSUrl,
         parameters: {}, headers: headers,
         body: jsonRequestBody);
 

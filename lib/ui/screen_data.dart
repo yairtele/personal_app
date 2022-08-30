@@ -5,7 +5,6 @@ import 'package:navigation_app/services/business/business_services.dart';
 class ScreenData<DataGetterParam, DataGetterReturn>{
   late final DataGetterReturn? data;
   late final UserInfo userInfo;
-  late final String companyName;
   Future<DataGetterReturn> Function(DataGetterParam? getterParam)? _dataGetter;
 
   ScreenData({Future<DataGetterReturn> Function(DataGetterParam? getterParam)? dataGetter}){
@@ -14,7 +13,7 @@ class ScreenData<DataGetterParam, DataGetterReturn>{
 
   //ScreenData()
 
-  ScreenData._withData(this.userInfo, this.companyName, this.data);
+  ScreenData._withData(this.userInfo, this.data);
 
   Future<ScreenData<DataGetterParam, DataGetterReturn>> getScreenData({DataGetterParam? dataGetterParam}) async{
     // Obtener CUIT del usuario (del perfil de Athento)
@@ -23,14 +22,7 @@ class ScreenData<DataGetterParam, DataGetterReturn>{
     if(userInfo == null) {
       final userName = (await Cache.getUserName())!;
       userInfo = await BusinessServices.getUserInfo(userName);
-      Cache.saveUserInfo(userInfo);
-    }
-
-    // Obtener Razon social con el servicio de Newsan
-    var companyName = await Cache.getCompanyName();
-    if(companyName ==  null) {
-      companyName = await BusinessServices.getCompanyName(userInfo.idNumber); // En el idNumber del perfil de athento se guarda l CUIT retail
-      Cache.saveCompanyName(companyName);
+      Cache.saveUserInfo(userInfo!);
     }
 
     // Obtener lista de lotes Draft (en principio) desde Athento
@@ -39,7 +31,7 @@ class ScreenData<DataGetterParam, DataGetterReturn>{
       data = await _dataGetter!(dataGetterParam);
     }
 
-    return ScreenData._withData(userInfo, companyName, data);
+    return ScreenData._withData(userInfo, data);
   }
 
 

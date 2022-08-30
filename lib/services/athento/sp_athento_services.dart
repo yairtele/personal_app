@@ -32,7 +32,7 @@ class SpAthentoServices {
   static Map<String, dynamic> _jsonDecodeResponseUTF8(Response response){
     return jsonDecode(const Utf8Decoder().convert(response.bodyBytes));
   }
-  static Future<TokenInfo> getAuthenticationToken(
+  /*static Future<TokenInfo> getAuthenticationToken(
       BasicAuthConfigProvider configProvider, String userName,
       String password) async {
     try{
@@ -85,7 +85,7 @@ class SpAthentoServices {
     on Error catch (e){
       throw e;
     }
-  }
+  }*/
 
   static Future<Map<String, dynamic>> createDocument({
     required ConfigProvider configProvider,
@@ -108,15 +108,10 @@ class SpAthentoServices {
 
     final headers = configProvider.getHttpHeaders();
 
-    //console.log("endpoint: " + configProvider.getServiceUrl() + "Athento.DocumentCreate/");
-    //console.log(JSON.stringify(jsonRequestBody));
     final response = await SpWS.post(
         configProvider.getEndpointUrl('createDocument'), parameters: {},
         headers: headers,
         body: jsonRequestBody);
-
-    //console.log("response.status: " + response.statusCode);
-    //console.log("response.body: " + response.body);
 
     return configProvider.parseResponse(response);
   }
@@ -180,20 +175,13 @@ class SpAthentoServices {
           mb.getBoundaryString()
     });
 
-    //console.log("messageHeaders: " + messageHeaders);
-
-    //fs.write("C:\\Temp\\borrarme\\svcMessageHeaders.txt", getPartHeadersString(messageHeaders));
-    //fs.write("C:\\Temp\\borrarme\\svcMessageBody.txt", messageBody);
-
     final response = await SpWS.post(
         configProvider.getEndpointUrl('createDocumentWithContent'),
         parameters: null,
         headers: messageHeaders,
         body: messageBody);
 
-    //console.log("Athento Response.status: " + response.statusCode);
     return configProvider.parseResponse(response);
-    //console.log(JSON.stringify(jsonRequestBody));
 
   }
 
@@ -230,7 +218,6 @@ class SpAthentoServices {
 
     // Document content part: file to be uploaded in base64 format.
     final documentContentPartHeaders = {
-      //'Content-Disposition': 'form-data; name="Michelle"; filename="sample.pdf"'
       'Content-Disposition': 'form-data; name="$friendlyFileName", filename="$friendlyFileName"',
       'Content-Type': documentContentType,
       'Content-Transfer-Encoding': 'base64'
@@ -247,12 +234,6 @@ class SpAthentoServices {
     final messageHeaders = configProvider.getHttpHeaders({
       'Content-Type': 'multipart/form-data; boundary=' + mb.getBoundaryString()
     });
-
-    //console.log("messageHeaders: " + messageHeaders);
-
-    //fs.write("C:\\Temp\\borrarme\\svcMessageHeaders.txt", getPartHeadersString(messageHeaders));
-    //fs.write("C:\\Temp\\borrarme\\svcMessageHeaders.txt", JSON(messageHeaders));
-    //fs.write("C:\\Temp\\borrarme\\svcMessageBody.txt", messageBody);
 
     final response = await SpWS.post(
         configProvider.getEndpointUrl('updateDocumentContent'), parameters: {},
@@ -419,8 +400,6 @@ class SpAthentoServices {
 
 }
 
-
-
 class FindResults{
   bool isNextPageAvailable;
   bool hasError;
@@ -479,7 +458,6 @@ class TokenInfo{
 
 
 class UserInfo {
-  String uuid;
   String idNumber;
   String userName;
   String firstName;
@@ -487,12 +465,11 @@ class UserInfo {
   String email;
   //String athentoSpaceUUID;
 
-  UserInfo({required this.uuid, required this.idNumber,
+  UserInfo({required this.idNumber,
     required this.userName, required this.firstName,
     required this.lastName, required this.email});
 
   UserInfo.fromJSON(Map<String, dynamic>json):
-    uuid = json['uuid'],
     idNumber = json['identification_number'],
     userName = json['username'],
     firstName = json['first_name'],
@@ -510,7 +487,6 @@ class UserInfo {
 
   Map<String, dynamic> toJSON() {
     return {
-      UserInfoAthentoFieldName.uuid: uuid,
       UserInfoAthentoFieldName.idNumber: idNumber,
       UserInfoAthentoFieldName.userName: userName,
       UserInfoAthentoFieldName.firstName: firstName,
