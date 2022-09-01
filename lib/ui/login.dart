@@ -52,11 +52,39 @@ class _LoginState extends State<Login> {
   late Future<bool> _localData;
   bool _isObscure = true;
   var _progressText = 'Cargando...';
+  final FocusNode _focusNodeUser = FocusNode();
+  final FocusNode _focusNodePass = FocusNode();
+  var _userColor = Configuration.customerSecondaryColor.withOpacity(0.3);
+  var _passColor = Configuration.customerSecondaryColor.withOpacity(0.3);
 
   @override
   void initState() {
     super.initState();
     _localData = updateLocalFiles();
+    _focusNodeUser.addListener(() {
+      if(_focusNodeUser.hasFocus){
+        setState(() {
+          _userColor = Configuration.customerSecondaryColor.withOpacity(0.75);
+        });
+      }
+      else{
+        setState(() {
+          _userColor = Configuration.customerSecondaryColor.withOpacity(0.3);
+        });
+      }
+    });
+    _focusNodePass.addListener(() {
+      if(_focusNodePass.hasFocus){
+        setState(() {
+          _passColor = Configuration.customerSecondaryColor.withOpacity(0.75);
+        });
+      }
+      else{
+        setState(() {
+          _passColor = Configuration.customerSecondaryColor.withOpacity(0.3);
+        });
+      }
+    });
   }
 
   @override
@@ -86,6 +114,12 @@ class _LoginState extends State<Login> {
                   child: LayoutBuilder(builder: (context, constraints) {
                     return Center(
                         child: Container(
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/drawed_photo_bg.jpeg'),
+                              fit: BoxFit.cover
+                            )
+                          ),
                           constraints: const BoxConstraints(maxWidth: 400),
                           child: Form(
                             key: _formKey,
@@ -98,12 +132,17 @@ class _LoginState extends State<Login> {
                                     children: [
                                       Expanded(
                                         child: TextFormField(
-                                            decoration: const InputDecoration(
-                                                border: UnderlineInputBorder(),
-                                                hintText: 'User'),
+                                            decoration: InputDecoration(
+                                              border: UnderlineInputBorder(),
+                                              hintText: 'User',
+                                              filled: true,
+                                              fillColor: _userColor
+                                            ),
                                             onChanged: (user) =>
                                             appState.username = user,
-                                            controller: userTextController),
+                                            controller: userTextController,
+                                            focusNode: _focusNodeUser
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -114,26 +153,30 @@ class _LoginState extends State<Login> {
                                     children: [
                                       Expanded(
                                         child: TextFormField(
-                                            enableSuggestions: false,
-                                            autocorrect: false,
-                                            obscureText: _isObscure,
-                                            decoration: InputDecoration(
-                                                border: const UnderlineInputBorder(),
-                                                hintText: 'Password',
-                                                suffixIcon: IconButton(
-                                                    icon: Icon(
-                                                        _isObscure? Icons.visibility : Icons.visibility_off
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _isObscure = !_isObscure;
-                                                      });
-                                                    }
-                                                ),
-                                            ),
-                                            onChanged: (password) =>
-                                            appState.password = password,
-                                            controller: passwordTextController),
+                                          enableSuggestions: false,
+                                          autocorrect: false,
+                                          obscureText: _isObscure,
+                                          decoration: InputDecoration(
+                                              border: const UnderlineInputBorder(),
+                                              hintText: 'Password',
+                                              filled: true,
+                                              fillColor: _passColor,
+                                              suffixIcon: IconButton(
+                                                  icon: Icon(
+                                                      _isObscure? Icons.visibility : Icons.visibility_off
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _isObscure = !_isObscure;
+                                                    });
+                                                  }
+                                              ),
+                                          ),
+                                          onChanged: (password) =>
+                                          appState.password = password,
+                                          controller: passwordTextController,
+                                          focusNode: _focusNodePass
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -148,7 +191,7 @@ class _LoginState extends State<Login> {
                                     ),
                                     Expanded(
                                       child: ElevatedButton(
-                                        child: Text('Iniciar sesión',
+                                        child: const Text('Iniciar sesión',
                                           style: TextStyle(
                                               color: Configuration.customerPrimaryColor
                                           ),

@@ -81,41 +81,47 @@ class _PresentationState extends State<Presentation> {
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white),
+                      color: Configuration.customerSecondaryColor),
                 ),
                 actions: [
-                  Center(
-                      child: Text(
-                        'Hola ${userInfo.firstName}!\n',
-                        style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white
-                        ),
-                      )),
-                  IconButton(
-                      icon: const Icon(Icons.logout),
-                      onPressed: () {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Alerta'),
-                              content: const Text('¿Cerrar sesión?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () => { Navigator.of(context).pop() },
-                                  child: const Text('No'),
-                                ),
-                                TextButton(
-                                    child: const Text('Si'),
-                                    onPressed: () async {
-                                      await appState.logout();
-                                    }),
-                              ]),
-                        );
-                      }
+                  Text(
+                    '${userInfo.firstName}\n${userInfo.lastName}\n',
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Configuration.customerSecondaryColor
+                    ),
                   ),
-                  IconButton(
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        primary: Configuration.customerPrimaryColor
+                    ),
+                    onPressed: () {
+                      //TODO: PAPP - Mostrar notita de alerta con info del user logueado
+                      showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Alerta'),
+                            content: const Text('¿Cerrar sesión?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => { Navigator.of(context).pop() },
+                                child: const Text('No'),
+                              ),
+                              TextButton(
+                                  child: const Text('Si'),
+                                  onPressed: () async {
+                                    await appState.logout();
+                                  }),
+                            ]),
+                      );
+                    },
+                    icon: Image.asset(
+                      'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
+                      height: 40.0, width: 40.0,),
+                    label: const Text(''),
+                  ),
+                  /*IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: () =>
                           appState.waitCurrentAction<bool>(
@@ -128,32 +134,19 @@ class _PresentationState extends State<Presentation> {
                               });
                             }
                           })
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        primary: Configuration.customerPrimaryColor
-                    ),
-                    onPressed: () {
-                      //TODO: PAPP - Mostrar notita de alerta con info del user logueado
-                    }
-                    ,
-                    icon: Image.asset(
-                      'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
-                      height: 40.0, width: 40.0,),
-                    label: const Text(''),
-                  ),
-                ],
+                  ),*/
+                  ],
               ),
               body: ListView(
                 children: [
                   Card(
                     child: ListTile(
-                      leading: Icon(FontAwesomeIcons.heart),//FlutterLogo(size: 72.0),
+                      leading: const Icon(FontAwesomeIcons.heart),
                       title: const Text('Movie Part 1'),
                       subtitle: const Text(
                           'Primera parte de esta historia.'
                       ),
-                      trailing: Icon(Icons.more_vert),
+                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
@@ -163,12 +156,12 @@ class _PresentationState extends State<Presentation> {
                   ),
                   Card(
                     child: ListTile(
-                      leading: Icon(FontAwesomeIcons.heart),//FlutterLogo(size: 72.0),
+                      leading: const Icon(FontAwesomeIcons.heart),
                       title: const Text('Movie Part 2'),
                       subtitle: const Text(
                           'Segunda parte de esta historia.'
                       ),
-                      trailing: Icon(Icons.more_vert),
+                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
@@ -211,27 +204,15 @@ class _PresentationState extends State<Presentation> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   /// Loader Animation Widget
-                                  CircularProgressIndicator(
+                                  const CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Configuration.customerSecondaryColor),
                                   ),
-                                  Text('Cargando...',
+                                  const Text('Cargando...',
                                       style: TextStyle(
                                           color: Configuration.customerSecondaryColor,
                                           height: 8,
                                           fontSize: 14
-                                      )
-                                  ),
-                                  Padding(
-                                      padding: const EdgeInsets.only(top: 30),
-                                      child: Column(
-                                          verticalDirection: VerticalDirection.up,
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                                          children: [
-                                            Image.asset('assets/images/logo_negro.png',
-                                              width: 90,
-                                              height: 30,)
-                                          ]
                                       )
                                   )
                                 ],

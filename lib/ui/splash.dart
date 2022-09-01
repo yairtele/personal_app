@@ -30,6 +30,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:navigation_app/config/configuration.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
@@ -51,15 +52,15 @@ class _SplashState extends State<Splash> {
     final itemWidth = size.width;
     final itemHeight = itemWidth * (size.width / size.height);
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Container(
-            child: Image.asset('assets/images/splash.png',
-                width: itemWidth, height: itemHeight),
-          ),
+        backgroundColor: Configuration.customerPrimaryColor,
+        body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/splash.png',
+                  width: itemWidth, height: itemHeight),
+                ]
         ),
-      ),
-    );
+      );
   }
 
 
