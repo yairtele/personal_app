@@ -32,12 +32,14 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:navigation_app/ui/fotos.dart';
 import '../app_state.dart';
 import '../ui/login.dart';
 import '../ui/movie_part_1.dart';
 import '../ui/movie_part_2.dart';
 import '../ui/presentation.dart';
 import '../ui/settings.dart';
+import '../ui/songs.dart';
 import '../ui/splash.dart';
 import 'back_dispatcher.dart';
 import 'ui_pages.dart';
@@ -181,6 +183,12 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case PageEnum.MoviePart2:
           _addPageData(const MoviePart2(), MoviePart2PageConfig);
           break;
+        case PageEnum.Fotos:
+          _addPageData(const Fotos(), FotosPageConfig);
+          break;
+        case PageEnum.Songs:
+          _addPageData(const Songs(), SongsPageConfig);
+          break;
         case PageEnum.Settings:
           _addPageData(Settings(), SettingsPageConfig);
           break;
@@ -252,6 +260,12 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         break;
       case PageEnum.MoviePart2:
         MoviePart2PageConfig.currentPageAction = action;
+        break;
+      case PageEnum.Fotos:
+        FotosPageConfig.currentPageAction = action;
+        break;
+      case PageEnum.Songs:
+        SongsPageConfig.currentPageAction = action;
         break;
       default:
         break;
@@ -333,6 +347,18 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           setPath([
             _createPage(const Presentation(), PresentationPageConfig),
             _createPage(const MoviePart2(), MoviePart1PageConfig)
+          ]);
+          break;
+        case 'fotos':
+          setPath([
+            _createPage(const Presentation(), PresentationPageConfig),
+            _createPage(const Fotos(), FotosPageConfig)
+          ]);
+          break;
+        case 'songs':
+          setPath([
+            _createPage(const Presentation(), PresentationPageConfig),
+            _createPage(const Songs(), SongsPageConfig)
           ]);
           break;
       }

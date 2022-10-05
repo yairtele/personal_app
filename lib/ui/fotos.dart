@@ -41,14 +41,14 @@ import '../app_state.dart';
 import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 
-class MoviePart2 extends StatefulWidget{
-  const MoviePart2({Key? key}) : super(key: key);
+class Fotos extends StatefulWidget{
+  const Fotos({Key? key}) : super(key: key);
 
   @override
-  _MoviePart2State createState() => _MoviePart2State();
+  _FotosState createState() => _FotosState();
 }
 
-class _MoviePart2State extends State<MoviePart2> {
+class _FotosState extends State<Fotos> {
 
   late Future<ScreenData<dynamic, bool>> _localData;
   @override
@@ -76,20 +76,37 @@ class _MoviePart2State extends State<MoviePart2> {
             //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
             //final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
             widget = Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                backgroundColor: Configuration.customerPrimaryColor,
-                title: const Text(
-                  '',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white),
-                ),
-                actions: [
-                  /*IconButton(
-                      icon: const Icon(Icons.logout),
+                appBar: AppBar(
+                  elevation: 0,
+                  backgroundColor: Configuration.customerPrimaryColor,
+                  title: const Text(
+                    '',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Configuration.customerSecondaryColor),
+                  ),
+                  actions: [
+                    IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () =>
+                            appState.waitCurrentAction<bool>(
+                                PageAction(state: PageState.addPage,
+                                    pageConfig: NewBatchPageConfig)
+                            ).then((shouldRefresh) {
+                              if (shouldRefresh!) {
+                                setState(() {
+                                  _localData = _getScreenData();
+                                });
+                              }
+                            })
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          primary: Configuration.customerPrimaryColor
+                      ),
                       onPressed: () {
+                        //TODO: PAPP - Mostrar notita de alerta con info del user logueado
                         showDialog<String>(
                           context: context,
                           builder: (BuildContext context) => AlertDialog(
@@ -107,64 +124,25 @@ class _MoviePart2State extends State<MoviePart2> {
                                     }),
                               ]),
                         );
-                      }
-                  ),
-                  IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () =>
-                          appState.waitCurrentAction<bool>(
-                              PageAction(state: PageState.addPage,
-                                  pageConfig: NewBatchPageConfig)
-                          ).then((shouldRefresh) {
-                            if (shouldRefresh!) {
-                              setState(() {
-                                _localData = _getScreenData();
-                              });
-                            }
-                          })
-                  ),*/
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        primary: Configuration.customerPrimaryColor
-                    ),
-                    onPressed: () {
-                      //TODO: PAPP - Mostrar notita de alerta con info del user logueado
-                      showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Alerta'),
-                            content: const Text('¿Cerrar sesión?'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () => { Navigator.of(context).pop() },
-                                child: const Text('No'),
+                      },
+                      icon: Image.asset(
+                        'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
+                        height: 40.0, width: 40.0,),
+                      label: Center(
+                          child: Text(
+                              '${userInfo.firstName}\n${userInfo.lastName}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Configuration.customerSecondaryColor,
                               ),
-                              TextButton(
-                                  child: const Text('Si'),
-                                  onPressed: () async {
-                                    await appState.logout();
-                                  }),
-                            ]),
-                      );
-                    },
-                    icon: Image.asset(
-                      'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
-                      height: 40.0, width: 40.0,),
-                    label: Center(
-                        child: Text(
-                            '${userInfo.firstName}\n${userInfo.lastName}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Configuration.customerSecondaryColor,
-                            ),
-                            textAlign: TextAlign.center
-                        )
+                              textAlign: TextAlign.center
+                          )
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              body: const Text('Segunda parte de la peli')
+                  ],
+                ),
+                body: const Text('Aca van las mejores fotos, puestas en tiles para que queden lindas. Despues de esto, se pasa a un visualizador de fotos')
             );
           }
           else if (snapshot.hasError) {

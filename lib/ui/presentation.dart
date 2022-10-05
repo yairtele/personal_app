@@ -28,6 +28,7 @@
  * THE SOFTWARE.
  */
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:navigation_app/services/business/batch.dart';
@@ -84,14 +85,6 @@ class _PresentationState extends State<Presentation> {
                       color: Configuration.customerSecondaryColor),
                 ),
                 actions: [
-                  Text(
-                    '${userInfo.firstName}\n${userInfo.lastName}\n',
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Configuration.customerSecondaryColor
-                    ),
-                  ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                         primary: Configuration.customerPrimaryColor
@@ -119,7 +112,17 @@ class _PresentationState extends State<Presentation> {
                     icon: Image.asset(
                       'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
                       height: 40.0, width: 40.0,),
-                    label: const Text(''),
+                    label: Center(
+                        child: Text(
+                            '${userInfo.firstName}\n${userInfo.lastName}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Configuration.customerSecondaryColor,
+                            ),
+                            textAlign: TextAlign.center
+                        )
+                    ),
                   ),
                   /*IconButton(
                       icon: const Icon(Icons.add),
@@ -166,6 +169,36 @@ class _PresentationState extends State<Presentation> {
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
                               pageConfig: MoviePart2PageConfig)
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(FontAwesomeIcons.photoVideo),
+                      title: const Text('Fotos'),
+                      subtitle: const Text(
+                          'Las mejores fotos de este viaje.'
+                      ),
+                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                      //isThreeLine: true,
+                      onTap: () => appState.waitCurrentAction<bool>(
+                          PageAction(state: PageState.addPage,
+                              pageConfig: FotosPageConfig)
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(FontAwesomeIcons.music),
+                      title: const Text('Canciones'),
+                      subtitle: const Text(
+                          'Todos los éxitos de esta dupla.'
+                      ),
+                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                      //isThreeLine: true,
+                      onTap: () => appState.waitCurrentAction<bool>(
+                          PageAction(state: PageState.addPage,
+                              pageConfig: SongsPageConfig)
                       ),
                     ),
                   )

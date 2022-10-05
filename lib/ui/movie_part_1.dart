@@ -87,16 +87,7 @@ class _MoviePart1State extends State<MoviePart1> {
                       color: Colors.white),
                 ),
                 actions: [
-                  Center(
-                      child: Text(
-                        'Hola ${userInfo.firstName}!\n',
-                        style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white
-                        ),
-                      )),
-                  IconButton(
+                  /*IconButton(
                       icon: const Icon(Icons.logout),
                       onPressed: () {
                         showDialog<String>(
@@ -131,19 +122,45 @@ class _MoviePart1State extends State<MoviePart1> {
                               });
                             }
                           })
-                  ),
+                  ),*/
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                         primary: Configuration.customerPrimaryColor
                     ),
                     onPressed: () {
                       //TODO: PAPP - Mostrar notita de alerta con info del user logueado
-                    }
-                    ,
+                      showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Alerta'),
+                            content: const Text('¿Cerrar sesión?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => { Navigator.of(context).pop() },
+                                child: const Text('No'),
+                              ),
+                              TextButton(
+                                  child: const Text('Si'),
+                                  onPressed: () async {
+                                    await appState.logout();
+                                  }),
+                            ]),
+                      );
+                    },
                     icon: Image.asset(
                       'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
                       height: 40.0, width: 40.0,),
-                    label: const Text(''),
+                    label: Center(
+                        child: Text(
+                            '${userInfo.firstName}\n${userInfo.lastName}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Configuration.customerSecondaryColor,
+                            ),
+                            textAlign: TextAlign.center
+                        )
+                    ),
                   ),
                 ],
               ),

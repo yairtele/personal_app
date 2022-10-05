@@ -38,6 +38,8 @@ const String PresentationPath = '/presentation';
 const String CariloPath = '/carilo';
 const String MoviePart1Path = '/movie_part_1';
 const String MoviePart2Path = '/movie_part_2';
+const String FotosPath = '/fotos';
+const String SongsPath = '/songs';
 const String BatchesPath = '/batches';
 const String DetailsPath = '/details';
 const String SettingsPath = '/settings';
@@ -51,6 +53,8 @@ enum PageEnum {
   Presentation,
   MoviePart1,
   MoviePart2,
+  Fotos,
+  Songs,
   CreateAccount,
   Batches,
   Details,
@@ -78,16 +82,15 @@ PageConfiguration SplashPageConfig =
 PageConfiguration LoginPageConfig =
     PageConfiguration(key: 'Login', path: LoginPath, uiPage: PageEnum.Login, currentPageAction: null);
 PageConfiguration PresentationPageConfig =
-PageConfiguration(
-    key: 'Presentation', path: PresentationPath, uiPage: PageEnum.Presentation, currentPageAction: null);
+    PageConfiguration(key: 'Presentation', path: PresentationPath, uiPage: PageEnum.Presentation, currentPageAction: null);
 PageConfiguration MoviePart1PageConfig =
-PageConfiguration(
-    key: 'MoviePart1', path: MoviePart1Path, uiPage: PageEnum.MoviePart1, currentPageAction: null);
+    PageConfiguration(key: 'MoviePart1', path: MoviePart1Path, uiPage: PageEnum.MoviePart1, currentPageAction: null);
 PageConfiguration MoviePart2PageConfig =
-PageConfiguration(
-    key: 'MoviePart2', path: MoviePart2Path, uiPage: PageEnum.MoviePart2, currentPageAction: null);
-PageConfiguration BatchesPageConfig = PageConfiguration(
-    key: 'Batches', path: BatchesPath, uiPage: PageEnum.Batches);
+    PageConfiguration(key: 'MoviePart2', path: MoviePart2Path, uiPage: PageEnum.MoviePart2, currentPageAction: null);
+PageConfiguration FotosPageConfig =
+    PageConfiguration(key: 'Fotos', path: FotosPath, uiPage: PageEnum.Fotos);
+PageConfiguration SongsPageConfig =
+    PageConfiguration(key: 'Songs', path: SongsPath, uiPage: PageEnum.Songs);
 PageConfiguration DetailsPageConfig =
     PageConfiguration(key: 'Details', path: DetailsPath, uiPage: PageEnum.Details, currentPageAction: null);
 PageConfiguration SettingsPageConfig = PageConfiguration(
@@ -100,4 +103,3 @@ PageConfiguration DetailsReturnPageConfig = PageConfiguration(
     key: 'DetailsReturn', path: DetailsReturnPath, uiPage: PageEnum.DetailsReturn, currentPageAction: null);
 PageConfiguration DetailProductPageConfig = PageConfiguration(
     key: 'DetailProduct', path: DetailProductPath, uiPage: PageEnum.DetailProduct, currentPageAction: null);
-

@@ -45,8 +45,16 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
         return SplashPageConfig;
       case LoginPath:
         return LoginPageConfig;
-      case BatchesPath:
-        return BatchesPageConfig;
+      case MoviePart1Path:
+        return MoviePart1PageConfig;
+      case MoviePart2Path:
+        return MoviePart2PageConfig;
+      case PresentationPath:
+        return PresentationPageConfig;
+      case FotosPath:
+        return FotosPageConfig;
+      case SongsPath:
+        return SongsPageConfig;
       case DetailsPath:
         return DetailsPageConfig;
       case SettingsPath:
@@ -67,6 +75,16 @@ class ShoppingParser extends RouteInformationParser<PageConfiguration> {
         return const RouteInformation(location: SplashPath);
       case PageEnum.Login:
         return const RouteInformation(location: LoginPath);
+      case PageEnum.Presentation:
+        return const RouteInformation(location: PresentationPath);
+      case PageEnum.Fotos:
+        return const RouteInformation(location: FotosPath);
+      case PageEnum.Songs:
+        return const RouteInformation(location: SongsPath);
+      case PageEnum.MoviePart1:
+        return const RouteInformation(location: MoviePart1Path);
+      case PageEnum.MoviePart2:
+        return const RouteInformation(location: MoviePart2Path);
       case PageEnum.Batches:
         return const RouteInformation(location: BatchesPath);
       case PageEnum.Details:
