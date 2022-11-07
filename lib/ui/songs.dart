@@ -6,6 +6,7 @@ import 'package:navigation_app/ui/screen_data.dart';
 import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 
 import '../app_state.dart';
 import '../config/configuration.dart';
@@ -27,7 +28,7 @@ class _SongsState extends State<Songs> {
     _localData =  _getScreenData();
   }
 
-  Future<ScreenData<dynamic, bool>> _getScreenData() => ScreenData<dynamic, bool>(dataGetter: _getBatchData).getScreenData();
+  Future<ScreenData<dynamic, bool>> _getScreenData() => ScreenData<dynamic, bool>(dataGetter: _getPerformancesData).getScreenData();
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +112,7 @@ class _SongsState extends State<Songs> {
                     ),
                   ],
                 ),
+                //TODO: En la previa del acceso a esta screen, llamar a smule para obtener canciones del usuario logueado -> en el body mostrar las canciones en tiles
                 body: const Text('Aca van las mejores canciones de los dos en listado, con titulo y mes + año. Mostrar reproductor de canciones al clickear en una')
             );
           }
@@ -171,8 +173,12 @@ class _SongsState extends State<Songs> {
     );
   }
 
-  Future<bool> _getBatchData(something) async{
-    // Obtener lista de lotes Draft (en principio) desde Athento
+  Future<dynamic> _getPerformancesData(String username) async {
+
+    await http.get(Uri.parse(Configuration.getInitialPerformancesURL(username)));
+
+
+
     return true;
     /*final batches =  BusinessServices.getRetailActiveBatches();
     return batches;*/
