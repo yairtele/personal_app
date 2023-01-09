@@ -21,14 +21,14 @@ class Songs extends StatefulWidget{
 
 class _SongsState extends State<Songs> {
 
-  late Future<ScreenData<dynamic, bool>> _localData;
+  late Future<ScreenData<void, bool>> _localData;
   @override
   void initState(){
     super.initState();
     _localData =  _getScreenData();
   }
 
-  Future<ScreenData<dynamic, bool>> _getScreenData() => ScreenData<dynamic, bool>(dataGetter: _getPerformancesData).getScreenData();
+  Future<ScreenData<void, bool>> _getScreenData() => ScreenData<void, bool>(dataGetter: _getPerformancesData).getScreenData();
 
   @override
   Widget build(BuildContext context) {
@@ -173,9 +173,9 @@ class _SongsState extends State<Songs> {
     );
   }
 
-  Future<dynamic> _getPerformancesData(String username) async {
+  Future<bool> _getPerformancesData(void username) async{//String? username) async {
 
-    await http.get(Uri.parse(Configuration.getInitialPerformancesURL(username)));
+    //await http.get(Uri.parse(Configuration.getInitialPerformancesURL(username)));
 
 
 

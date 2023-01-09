@@ -28,18 +28,23 @@
  * THE SOFTWARE.
  */
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_services.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:navigation_app/ui/ui_helper.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../app_state.dart';
 import '../config/configuration.dart';
 import '../router/ui_pages.dart';
+import '../utils/ui/sp_ui.dart';
 
 class Fotos extends StatefulWidget{
   const Fotos({Key? key}) : super(key: key);
@@ -50,18 +55,20 @@ class Fotos extends StatefulWidget{
 
 class _FotosState extends State<Fotos> {
 
-  late Future<ScreenData<dynamic, bool>> _localData;
+  late List<String> _photos;
+  late Future<ScreenData<void, bool>> _localData;
   @override
   void initState(){
     super.initState();
     _localData =  _getScreenData();
   }
 
-  Future<ScreenData<dynamic, bool>> _getScreenData() => ScreenData<dynamic, bool>(dataGetter: _getBatchData).getScreenData();
+  Future<ScreenData<void, bool>> _getScreenData() => ScreenData<void, bool>(dataGetter: _getPhotos).getScreenData();
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
+    final photosState = this;
 
     return FutureBuilder<ScreenData<void, bool>>(
 
@@ -142,7 +149,45 @@ class _FotosState extends State<Fotos> {
                     ),
                   ],
                 ),
-                body: const Text('Aca van las mejores fotos, puestas en tiles para que queden lindas. Despues de esto, se pasa a un visualizador de fotos')
+                body: SpUI.buildThumbnailsGridView(state: photosState, photos: _photos, context: context)
+              /*GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
+                    crossAxisCount: 3,
+                  ),
+                  itemCount: _photos.length,
+                  itemBuilder: (context, index) {
+                    // Item rendering
+                    return GestureDetector(
+                      onTap: () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        await showDialog(
+                            context: context,
+                            builder: (_) {
+                          return Dialog(
+                            child: InteractiveViewer(
+                                maxScale: 5,
+                                child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Image.file(File(_photos[index].toString()))
+                                )
+                            ),
+                          );
+                        }
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(_photos[index].image),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )*///const Text('Aca van las mejores fotos, puestas en tiles para que queden lindas. Despues de esto, se pasa a un visualizador de fotos')
             );
           }
           else if (snapshot.hasError) {
@@ -223,4 +268,15 @@ class _FotosState extends State<Fotos> {
       _localData =  _getScreenData();
     });
   }
+
+  Future<bool> _getPhotos(void something) async {
+
+    final manifestJson = await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
+    var photos = json.decode(manifestJson).keys.where((String key) => key.startsWith('assets/images/photos')).toList();
+
+    _photos = photos;
+
+    return true;
+  }
+
 }

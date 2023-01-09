@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/utils/ui/thumb_photo.dart';
@@ -10,10 +11,16 @@ import 'package:file_picker_cross/file_picker_cross.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required Map<String, ThumbPhoto> photos, required XFile dummyPhoto, required String photoParentState, required BuildContext context}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required List<String> photos, required BuildContext context}) {
 
     final _mediaQuery = MediaQuery.of(context).size;
     final  desktopCrossAxisElements = _mediaQuery.width < 300? 1 : (_mediaQuery.width / 300).floor();
+    final children = <Widget>[];
+    for(var photoIndex = 0; photoIndex < photos.length; photoIndex++){
+      var photoName = photos[photoIndex].toString();//TODO: No se está usando, revisar
+      var photo = photos[photoIndex];
+      children.add(_buildPhotoThumbnail(photoName, photo, state, context));
+    }
 
     return GridView.count(
         primary: false,
@@ -22,142 +29,39 @@ class SpUI{
         mainAxisSpacing: 10,
         crossAxisCount: Platform.isAndroid? 2 : desktopCrossAxisElements,
         shrinkWrap: true,
-        children: <Widget>[
-          for(final photoName in  photos.keys)
-            _buildPhotoThumbnail(photoName, photos, state, dummyPhoto, photoParentState, context)
-        ]
+        children: children
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, Map<String, ThumbPhoto> photos, State<T> state, XFile dummyPhoto, photoParentState, BuildContext context) {
-    final photo = photos[photoName]!;
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, String photo, State<T> state, BuildContext context) {
 
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 4),
-        decoration: BoxDecoration(
-          border: Border.all(
-              color: photo.state == BatchStates.InfoPendiente ?  Colors.yellow : Colors.blueGrey,
-              width: photo.state == BatchStates.InfoPendiente ? 3 : 1,
-              style: BorderStyle.solid
-          )
+        decoration: const BoxDecoration(
+          color: Configuration.customerPrimaryColor
         ),
         child: Column(
           children: [
             Expanded(
               child: GestureDetector(
-              child: Image.file(File(photo.photo.path), fit: BoxFit.fitWidth),
+              child: Image.asset(photo),
               onTap: () async {
                 FocusManager.instance.primaryFocus?.unfocus();
-                if (photo.isDummy){
-                  if(Platform.isAndroid) {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) =>
-                            AlertDialog(
-                                title: const Text('Cargar foto'),
-                                content: const Text(
-                                    'Seleccionar tipo de carga'),
-                                actions: [
-                                  TextButton(
-                                      child: const Text('Cámara'),
-                                      onPressed: () {
-                                        _getPhotoFromSource(
-                                            state, photoParentState, photo,
-                                            dummyPhoto, _getPhotoFromCamera);
-                                        Navigator.pop(context);
-                                      }
-                                  ),
-                                  TextButton(
-                                      child: const Text('Galería'),
-                                      onPressed: () {
-                                        _getPhotoFromSource(
-                                            state, photoParentState, photo,
-                                            dummyPhoto, _getPhotoFromGallery);
-                                        Navigator.pop(context);
-                                      }),
-                                ]));
-                  } else {
-                    _getPhotoFromSource(
-                        state, photoParentState, photo,
-                        dummyPhoto, _getPhotoFromGallery);
-                  }
-                } else {
                   await showDialog(
                       context: context,
                       builder: (_) {
                       return Dialog(
                         child: InteractiveViewer(
+                            clipBehavior: Clip.none,
                             maxScale: 5,
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: Image.file(File(photo.photo.path))
-                            )
+                            child: Image.asset(photo)
                         ),
                       );
                     }
                 );
-    }
               }
             ),
             ),
-            Row(
-              children: [
-                Expanded(child: Text(_getThumbTitle(photoName), textAlign: TextAlign.center, style: TextStyle(fontSize: !photo.isDummy || photo.isDummy && _getThumbTitle(photoName).length<=9?14:12),)), // Photo name
-                if(photo.isDummy == false)
-                  ElevatedButton( // Delete photo
-                    child: const Icon(FontAwesomeIcons.trash),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: const EdgeInsets.all(4),
-                    ),
-                    onPressed: _shouldDisablePhotoButton(
-                        photoParentState, photo.state) ? null : () async {
-                      //TODO: ver si se debe borrar el archivo donde estaba la foto
-                      state.setState(() {
-                        photo.isDummy = true;
-                        photo.photo = dummyPhoto;
-                        photo.hasChanged = true;
-                      });
-                    },
-                  )
-                else
-                  Row(
-                    children: [
-                      if(Platform.isAndroid)
-                        ElevatedButton( // Take photo
-                          child: const Icon(FontAwesomeIcons.camera),
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size.zero,
-                            padding: const EdgeInsets.all(4),
-                          ),
-                          onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
-                            final pickedPhoto = await _getPhotoFromCamera();
-                            state.setState(() {
-                              photo.photo = pickedPhoto ?? dummyPhoto;
-                              photo.isDummy = pickedPhoto == null;
-                              photo.hasChanged = true;
-                            });
-                          },
-                        ),
-                      ElevatedButton( // Take photo
-                        child: const Icon(FontAwesomeIcons.folder),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: const EdgeInsets.all(4),
-                        ),
-                        onPressed: _shouldDisablePhotoButton(photoParentState, photo.state) ? null :() async {
-                          final pickedPhoto = await _getPhotoFromGallery();
-                          state.setState(() {
-                            photo.photo = pickedPhoto ?? dummyPhoto;
-                            photo.isDummy = pickedPhoto == null;
-                            photo.hasChanged = true;
-                          });
-                        },
-                      )
-                    ],
-                  )
-              ],
-            )
           ],
         )
     );
