@@ -10,19 +10,8 @@ class UserServices{
     await Cache.clearAll();
 
     // Perform Login
-    /*final serviceBaseUrl = Configuration.athentoAPIBaseURL;
-    final configProvider = BasicAuthConfigProvider(serviceBaseUrl, user, password);
-    if(Configuration.authenticationType == 'bearer_token'){
-      final tokenInfo = await SpAthentoServices.getAuthenticationToken(configProvider, user, password);
-      await Cache.saveTokenInfo(tokenInfo);
-    }*/
-    final allowed_user_combinations = {
-      'marystique': '050700',
-      'yairtele': '020496'
-    };
-
-    for(final user_comb in allowed_user_combinations.entries){
-      if(user == user_comb.key && password == user_comb.value){
+    for(final user_comb in Configuration.usersJson.entries){
+      if(user == user_comb.key && password == user_comb.value['password']){
         return true;
       }
     }

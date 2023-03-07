@@ -16,7 +16,6 @@ class ScreenData<DataGetterParam, DataGetterReturn>{
   ScreenData._withData(this.userInfo, this.data);
 
   Future<ScreenData<DataGetterParam, DataGetterReturn>> getScreenData({DataGetterParam? dataGetterParam}) async{
-    // Obtener CUIT del usuario (del perfil de Athento)
     var userInfo = await Cache.getUserInfo();
 
     if(userInfo == null) {

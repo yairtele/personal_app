@@ -54,7 +54,12 @@ class SpUI{
                         child: InteractiveViewer(
                             clipBehavior: Clip.none,
                             maxScale: 5,
-                            child: Image.asset(photo)
+                            child: Container(
+                              child:Image.asset(photo),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Configuration.customerSecondaryColor),
+                              ),
+                            )
                         ),
                       );
                     }

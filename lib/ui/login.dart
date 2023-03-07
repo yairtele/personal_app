@@ -114,12 +114,12 @@ class _LoginState extends State<Login> {
                   child: LayoutBuilder(builder: (context, constraints) {
                     return Center(
                         child: Container(
-                          decoration: const BoxDecoration(
+                          /*decoration: const BoxDecoration(
                             image: DecorationImage(
                               image: AssetImage('assets/images/drawed_photo_bg.jpeg'),
                               fit: BoxFit.cover
                             )
-                          ),
+                          ),*/
                           constraints: const BoxConstraints(maxWidth: 400),
                           child: Form(
                             key: _formKey,

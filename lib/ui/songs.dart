@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_services.dart';
+import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
 import 'package:navigation_app/ui/screen_data.dart';
 import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
@@ -9,8 +10,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import '../app_state.dart';
+import '../config/cache.dart';
 import '../config/configuration.dart';
 import '../router/ui_pages.dart';
+import '../services/business/song.dart';
+import '../web_services/smule_api.dart';
 
 class Songs extends StatefulWidget{
   const Songs({Key? key}) : super(key: key);
@@ -21,29 +25,29 @@ class Songs extends StatefulWidget{
 
 class _SongsState extends State<Songs> {
 
-  late Future<ScreenData<void, bool>> _localData;
+  late Future<ScreenData<void, List<Song>>> _localData;
   @override
   void initState(){
     super.initState();
     _localData =  _getScreenData();
   }
 
-  Future<ScreenData<void, bool>> _getScreenData() => ScreenData<void, bool>(dataGetter: _getPerformancesData).getScreenData();
+  Future<ScreenData<void, List<Song>>> _getScreenData() => ScreenData<void, List<Song>>(dataGetter: _getPerformancesData).getScreenData();
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    return FutureBuilder<ScreenData<void, bool>>(
+    return FutureBuilder<ScreenData<void, List<Song>>>(
 
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, bool>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, List<Song>>> snapshot) {
 
           Widget widget;
-          if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
             final data = snapshot.data!;
             final userInfo = data.userInfo;
-            //final batches = data.data!;
+            final songs = data.data!;
             //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
             //final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
             widget = Scaffold(
@@ -113,8 +117,82 @@ class _SongsState extends State<Songs> {
                   ],
                 ),
                 //TODO: En la previa del acceso a esta screen, llamar a smule para obtener canciones del usuario logueado -> en el body mostrar las canciones en tiles
-                body: const Text('Aca van las mejores canciones de los dos en listado, con titulo y mes + año. Mostrar reproductor de canciones al clickear en una')
-            );
+                body: SafeArea(
+                  child: RefreshIndicator(child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        DataTable(
+                          dataRowHeight: 55,
+                          columns: <DataColumn>[
+                            const DataColumn(
+                              label: Text('Canciones',
+                              style: TextStyle(fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black)),
+                            ),
+                          ],
+                          rows: List<DataRow>.generate (
+                          songs.length,
+                          (int index) => DataRow(
+                            cells: <DataCell>[
+                              DataCell(
+                                ListTile(
+                                  //isThreeLine: true,
+                                  leading: const Icon(
+                                  Icons.queue_music,
+                                  color: Configuration.customerSecondaryColor),
+                                  title: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,//y
+                                  crossAxisAlignment: CrossAxisAlignment.start,//x
+                                  children:[
+                                    Text(
+                                      songs[index].title != null ? '${songs[index].title}' : 'Sin definir...',
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black
+                                      )
+                                    ),
+                                    Text(
+                                      '${songs[index].message}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey
+                                      )
+                                    )
+                                  ]
+                                ),
+                              ),
+                              onTap: () {
+                                /*appState.waitCurrentAction<RefreshPropagation>(
+                                  PageAction(
+                                    state: PageState.addWidget,
+                                    widget: BatchDetailsScreen(
+                                    batch: songs[index]),
+                                    pageConfig: DetailsPageConfig
+                                  )
+                                ).then((shouldRefresh) {
+                                  if (shouldRefresh! != RefreshPropagation.none) { //TODO:  Manejar el resultado de la pantalla Batch Details
+                                    setState(() {
+                                      _localData = _getScreenData(usernameId);
+                                    });
+                                  }
+                                });*/
+                              }
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                  ]
+                  )
+                  ),
+                      onRefresh: _refresh
+                  )
+                )
+                            //const Text('Aca van las mejores canciones de los dos en listado, con titulo y mes + año. Mostrar reproductor de canciones al clickear en una')
+                            );
           }
           else if (snapshot.hasError) {
             widget = Center(
@@ -173,24 +251,16 @@ class _SongsState extends State<Songs> {
     );
   }
 
-  Future<bool> _getPerformancesData(void username) async{//String? username) async {
+  Future<List<Song>> _getPerformancesData(void _) async{
 
-    //await http.get(Uri.parse(Configuration.getInitialPerformancesURL(username)));
+    //get actual user smule id
+    final actualUser = await Cache.getUserName();
+    final usersData =  Configuration.usersJson.entries;
+    final filteredUsersData = usersData.where((e) => actualUser == e.key).map((u) => u.value['smuleId']).toList();
+    final actualUserSmuleId = filteredUsersData[0];
 
-
-
-    return true;
-    /*final batches =  BusinessServices.getRetailActiveBatches();
-    return batches;*/
-  }
-
-  String _getBatchSubTitle(Batch batch) {
-    var batchDescription = (batch.description ?? '' ).trim();
-    if (batchDescription.length==0){
-      batchDescription = '(sin descripción)';
-    }
-    final batchRetailReference = (batch.retailReference ?? '').trim();
-    return batchRetailReference  != '' ? batchRetailReference : batchDescription;
+    //get songs from that smule id
+    return getSmuleSongs(actualUserSmuleId);
   }
 
   Future<void> _refresh() async{
