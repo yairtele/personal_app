@@ -32,7 +32,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:navigation_app/ui/fotos.dart';
+import 'package:navigation_app/ui/photos.dart';
 import '../app_state.dart';
 import '../ui/login.dart';
 import '../ui/movie_part_1.dart';

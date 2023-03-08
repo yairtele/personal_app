@@ -14,6 +14,7 @@ class Song {
   String coverURL; //song's photo
   String webURL; //Configuration.songsURL+webURL to go to the performance media //we must extract the m4a for audios and the mp4 for videos
   String performedBy; //creator of the song
+  //String? otherPerformers;//it is a list, but it's not coming with a value when consulting from the own user that created the duet
 
   Song(
       {
@@ -26,7 +27,8 @@ class Song {
         required this.ensembleType,
         required this.coverURL,
         required this.webURL,
-        required this.performedBy
+        required this.performedBy,
+        //this.otherPerformers
       }
     );
 
@@ -41,7 +43,8 @@ class Song {
       'ensembleType': ensembleType,
       'coverURL': coverURL,
       'webURL': webURL,
-      'performedBy': performedBy
+      'performedBy': performedBy,
+      //'otherPerformers': otherPerformers
     };
   }
 
@@ -56,4 +59,5 @@ class Song {
         coverURL = json['cover_url'],
         webURL = json['web_url'],
         performedBy = json['performed_by_url'].replaceAll('/', '');
+        //otherPerformers = json['other_performers'];
 }

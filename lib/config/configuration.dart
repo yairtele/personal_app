@@ -8,7 +8,7 @@ class Configuration{
   static const Color customerPrimaryColor = Color(0xFF99cfe0);
   static const Color customerSecondaryColor = Color(0xFFce5eb3);
   static const String photosURL = 'https://drive.google.com/drive/u/1/folders/1da75DOhostOiiYIBtXmR376TYQgJqa3j';
-  static const String songsURL = 'https://www.smule.com/';
+  static const String songsURL = 'https://www.smule.com';
   static const usersJson = {
     'marystique': {
       'password': '050700',

@@ -8,6 +8,7 @@ import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app_state.dart';
 import '../config/cache.dart';
@@ -139,46 +140,43 @@ class _SongsState extends State<Songs> {
                               DataCell(
                                 ListTile(
                                   //isThreeLine: true,
-                                  leading: const Icon(
-                                  Icons.queue_music,
-                                  color: Configuration.customerSecondaryColor),
+                                  leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(songs[index].coverURL), // No matter how big it is, it won't overflow
+                                  ),
+                                  /*,
+                                      const Icon(
+                                        Icons.queue_music,
+                                        color: Configuration.customerSecondaryColor
+                                      )*/
                                   title: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,//y
-                                  crossAxisAlignment: CrossAxisAlignment.start,//x
-                                  children:[
-                                    Text(
-                                      songs[index].title != null ? '${songs[index].title}' : 'Sin definir...',
-                                      style: const TextStyle(
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black
+                                    mainAxisAlignment: MainAxisAlignment.center,//y
+                                    crossAxisAlignment: CrossAxisAlignment.start,//x
+                                    children:[
+                                      Text(
+                                        songs[index].title,
+                                        style: const TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                        )
+                                      ),
+                                      Text(
+                                        '${songs[index].message}',
+                                        style: const TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.grey
+                                        )
                                       )
-                                    ),
-                                    Text(
-                                      '${songs[index].message}',
-                                      style: const TextStyle(
-                                        fontSize: 12.0,
-                                        color: Colors.grey
-                                      )
-                                    )
-                                  ]
+                                    ]
                                 ),
                               ),
-                              onTap: () {
-                                /*appState.waitCurrentAction<RefreshPropagation>(
-                                  PageAction(
-                                    state: PageState.addWidget,
-                                    widget: BatchDetailsScreen(
-                                    batch: songs[index]),
-                                    pageConfig: DetailsPageConfig
-                                  )
-                                ).then((shouldRefresh) {
-                                  if (shouldRefresh! != RefreshPropagation.none) { //TODO:  Manejar el resultado de la pantalla Batch Details
-                                    setState(() {
-                                      _localData = _getScreenData(usernameId);
-                                    });
-                                  }
-                                });*/
+                              onTap: () async {
+                                final url = Configuration.songsURL + songs[index].webURL;
+                                if(await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                }else{
+                                  print("URL can't be launched.");
+                                }
                               }
                           )
                         ],
