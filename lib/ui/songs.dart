@@ -25,15 +25,32 @@ class Songs extends StatefulWidget{
 }
 
 class _SongsState extends State<Songs> {
+  TextEditingController songTextController = TextEditingController();
+  final FocusNode _focusNodeSong = FocusNode();
+  var _songSearchColor = Configuration.customerSecondaryColor.withOpacity(0.3);
+  var _songs;
 
-  late Future<ScreenData<void, List<Song>>> _localData;
+  late Future<ScreenData<String, List<Song>>> _localData;
+
   @override
   void initState(){
     super.initState();
     _localData =  _getScreenData();
+    _focusNodeSong.addListener(() {
+      if(_focusNodeSong.hasFocus){
+        setState(() {
+          _songSearchColor = Configuration.customerSecondaryColor.withOpacity(0.75);
+        });
+      }
+      else{
+        setState(() {
+          _songSearchColor = Configuration.customerSecondaryColor.withOpacity(0.3);
+        });
+      }
+    });
   }
 
-  Future<ScreenData<void, List<Song>>> _getScreenData() => ScreenData<void, List<Song>>(dataGetter: _getPerformancesData).getScreenData();
+  Future<ScreenData<String, List<Song>>> _getScreenData({String? songText = ''}) => ScreenData<String, List<Song>>(dataGetter: _getPerformancesData).getScreenData(dataGetterParam: songText);
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +66,7 @@ class _SongsState extends State<Songs> {
             final data = snapshot.data!;
             final userInfo = data.userInfo;
             final songs = data.data!;
+            final songsToShow = _songs ?? songs;
             //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
             //final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
             widget = Scaffold(
@@ -117,7 +135,6 @@ class _SongsState extends State<Songs> {
                     ),
                   ],
                 ),
-                //TODO: En la previa del acceso a esta screen, llamar a smule para obtener canciones del usuario logueado -> en el body mostrar las canciones en tiles
                 body: SafeArea(
                   child: RefreshIndicator(child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -126,34 +143,60 @@ class _SongsState extends State<Songs> {
                         DataTable(
                           dataRowHeight: 55,
                           columns: <DataColumn>[
-                            const DataColumn(
-                              label: Text('Canciones',
-                              style: TextStyle(fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black)),
+                            DataColumn(
+                              label: Row(
+                                  //mainAxisSize: MainAxisSize.min,
+                                  children:[
+                                    const Text(
+                                      'Canciones',
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 200,
+                                      child: TextFormField(
+                                        decoration: InputDecoration(
+                                            border: const UnderlineInputBorder(),
+                                            hintText: 'Search',
+                                            filled: true,
+                                            fillColor: _songSearchColor
+                                        ),
+                                        onChanged: (text){
+                                          setState(() {
+                                            if(text != ''){
+                                              _songs = songs.where((s) => s.title.toUpperCase().contains(text.toUpperCase()) || s.message!.toUpperCase().contains(text.toUpperCase())).toList();
+                                            //_localData = _getScreenData(songText: text);
+                                            } else {
+                                              _songs = songs;
+                                            }
+                                          });
+                                        },
+                                        controller: songTextController,
+                                        focusNode: _focusNodeSong
+                                      ),
+                                    )
+                                  ])
                             ),
                           ],
                           rows: List<DataRow>.generate (
-                          songs.length,
+                            songsToShow.length,
                           (int index) => DataRow(
                             cells: <DataCell>[
                               DataCell(
                                 ListTile(
                                   //isThreeLine: true,
                                   leading: CircleAvatar(
-                                        backgroundImage: NetworkImage(songs[index].coverURL), // No matter how big it is, it won't overflow
+                                        backgroundImage: NetworkImage(songsToShow[index].coverURL), // No matter how big it is, it won't overflow
                                   ),
-                                  /*,
-                                      const Icon(
-                                        Icons.queue_music,
-                                        color: Configuration.customerSecondaryColor
-                                      )*/
                                   title: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,//y
                                     crossAxisAlignment: CrossAxisAlignment.start,//x
                                     children:[
                                       Text(
-                                        songs[index].title,
+                                          songsToShow[index].title,
                                         style: const TextStyle(
                                           fontSize: 14.0,
                                           fontWeight: FontWeight.bold,
@@ -161,7 +204,7 @@ class _SongsState extends State<Songs> {
                                         )
                                       ),
                                       Text(
-                                        '${songs[index].message}',
+                                        '${songsToShow[index].message}',
                                         style: const TextStyle(
                                           fontSize: 12.0,
                                           color: Colors.grey
@@ -171,7 +214,7 @@ class _SongsState extends State<Songs> {
                                 ),
                               ),
                               onTap: () async {
-                                final url = Configuration.songsURL + songs[index].webURL;
+                                final url = Configuration.songsURL + songsToShow[index].webURL;
                                 if(await canLaunchUrl(Uri.parse(url))) {
                                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                                 }else{
@@ -224,11 +267,11 @@ class _SongsState extends State<Songs> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   /// Loader Animation Widget
-                                  CircularProgressIndicator(
+                                  const CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Configuration.customerSecondaryColor),
                                   ),
-                                  Text('Cargando...',
+                                  const Text('Cargando...',
                                       style: TextStyle(
                                           color: Configuration.customerSecondaryColor,
                                           height: 8,
@@ -249,7 +292,7 @@ class _SongsState extends State<Songs> {
     );
   }
 
-  Future<List<Song>> _getPerformancesData(void _) async{
+  Future<List<Song>> _getPerformancesData(String? songText) async{
 
     //get actual user smule id
     final actualUser = await Cache.getUserName();
@@ -258,7 +301,14 @@ class _SongsState extends State<Songs> {
     final actualUserSmuleId = filteredUsersData[0];
 
     //get songs from that smule id
-    return getSmuleSongs(actualUserSmuleId);
+    var smuleSongs = await getSmuleSongs(actualUserSmuleId);
+
+    //filter in case of search
+    if(songText != ''){
+      smuleSongs = smuleSongs.where((s) => s.title.contains(songText!) || s.message!.contains(songText)).toList();
+    }
+
+    return smuleSongs;
   }
 
   Future<void> _refresh() async{
