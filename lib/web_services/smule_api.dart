@@ -11,12 +11,44 @@ String getPerformancesURL(usernameId, offset) {
   return 'https://www.smule.com/api/profile/performances?accountId=${usernameId}&appUid=sing&offset=${offset}';//el offset cuenta de a 15
 }
 
-/*String getInitialPerformancesURL(usernameId){
-  return getPerformancesURL(usernameId, '0');
-}*/
-
 Future<List<Song>> getSmuleSongs(usernameId) async {
 
+  //the idea is to use only the usernameId, but for now it will get just the songs of the two users specified
+  //getAllSongsFrom(usernameId);
+
+  final songsFromPerformerUser = await getAllSongsFrom(usernameId);
+
+  final otherUsernameId = await SongsUtils.getOtherSmuleUserId(usernameId);
+  final songsFromOtherPerformerUser = await getAllSongsFrom(otherUsernameId);
+
+  final allSongs = [...songsFromPerformerUser, ...songsFromOtherPerformerUser];
+
+  //order by date
+  allSongs.sort((s1, s2){
+    return s2.createdAt.toLowerCase().compareTo(s1.createdAt.toLowerCase());
+  });
+
+  return allSongs;
+}
+
+Map<String, dynamic> parseResponse(Response response) {
+  return jsonDecode(const Utf8Decoder().convert(response.bodyBytes));
+}
+
+Future<List<Song>> filterSongs(List<Song> songs, String usernameSmuleId) async {
+
+  //se filtran las que sean performedBy el otro user (x ahora esto nomas)
+  //+ las que sean performedBy el user actual y en other_performers aparezca el otro user
+
+  final otherPerformerUser = await SongsUtils.getOtherSmuleUser(usernameSmuleId);
+  final songsFiltered = songs.where((song){
+    return song.performedBy == otherPerformerUser;// || song.performedBy == performerUser && song.otherPerformers == '';
+  }).toList();
+
+  return songsFiltered;
+}
+
+Future<List<Song>> getAllSongsFrom(usernameId) async {
   var offset = 0;
   var allSongs = <Song>[];
 
@@ -33,7 +65,7 @@ Future<List<Song>> getSmuleSongs(usernameId) async {
 
       final songs = entries.map<Song>((e) => Song.fromJSON(e)).toList();
 
-      final songsFiltered = await filterSongs(songs);
+      final songsFiltered = await filterSongs(songs, usernameId);
 
       allSongs = [...allSongs, ...songsFiltered];
 
@@ -53,22 +85,4 @@ Future<List<Song>> getSmuleSongs(usernameId) async {
   }
 
   return allSongs;
-}
-
-Map<String, dynamic> parseResponse(Response response) {
-  return jsonDecode(const Utf8Decoder().convert(response.bodyBytes));
-}
-
-Future<List<Song>> filterSongs(List<Song> songs) async {
-
-  //se filtran las que sean performedBy el otro user (x ahora esto nomas)
-  //+ las que sean performedBy el user actual y en other_performers aparezca el otro user
-  final performerUser = await SongsUtils.getSmuleUser();
-  final otherPerformerUser = await SongsUtils.getOtherSmuleUser();
-  final songsFiltered = songs.where((song){
-    return song.performedBy == otherPerformerUser;// || song.performedBy == performerUser && song.otherPerformers == '';
-  }).toList();
-
-
-  return songsFiltered;
 }

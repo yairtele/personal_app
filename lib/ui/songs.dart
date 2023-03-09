@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_services.dart';
@@ -67,8 +68,7 @@ class _SongsState extends State<Songs> {
             final userInfo = data.userInfo;
             final songs = data.data!;
             final songsToShow = _songs ?? songs;
-            //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
-            //final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
+
             widget = Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -139,46 +139,77 @@ class _SongsState extends State<Songs> {
                   child: RefreshIndicator(child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
+                      //crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16),
+                        ),
+                        Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children:[
+                              const Text(
+                                'Canciones',
+                                style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black
+                                ),
+                              ),
+                              SizedBox(
+                                width: 175,
+                                height: 55,
+                                child: TextFormField(
+                                    textAlignVertical: TextAlignVertical.bottom,
+                                    textAlign: TextAlign.start,
+                                    maxLength: 16,
+                                    decoration: InputDecoration(
+                                        border: const UnderlineInputBorder(),
+                                        hintText: 'Search',
+                                        hintStyle: const TextStyle(
+                                            fontSize: 16.0,
+                                            //fontWeight: FontWeight.bold,
+                                            //color: Colors.black
+                                        ),
+                                        filled: true,
+                                        fillColor: _songSearchColor
+                                    ),
+                                    onChanged: (text){
+                                      setState(() {
+                                        if(text != ''){
+                                          _songs = songs.where((s) => s.title.toUpperCase().contains(text.toUpperCase()) || s.message!.toUpperCase().contains(text.toUpperCase())).toList();
+                                        } else {
+                                          _songs = songs;
+                                        }
+                                      });
+                                    },
+                                    controller: songTextController,
+                                    focusNode: _focusNodeSong
+                                ),
+                              ),
+
+                            ]
+                        ),
                         DataTable(
                           dataRowHeight: 55,
                           columns: <DataColumn>[
                             DataColumn(
-                              label: Row(
-                                  //mainAxisSize: MainAxisSize.min,
-                                  children:[
-                                    const Text(
-                                      'Canciones',
-                                      style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 200,
-                                      child: TextFormField(
-                                        decoration: InputDecoration(
-                                            border: const UnderlineInputBorder(),
-                                            hintText: 'Search',
-                                            filled: true,
-                                            fillColor: _songSearchColor
-                                        ),
-                                        onChanged: (text){
-                                          setState(() {
-                                            if(text != ''){
-                                              _songs = songs.where((s) => s.title.toUpperCase().contains(text.toUpperCase()) || s.message!.toUpperCase().contains(text.toUpperCase())).toList();
-                                            //_localData = _getScreenData(songText: text);
-                                            } else {
-                                              _songs = songs;
-                                            }
-                                          });
-                                        },
-                                        controller: songTextController,
-                                        focusNode: _focusNodeSong
+                              label: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: Text(
+                                      'Total: ${songsToShow.length.toString()}',
+                                      style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
                                       ),
                                     )
-                                  ])
+                                  )
+                                ],
+                              )
                             ),
                           ],
                           rows: List<DataRow>.generate (
@@ -271,7 +302,8 @@ class _SongsState extends State<Songs> {
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Configuration.customerSecondaryColor),
                                   ),
-                                  const Text('Cargando...',
+                                  const Text(
+                                      'Cargando...',
                                       style: TextStyle(
                                           color: Configuration.customerSecondaryColor,
                                           height: 8,
