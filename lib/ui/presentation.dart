@@ -36,6 +36,7 @@ import 'package:navigation_app/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../config/cache.dart';
 import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 
@@ -49,6 +50,7 @@ class Presentation extends StatefulWidget{
 class _PresentationState extends State<Presentation> {
 
   late Future<ScreenData<dynamic, bool>> _localData;
+  late String _userPhoto;
   @override
   void initState(){
     super.initState();
@@ -110,8 +112,10 @@ class _PresentationState extends State<Presentation> {
                       );
                     },
                     icon: Image.asset(
-                      'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
-                      height: 40.0, width: 40.0,),
+                      _userPhoto,
+                      height: 40.0,
+                      width: 40.0
+                    ),
                     label: Center(
                         child: Text(
                             '${userInfo.firstName}\n${userInfo.lastName}',
@@ -123,21 +127,7 @@ class _PresentationState extends State<Presentation> {
                             textAlign: TextAlign.center
                         )
                     ),
-                  ),
-                  /*IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () =>
-                          appState.waitCurrentAction<bool>(
-                              PageAction(state: PageState.addPage,
-                                  pageConfig: NewBatchPageConfig)
-                          ).then((shouldRefresh) {
-                            if (shouldRefresh!) {
-                              setState(() {
-                                _localData = _getScreenData();
-                              });
-                            }
-                          })
-                  ),*/
+                  )
                   ],
               ),
               body: ListView(
@@ -149,7 +139,7 @@ class _PresentationState extends State<Presentation> {
                       subtitle: const Text(
                           'Primera parte de esta historia.'
                       ),
-                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
@@ -164,7 +154,7 @@ class _PresentationState extends State<Presentation> {
                       subtitle: const Text(
                           'Segunda parte de esta historia.'
                       ),
-                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
@@ -179,7 +169,7 @@ class _PresentationState extends State<Presentation> {
                       subtitle: const Text(
                           'Las mejores fotos de este viaje.'
                       ),
-                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
@@ -194,7 +184,7 @@ class _PresentationState extends State<Presentation> {
                       subtitle: const Text(
                           'Todos los éxitos de esta dupla.'
                       ),
-                      trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
                       onTap: () => appState.waitCurrentAction<bool>(
                           PageAction(state: PageState.addPage,
@@ -263,19 +253,10 @@ class _PresentationState extends State<Presentation> {
   }
 
   Future<bool> _getBatchData(something) async{
+
+    _userPhoto = 'assets/images/'+ (await Cache.getUserName())! + '_user.jpg';
     // Obtener lista de lotes Draft (en principio) desde Athento
     return true;
-    /*final batches =  BusinessServices.getRetailActiveBatches();
-    return batches;*/
-  }
-
-  String _getBatchSubTitle(Batch batch) {
-    var batchDescription = (batch.description ?? '' ).trim();
-    if (batchDescription.length==0){
-      batchDescription = '(sin descripción)';
-    }
-    final batchRetailReference = (batch.retailReference ?? '').trim();
-    return batchRetailReference  != '' ? batchRetailReference : batchDescription;
   }
 
   Future<void> _refresh() async{

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "836975540592",
+    "project_id": "personal-app-494cd",
+    "storage_bucket": "personal-app-494cd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836975540592:android:cea10a478bcf5fb5dc77b5",
+        "android_client_info": {
+          "package_name": "com.yairtelezon.marieyayo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "836975540592-rq3nn68fn3db6cc8358jac1n2805kd04.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA32j3_tnY_UtY_5lxHmTayDdRJy0D5Su4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "836975540592-rq3nn68fn3db6cc8358jac1n2805kd04.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

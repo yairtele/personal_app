@@ -41,9 +41,12 @@ import 'router/router_delegate.dart';
 import 'router/shopping_parser.dart';
 import 'router/ui_pages.dart';
 
-void main() {
+//import 'package:firebase_core/firebase_core.dart';
+
+void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+  //await Firebase.initializeApp();
 
   if (Platform.isWindows) {
     setWindowMinSize(const Size(500, 600));
@@ -101,7 +104,7 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider<AppState>(
       create: (_) => appState,
       child: MaterialApp.router(
-        title: 'Desarrollo Newsan',
+        title: 'Marie y Yayo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

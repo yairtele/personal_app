@@ -1,34 +1,5 @@
-/*
- * Copyright (c) 2021 Razeware LLC
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
- * distribute, sublicense, create a derivative work, and/or sell copies of the
- * Software in any work that is designed, intended, or marketed for pedagogical or
- * instructional purposes related to programming, coding, application development,
- * or information technology.  Permission for such use, copying, modification,
- * merger, publication, distribution, sublicensing, creation of derivative works,
- * or sale is expressly withheld.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:navigation_app/services/business/batch.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/services/business/business_services.dart';
@@ -38,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../app_state.dart';
+import '../config/cache.dart';
 import '../config/configuration.dart';
 import '../router/ui_pages.dart';
 
@@ -50,29 +22,31 @@ class MoviePart2 extends StatefulWidget{
 
 class _MoviePart2State extends State<MoviePart2> {
 
-  late Future<ScreenData<dynamic, bool>> _localData;
+  late Future<ScreenData<void, String>> _localData;
+  late String _userPhoto;
+
   @override
   void initState(){
     super.initState();
     _localData =  _getScreenData();
   }
 
-  Future<ScreenData<dynamic, bool>> _getScreenData() => ScreenData<dynamic, bool>(dataGetter: _getBatchData).getScreenData();
+  Future<ScreenData<void, String>> _getScreenData() => ScreenData<void, String>(dataGetter: _loadText).getScreenData();
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    return FutureBuilder<ScreenData<void, bool>>(
+    return FutureBuilder<ScreenData<void, String>>(
 
         future: _localData,
-        builder: (BuildContext context, AsyncSnapshot<ScreenData<dynamic, bool>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ScreenData<void, String>> snapshot) {
 
           Widget widget;
           if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
             final data = snapshot.data!;
             final userInfo = data.userInfo;
-            //final batches = data.data!;
+            final textToShow = data.data!;
             //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
             //final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
             widget = Scaffold(
@@ -87,42 +61,6 @@ class _MoviePart2State extends State<MoviePart2> {
                       color: Colors.white),
                 ),
                 actions: [
-                  /*IconButton(
-                      icon: const Icon(Icons.logout),
-                      onPressed: () {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Alerta'),
-                              content: const Text('¿Cerrar sesión?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () => { Navigator.of(context).pop() },
-                                  child: const Text('No'),
-                                ),
-                                TextButton(
-                                    child: const Text('Si'),
-                                    onPressed: () async {
-                                      await appState.logout();
-                                    }),
-                              ]),
-                        );
-                      }
-                  ),
-                  IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () =>
-                          appState.waitCurrentAction<bool>(
-                              PageAction(state: PageState.addPage,
-                                  pageConfig: NewBatchPageConfig)
-                          ).then((shouldRefresh) {
-                            if (shouldRefresh!) {
-                              setState(() {
-                                _localData = _getScreenData();
-                              });
-                            }
-                          })
-                  ),*/
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                         primary: Configuration.customerPrimaryColor
@@ -148,8 +86,10 @@ class _MoviePart2State extends State<MoviePart2> {
                       );
                     },
                     icon: Image.asset(
-                      'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
-                      height: 40.0, width: 40.0,),
+                      _userPhoto,
+                      height: 40.0,
+                      width: 40.0
+                    ),
                     label: Center(
                         child: Text(
                             '${userInfo.firstName}\n${userInfo.lastName}',
@@ -164,7 +104,10 @@ class _MoviePart2State extends State<MoviePart2> {
                   ),
                 ],
               ),
-              body: const Text('Segunda parte de la peli')
+              body: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+                  child: Text(textToShow)
+              )
             );
           }
           else if (snapshot.hasError) {
@@ -199,11 +142,11 @@ class _MoviePart2State extends State<MoviePart2> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   /// Loader Animation Widget
-                                  CircularProgressIndicator(
+                                  const CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Configuration.customerSecondaryColor),
                                   ),
-                                  Text('Cargando...',
+                                  const Text('Cargando...',
                                       style: TextStyle(
                                           color: Configuration.customerSecondaryColor,
                                           height: 8,
@@ -224,20 +167,10 @@ class _MoviePart2State extends State<MoviePart2> {
     );
   }
 
-  Future<bool> _getBatchData(something) async{
-    // Obtener lista de lotes Draft (en principio) desde Athento
-    return true;
-    /*final batches =  BusinessServices.getRetailActiveBatches();
-    return batches;*/
-  }
+  Future<String> _loadText(void _) async {
+    _userPhoto = 'assets/images/'+ (await Cache.getUserName())! + '_user.jpg';
 
-  String _getBatchSubTitle(Batch batch) {
-    var batchDescription = (batch.description ?? '' ).trim();
-    if (batchDescription.length==0){
-      batchDescription = '(sin descripción)';
-    }
-    final batchRetailReference = (batch.retailReference ?? '').trim();
-    return batchRetailReference  != '' ? batchRetailReference : batchDescription;
+    return rootBundle.loadString('assets/texts/movie_part2.txt');
   }
 
   Future<void> _refresh() async{
@@ -246,3 +179,4 @@ class _MoviePart2State extends State<MoviePart2> {
     });
   }
 }
+

@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name="${applicationName}"
-        android:label="Newsan Premium"
+        android:label="Marie y Yayo"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

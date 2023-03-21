@@ -6,16 +6,18 @@ import 'package:navigation_app/services/athento/sp_athento_services.dart';
 
 class UserServices{
   static Future<bool> login(String user, String password) async{
-    // Clear the cached data
-    await Cache.clearAll();
 
-    // Perform Login
-    for(final user_comb in Configuration.usersJson.entries){
-      if(user == user_comb.key && password == user_comb.value['password']){
-        return true;
+      // Clear the cached data
+      await Cache.clearAll();
+
+      // Perform Login
+      for(final user_comb in Configuration.usersJson.entries){
+        if(user == user_comb.key && password == user_comb.value['password']){
+          return true;
+        }
       }
-    }
-    return false;
+
+      throw InvalidLoginException('Usuario o clave inválidos');
   }
 }
 

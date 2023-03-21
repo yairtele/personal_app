@@ -184,7 +184,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
           _addPageData(const MoviePart2(), MoviePart2PageConfig);
           break;
         case PageEnum.Fotos:
-          _addPageData(const Fotos(), FotosPageConfig);
+          _addPageData(const Photos(), FotosPageConfig);
           break;
         case PageEnum.Songs:
           _addPageData(const Songs(), SongsPageConfig);
@@ -352,7 +352,7 @@ class ShoppingRouterDelegate extends RouterDelegate<PageConfiguration>
         case 'fotos':
           setPath([
             _createPage(const Presentation(), PresentationPageConfig),
-            _createPage(const Fotos(), FotosPageConfig)
+            _createPage(const Photos(), FotosPageConfig)
           ]);
           break;
         case 'songs':

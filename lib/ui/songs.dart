@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:navigation_app/services/business/batch.dart';
-import 'package:navigation_app/services/business/batch_states.dart';
-import 'package:navigation_app/services/business/business_services.dart';
-import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
 import 'package:navigation_app/ui/screen_data.dart';
-import 'package:navigation_app/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_state.dart';
@@ -32,6 +24,7 @@ class _SongsState extends State<Songs> {
   var _songs;
 
   late Future<ScreenData<String, List<Song>>> _localData;
+  late String _userPhoto;
 
   @override
   void initState(){
@@ -81,29 +74,6 @@ class _SongsState extends State<Songs> {
                         color: Configuration.customerSecondaryColor),
                   ),
                   actions: [
-                    Center(
-                        child: Text(
-                          '${userInfo.firstName}\n${userInfo.lastName}',
-                          style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Configuration.customerSecondaryColor
-                          ),
-                        )),
-                    IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () =>
-                            appState.waitCurrentAction<bool>(
-                                PageAction(state: PageState.addPage,
-                                    pageConfig: NewBatchPageConfig)
-                            ).then((shouldRefresh) {
-                              if (shouldRefresh!) {
-                                setState(() {
-                                  _localData = _getScreenData();
-                                });
-                              }
-                            })
-                    ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                           primary: Configuration.customerPrimaryColor
@@ -129,9 +99,21 @@ class _SongsState extends State<Songs> {
                         );
                       },
                       icon: Image.asset(
-                        'assets/images/yayo_user.jpg',//TODO: PAPP - Mostrar imagen del usuario, tomarlo de alguna asociacion user-photofile
-                        height: 40.0, width: 40.0,),
-                      label: const Text(''),
+                        _userPhoto,
+                        height: 40.0,
+                        width: 40.0
+                      ),
+                      label: Center(
+                          child: Text(
+                              '${userInfo.firstName}\n${userInfo.lastName}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Configuration.customerSecondaryColor,
+                              ),
+                              textAlign: TextAlign.center
+                          )
+                      ),
                     ),
                   ],
                 ),
@@ -163,8 +145,11 @@ class _SongsState extends State<Songs> {
                                     textAlignVertical: TextAlignVertical.bottom,
                                     textAlign: TextAlign.start,
                                     maxLength: 16,
+
                                     decoration: InputDecoration(
-                                        border: const UnderlineInputBorder(),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(7.5),
+                                        ),
                                         hintText: 'Search',
                                         hintStyle: const TextStyle(
                                             fontSize: 16.0,
@@ -172,7 +157,8 @@ class _SongsState extends State<Songs> {
                                             //color: Colors.black
                                         ),
                                         filled: true,
-                                        fillColor: _songSearchColor
+                                        fillColor: _songSearchColor,
+
                                     ),
                                     onChanged: (text){
                                       setState(() {
@@ -249,7 +235,7 @@ class _SongsState extends State<Songs> {
                                 if(await canLaunchUrl(Uri.parse(url))) {
                                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                                 }else{
-                                  print("URL can't be launched.");
+                                  _showErrorSnackBar('URL can\'t be launched.', context);
                                 }
                               }
                           )
@@ -262,9 +248,19 @@ class _SongsState extends State<Songs> {
                   ),
                       onRefresh: _refresh
                   )
+                ),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () async {
+                    if(await canLaunchUrl(Uri.parse(Configuration.songsURL))) {
+                      await launchUrl(Uri.parse(Configuration.songsURL), mode: LaunchMode.externalApplication);
+                    }else{
+                      _showErrorSnackBar('URL can\'t be launched.', context);
+                    }
+                  },
+                  backgroundColor: Configuration.customerSecondaryColor,
+                  child: const Icon(Icons.add, color: Configuration.customerPrimaryColor),
                 )
-                            //const Text('Aca van las mejores canciones de los dos en listado, con titulo y mes + año. Mostrar reproductor de canciones al clickear en una')
-                            );
+            );
           }
           else if (snapshot.hasError) {
             widget = Center(
@@ -326,8 +322,11 @@ class _SongsState extends State<Songs> {
 
   Future<List<Song>> _getPerformancesData(String? songText) async{
 
-    //get actual user smule id
     final actualUser = await Cache.getUserName();
+
+    _userPhoto = 'assets/images/'+ actualUser! + '_user.jpg';
+
+    //get actual user smule id
     final usersData =  Configuration.usersJson.entries;
     final filteredUsersData = usersData.where((e) => actualUser == e.key).map((u) => u.value['smuleId']).toList();
     final actualUserSmuleId = filteredUsersData[0];
@@ -348,4 +347,16 @@ class _SongsState extends State<Songs> {
       _localData =  _getScreenData();
     });
   }
+}
+
+void _showErrorSnackBar(String message, context) {
+  _showSnackBar(message, Colors.red, context);
+}
+void _showSuccessfulSnackBar(String message, context) {
+  _showSnackBar(message, Colors.green, context);
+}
+void _showSnackBar(String message, MaterialColor bgColor, context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(message), backgroundColor: bgColor),
+  );
 }

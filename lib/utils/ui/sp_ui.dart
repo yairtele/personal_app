@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:navigation_app/config/configuration.dart';
 import 'package:navigation_app/services/athento/binary_file_info.dart';
 import 'package:navigation_app/services/business/batch_states.dart';
 import 'package:navigation_app/utils/ui/thumb_photo.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 
+import '../../config/configuration.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
@@ -38,40 +38,39 @@ class SpUI{
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 4),
         decoration: const BoxDecoration(
-          color: Configuration.customerPrimaryColor
+            color: Configuration.customerPrimaryColor
         ),
         child: Column(
           children: [
             Expanded(
               child: GestureDetector(
-              child: Image.asset(photo),
-              onTap: () async {
-                FocusManager.instance.primaryFocus?.unfocus();
-                  await showDialog(
-                      context: context,
-                      builder: (_) {
-                      return Dialog(
-                        child: InteractiveViewer(
-                            clipBehavior: Clip.none,
-                            maxScale: 5,
-                            child: Container(
-                              child:Image.asset(photo),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Configuration.customerSecondaryColor),
-                              ),
-                            )
-                        ),
-                      );
-                    }
-                );
-              }
-            ),
+                  child: Image.asset(photo),
+                  onTap: () async {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    await showDialog(
+                        context: context,
+                        builder: (_) {
+                          return Dialog(
+                            child: InteractiveViewer(
+                                clipBehavior: Clip.none,
+                                maxScale: 5,
+                                child: Container(
+                                  child:Image.asset(photo),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Configuration.customerSecondaryColor),
+                                  ),
+                                )
+                            ),
+                          );
+                        }
+                    );
+                  }
+              ),
             ),
           ],
         )
     );
   }
-
   static Future<XFile?> _getPhotoFromCamera() async {
     return _getPhoto(ImageSource.camera);
   }
@@ -171,7 +170,7 @@ class SpUI{
 
   static void _getPhotoFromSource (State state, String photoParentState, ThumbPhoto photo, XFile dummyPhoto, Future<XFile?> getPhotoFunction ()){
     if(! _shouldDisablePhotoButton(photoParentState, photo.state)) {
-      () async {
+          () async {
         final pickedPhoto = await getPhotoFunction();
         state.setState(() {
           photo.photo = pickedPhoto ?? dummyPhoto;
