@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:navigation_app/utils/ui/working_indicator_dialog.dart';
+import 'package:marieyayo/utils/ui/working_indicator_dialog.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../ui/ui_helper.dart';
 
 Future<String> getMediaType(arg) async {
   if (!(arg.runtimeType is String)) {
@@ -86,7 +88,7 @@ Future<dynamic> getVideoAndAudio(String link, context) async {
           );
 
           WorkingIndicatorDialog().dismiss();
-          _showSuccessfulSnackBar('Downloading finished', context);
+          UIHelper.showSuccessfulSnackBar('Downloading finished', context);
 
         } catch(_){
           throw Exception('Song couldn\'t be downloaded. Check free storage space.');//Broken link or maybe the song has been removed!
@@ -105,16 +107,4 @@ bool isURL(url){
 
 String songName(String url){
   return url.split('/')[4];
-}
-
-void _showErrorSnackBar(String message, context) {
-  _showSnackBar(message, Colors.red, context);
-}
-void _showSuccessfulSnackBar(String message, context) {
-  _showSnackBar(message, Colors.green, context);
-}
-void _showSnackBar(String message, MaterialColor bgColor, context) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), backgroundColor: bgColor),
-  );
 }

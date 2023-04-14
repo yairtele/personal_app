@@ -1,25 +1,27 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:navigation_app/services/athento/binary_file_info.dart';
-import 'package:navigation_app/services/business/batch_states.dart';
-import 'package:navigation_app/utils/ui/thumb_photo.dart';
+import 'package:marieyayo/services/athento/binary_file_info.dart';
+import 'package:marieyayo/services/business/batch_states.dart';
+import 'package:marieyayo/utils/ui/thumb_photo.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 
 import '../../config/configuration.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, required List<String> photos, required BuildContext context}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, /*required List<PhotoObject> photos**/required List<String> photos, required BuildContext context}) {
 
     final _mediaQuery = MediaQuery.of(context).size;
     final  desktopCrossAxisElements = _mediaQuery.width < 300? 1 : (_mediaQuery.width / 300).floor();
     final children = <Widget>[];
     for(var photoIndex = 0; photoIndex < photos.length; photoIndex++){
-      var photoName = photos[photoIndex].toString();//TODO: No se está usando, revisar
+      //var photoName = photos[photoIndex].name;
+      //var photoId = photos[photoIndex].id;
       var photo = photos[photoIndex];
-      children.add(_buildPhotoThumbnail(photoName, photo, state, context));
+      children.add(_buildPhotoThumbnail(/*photoName, photoId*/ photo, state, context));
     }
 
     return GridView.count(
@@ -33,7 +35,9 @@ class SpUI{
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(String photoName, String photo, State<T> state, BuildContext context) {
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(/*String photoName,*/ String photoId, State<T> state, BuildContext context) {
+
+    final photoURL = Configuration.photosURL.replaceAll('<<photoId>>', photoId);
 
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 4),
@@ -44,7 +48,7 @@ class SpUI{
           children: [
             Expanded(
               child: GestureDetector(
-                  child: Image.asset(photo),
+                  child: Image.network(photoURL),
                   onTap: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
                     await showDialog(
@@ -55,7 +59,7 @@ class SpUI{
                                 clipBehavior: Clip.none,
                                 maxScale: 5,
                                 child: Container(
-                                  child:Image.asset(photo),
+                                  child:Image.network(photoURL),
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Configuration.customerSecondaryColor),
                                   ),

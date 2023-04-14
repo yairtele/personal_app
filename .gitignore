@@ -43,3 +43,6 @@ app.*.map.json
 #User defined
 android/app/google-services.json
 assets/cfg/apps.googleusercontent.com.json
+
+#App files
+lib/config/configuration.dart

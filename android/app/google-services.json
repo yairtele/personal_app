@@ -7,14 +7,22 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:836975540592:android:cea10a478bcf5fb5dc77b5",
+        "mobilesdk_app_id": "1:836975540592:android:33fe445e0fe3a33fdc77b5",
         "android_client_info": {
           "package_name": "com.yairtelezon.marieyayo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "836975540592-rq3nn68fn3db6cc8358jac1n2805kd04.apps.googleusercontent.com",
+          "client_id": "836975540592-4lu9m54ugkluu9s86e6f4h57t4rlpvbf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yairtelezon.marieyayo",
+            "certificate_hash": "063a12f7005d2466a6983dfe3d3abccdb85aa2a7"
+          }
+        },
+        {
+          "client_id": "836975540592-13tb9epfih1ak21q2ck890oiheco3k6p.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "836975540592-rq3nn68fn3db6cc8358jac1n2805kd04.apps.googleusercontent.com",
+              "client_id": "836975540592-13tb9epfih1ak21q2ck890oiheco3k6p.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

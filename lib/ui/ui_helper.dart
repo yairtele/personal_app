@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:navigation_app/services/business/batch_states.dart';
+import 'package:marieyayo/services/business/batch_states.dart';
 
 class UIHelper {
   static MaterialStateProperty<Color?>? getAuditItemBackgroundColor(String athentoLifeCycleState){
@@ -24,5 +24,23 @@ class UIHelper {
     };
 
     return colors[state];
+  }
+
+  static void showSuccessfulSnackBar(String message, context) {
+    _showSnackBar(message, Colors.green, context);
+  }
+
+  static void showWarningSnackBar(String message, context) {
+    _showSnackBar(message, Colors.orange, context);
+  }
+
+  static void showErrorSnackBar(String message, context) {
+    _showSnackBar(message, Colors.red, context);
+  }
+
+  static void _showSnackBar(String message, MaterialColor bgColor, context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: bgColor),
+    );
   }
 }

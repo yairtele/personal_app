@@ -31,8 +31,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:navigation_app/services/business/batch.dart';
-import 'package:navigation_app/ui/screen_data.dart';
+import 'package:marieyayo/services/business/batch.dart';
+import 'package:marieyayo/ui/screen_data.dart';
+import 'package:marieyayo/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
@@ -171,10 +172,16 @@ class _PresentationState extends State<Presentation> {
                       ),
                       //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
                       //isThreeLine: true,
-                      onTap: () => appState.waitCurrentAction<bool>(
-                          PageAction(state: PageState.addPage,
-                              pageConfig: FotosPageConfig)
-                      ),
+                      onTap: () {
+                        try {
+                          appState.waitCurrentAction<bool>(
+                              PageAction(state: PageState.addPage,
+                                  pageConfig: FotosPageConfig)
+                          );
+                        } on Exception catch (_) {
+                          UIHelper.showErrorSnackBar('No fue posible recuperar las fotos.', context);
+                        }
+                      }
                     ),
                   ),
                   Card(

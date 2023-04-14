@@ -1,6 +1,6 @@
-import 'package:navigation_app/config/cache.dart';
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
-import 'package:navigation_app/services/business/business_services.dart';
+import 'package:marieyayo/config/cache.dart';
+import 'package:marieyayo/services/athento/sp_athento_services.dart';
+import 'package:marieyayo/services/business/business_services.dart';
 
 class ScreenData<DataGetterParam, DataGetterReturn>{
   late final DataGetterReturn? data;

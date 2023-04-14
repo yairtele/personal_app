@@ -1,4 +1,4 @@
-name: navigation_app
+name: marieyayo
 description: Navigation 2.0 Example
 
 # The following line prevents the package from being accidentally published to
@@ -26,28 +26,30 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  shared_preferences: ^2.0.12
-  provider: ^6.0.2
+  cupertino_icons: ^1.0.5
+  shared_preferences: ^2.0.17
+  provider: ^6.0.5
   uni_links: ^0.5.1
-  url_launcher: ^6.0.4
-  http: ^0.13.4
-  json_intl: ^2.0.0
-  email_validator: ^2.0.1
-  image_picker: ^0.8.4+4
-  path_provider: ^2.0.8
-  html: ^0.15.0
-  barcode_scan2: ^4.2.0
-  flutter_barcode_sdk: ^1.2.2
-  universal_html: ^2.0.8
+  url_launcher: ^6.1.8
+  http: ^0.13.5
+  json_intl: ^3.0.0
+  email_validator: ^2.1.17
+  image_picker: ^0.8.6+1
+  path_provider: ^2.0.11
+  html: ^0.15.1
+  barcode_scan2: ^4.2.4
+  flutter_barcode_sdk: ^2.2.2
+  universal_html: ^2.0.9
   font_awesome_flutter: ^9.2.0
-  uuid: ^3.0.6
-  dio: ^5.0.0
+  uuid: ^3.0.7
+  dio: ^5.0.3
   intl: ^0.17.0
   file_picker_cross: ^4.6.0
   connectivity_plus: ^2.3.9
-  googleapis: ^5.0.0
-  google_sign_in: ^5.0.1
+  googleapis: ^9.1.0
+  google_sign_in: ^5.4.3
+  firebase_auth: ^3.4.2
+  firebase_core: ^1.24.0
 
 #  keycloak_flutter: ^0.0.3
   thumbnailer: ^2.0.1
@@ -55,6 +57,9 @@ dependencies:
     git:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
+
+dependency_overrides:
+  firebase_core_platform_interface: 4.5.1
 
 dev_dependencies:
   flutter_test:

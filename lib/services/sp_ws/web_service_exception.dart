@@ -1,5 +1,5 @@
 import 'package:http/http.dart';
-import 'package:navigation_app/exceptions/custom_exception.dart';
+import 'package:marieyayo/exceptions/custom_exception.dart';
 
 class WebServiceException extends CustomException{
   Response? response;

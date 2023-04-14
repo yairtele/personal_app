@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:navigation_app/ui/screen_data.dart';
+import 'package:marieyayo/ui/screen_data.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -230,16 +230,16 @@ class _SongsState extends State<Songs> {
                                     ]
                                 ),
                               ),
-                              onTap: () async {
-                                final url = Configuration.songsURL + songsToShow[index].webURL;
-                                if(await canLaunchUrl(Uri.parse(url))) {
-                                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                                }else{
-                                  _showErrorSnackBar('URL can\'t be launched.', context);
+                                onTap: () async {
+                                  final url = Configuration.songsURL + songsToShow[index].webURL;
+                                  if(await canLaunchUrl(Uri.parse(url))) {
+                                    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                  }else{
+                                    _showErrorSnackBar('URL can\'t be launched.', context);
+                                  }
                                 }
-                              }
-                          )
-                        ],
+                              )
+                            ],
                       ),
                     ),
                   )

@@ -1,6 +1,6 @@
-import 'package:navigation_app/services/business/photo_detail.dart';
-import 'package:navigation_app/services/business/product.dart';
-import 'package:navigation_app/utils/ui/thumb_photo.dart';
+import 'package:marieyayo/services/business/photo_detail.dart';
+import 'package:marieyayo/services/business/product.dart';
+import 'package:marieyayo/utils/ui/thumb_photo.dart';
 
 class ReturnRequestDetail {
   List<Product> products;

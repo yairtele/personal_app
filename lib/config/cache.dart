@@ -1,4 +1,4 @@
-import 'package:navigation_app/services/athento/sp_athento_services.dart';
+import 'package:marieyayo/services/athento/sp_athento_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //TODO: ¿se debería usar await en todas las clases cliente cuando llamen a los métodos saveXXX?

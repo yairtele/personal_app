@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:navigation_app/services/business/batch.dart';
-import 'package:navigation_app/services/business/batch_states.dart';
-import 'package:navigation_app/services/business/business_services.dart';
-import 'package:navigation_app/ui/screen_data.dart';
-import 'package:navigation_app/ui/ui_helper.dart';
+import 'package:marieyayo/services/business/batch.dart';
+import 'package:marieyayo/services/business/batch_states.dart';
+import 'package:marieyayo/services/business/business_services.dart';
+import 'package:marieyayo/ui/screen_data.dart';
+import 'package:marieyayo/ui/ui_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

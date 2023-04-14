@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:navigation_app/services/athento/athento_field_name.dart';
-import 'package:navigation_app/services/business/return_request.dart';
+import 'package:marieyayo/services/athento/athento_field_name.dart';
+import 'package:marieyayo/services/business/return_request.dart';
 
 class Product {
   String? uuid;

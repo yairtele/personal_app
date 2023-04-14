@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:navigation_app/services/athento/athento_field_name.dart';
+import 'package:marieyayo/services/athento/athento_field_name.dart';
 
 class ProductPhoto {
   String uuid;

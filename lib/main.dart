@@ -41,12 +41,12 @@ import 'router/router_delegate.dart';
 import 'router/shopping_parser.dart';
 import 'router/ui_pages.dart';
 
-//import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-  //await Firebase.initializeApp();
+  await Firebase.initializeApp();
 
   if (Platform.isWindows) {
     setWindowMinSize(const Size(500, 600));

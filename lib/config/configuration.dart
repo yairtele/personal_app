@@ -2,23 +2,28 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class Configuration{
-  static const String productsFileName = 'products_db.csv';
-  static const String salesFileName = 'sales_db.csv';
-  static const String rulesFileName = 'rules_db.csv';
-  static const Color customerPrimaryColor = Color(0xFF99cfe0);
-  static const Color customerSecondaryColor = Color(0xFFce5eb3);
-  static const String photosFolderID = '1da75DOhostOiiYIBtXmR376TYQgJqa3j';
+  static const Color customerPrimaryColor = Color(0xFF99cfe0);//TODO: Esto será personalizado por usuario
+  static const Color customerSecondaryColor = Color(0xFFce5eb3);//TODO: Esto será personalizado por usuario
+  static const String photosFolderName = 'personal_app_photos';
+  static const String photosURL = 'https://drive.google.com/uc?export=view&id=<<photoId>>';
   static const String songsURL = 'https://www.smule.com';
+  //TODO: PAPP - Pasar a archivo o db
   static const usersJson = {
     'marystique': {
       'password': '050700',
       'smuleUser': 'Marystique',
-      'smuleId': '2876977630'
+      'smuleId': '2876977630',
+      'email': 'marie.brugiroux@outlook.fr',
+      'firstName': 'Marie',
+      'lastName': 'Brugiroux'
     },
     'yairtele': {
       'password': '020496',
       'smuleUser': 'yairtele96',
-      'smuleId': '39223017'
+      'smuleId': '39223017',
+      'email': 'yairtele@yahoo.com.ar',
+      'firstName': 'Yair',
+      'lastName': 'Telezon'
     },
     /*'genapardo': {
       'password': '140798',

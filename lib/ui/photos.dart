@@ -1,39 +1,12 @@
-/*
- * Copyright (c) 2021 Razeware LLC
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
- * distribute, sublicense, create a derivative work, and/or sell copies of the
- * Software in any work that is designed, intended, or marketed for pedagogical or
- * instructional purposes related to programming, coding, application development,
- * or information technology.  Permission for such use, copying, modification,
- * merger, publication, distribution, sublicensing, creation of derivative works,
- * or sale is expressly withheld.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:navigation_app/services/business/batch.dart';
-import 'package:navigation_app/ui/screen_data.dart';
+import 'package:marieyayo/services/business/batch.dart';
+import 'package:marieyayo/services/sp_ws/web_service_exception.dart';
+import 'package:marieyayo/ui/screen_data.dart';
+import 'package:marieyayo/ui/ui_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -72,7 +45,7 @@ class _PhotosState extends State<Photos> {
     final appState = Provider.of<AppState>(context, listen: false);
     final photosState = this;
 
-    if(loginStatus){
+    if(getLoginStatus()){
       return FutureBuilder<ScreenData<void, bool>>(
 
           future: _localData,
@@ -82,9 +55,7 @@ class _PhotosState extends State<Photos> {
             if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
               final data = snapshot.data!;
               final userInfo = data.userInfo;
-              //final batches = data.data!;
-              //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
-              //final auditedBatches = batches.where((batch) => batch.state != BatchStates.Draft).toList();
+
               widget = Scaffold(
                   appBar: AppBar(
                     elevation: 0,
@@ -164,9 +135,9 @@ class _PhotosState extends State<Photos> {
                             try {
                               await saveImage(file!);
 
-                              _showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
+                              UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
                             } catch(e){
-                              _showErrorSnackBar('La imagen no pudo ser almacenada', context);
+                              UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
                             }
                           },
                           backgroundColor: Configuration.customerPrimaryColor,
@@ -180,11 +151,11 @@ class _PhotosState extends State<Photos> {
                               await saveImage(file!);
 
                               setState((){
-                                _showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
+                                UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
                               });
                             } catch(e){
                               setState((){
-                                _showErrorSnackBar('La imagen no pudo ser almacenada', context);
+                                UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
                               });
                             }
                           },
@@ -269,18 +240,18 @@ class _PhotosState extends State<Photos> {
             icon: Image.asset('assets/images/google_logo.png', height: 24),
             onPressed: () async {
 
-              var loginOK = false;
-
-              /*try {
-                loginOK = await signIn();
-              }catch(_){ }*/
+              try {
+                await signIn();
+              }catch(_){ }
 
               setState(() {
-                if(!loginOK){
-                  _showErrorSnackBar('Falló el inicio de sesión.', context);
+                if(getLoginStatus()) {
+                  _localData = _getScreenData();
+                  UIHelper.showSuccessfulSnackBar('Inicio de sesión exitoso.', context);
+                }else{
+                  UIHelper.showErrorSnackBar('Falló el inicio de sesión.', context);
                 }
               });
-
             }
           ),
         ),
@@ -291,28 +262,21 @@ class _PhotosState extends State<Photos> {
   Future<bool> _getPhotos(void something) async {
 
     _userPhoto = 'assets/images/'+ (await Cache.getUserName())! + '_user.jpg';
-/*
-    //Create directory if not exists
-    await SpFileUtils.createDirectory('loadedPhotos');
 
-    //Get all photos in photos directory
-    final directory = await getApplicationDocumentsDirectory();
-    final photosDirectory = '$directory/loadedPhotos';
+    //Retrieve photos only if user is logged in
+    if(getLoginStatus()) {
+      final filesList = await allFileList(context);
+      //a este punto solo tengo los ids de las fotos en google
 
-    final photosObjectDirectory = Directory(photosDirectory);
-    final listOfFiles = photosObjectDirectory.listSync(recursive: false);
-    final filesList = listOfFiles.toList();
-    final photos = <String>[];
-    for (final file in filesList) {
-      if (file is File && file.path.endsWith('.png')) {
-        photos.add(file.path);
+      if (filesList == null) {
+        throw Exception();
       }
-    }*/
-    //return imagePaths;
-    final manifestJson = await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
-    final photos = json.decode(manifestJson).keys.where((String key) => key.startsWith('assets/images/photos')).toList();
 
-    _photos = photos;
+      final photosIds = filesList.files!.map((f) => f.id!).toList();
+
+      //TODO: ESTARIA BUENO DEVOLVER UN OBJETO CON NOMBRE DE LA FOTO Y BYTES PARA MOSTRAR
+      _photos = photosIds;
+    }
 
     return true;
   }
@@ -322,16 +286,4 @@ class _PhotosState extends State<Photos> {
       _localData =  _getScreenData();
     });
   }
-}
-
-void _showErrorSnackBar(String message, context) {
-  _showSnackBar(message, Colors.red, context);
-}
-void _showSuccessfulSnackBar(String message, context) {
-  _showSnackBar(message, Colors.green, context);
-}
-void _showSnackBar(String message, MaterialColor bgColor, context) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), backgroundColor: bgColor),
-  );
 }

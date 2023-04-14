@@ -2,8 +2,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
-import 'package:navigation_app/utils/sp_file_utils.dart';
+import 'package:marieyayo/services/sp_ws/web_service_exception.dart';
+import 'package:marieyayo/utils/sp_file_utils.dart';
 
 class SpWS {
   static Map<String,Map<String, String>>? _contentTypeMapByExtension;

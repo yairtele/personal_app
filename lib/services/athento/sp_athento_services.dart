@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:navigation_app/config/configuration.dart';
-import 'package:navigation_app/services/athento/athento_endpoint.dart';
-import 'package:navigation_app/services/athento/basic_auth_config_provider.dart';
-import 'package:navigation_app/services/athento/athento_field_name.dart';
-import 'package:navigation_app/services/sp_ws/multipart_message_builder.dart';
-import 'package:navigation_app/services/sp_ws/sp_ws.dart';
-import 'package:navigation_app/services/sp_ws/web_service_exception.dart';
-import 'package:navigation_app/services/user_services.dart';
+import 'package:marieyayo/config/configuration.dart';
+import 'package:marieyayo/services/athento/athento_endpoint.dart';
+import 'package:marieyayo/services/athento/basic_auth_config_provider.dart';
+import 'package:marieyayo/services/athento/athento_field_name.dart';
+import 'package:marieyayo/services/sp_ws/multipart_message_builder.dart';
+import 'package:marieyayo/services/sp_ws/sp_ws.dart';
+import 'package:marieyayo/services/sp_ws/web_service_exception.dart';
+import 'package:marieyayo/services/user_services.dart';
 import 'binary_file_info.dart';
 import 'config_provider.dart';
 
@@ -32,60 +32,7 @@ class SpAthentoServices {
   static Map<String, dynamic> _jsonDecodeResponseUTF8(Response response){
     return jsonDecode(const Utf8Decoder().convert(response.bodyBytes));
   }
-  /*static Future<TokenInfo> getAuthenticationToken(
-      BasicAuthConfigProvider configProvider, String userName,
-      String password) async {
-    try{
-      //TODO: usar SpWS en lugar de http directo.
 
-      final requestBody = {
-        'grant_type': 'password',
-        'username': userName,
-        'password': password,
-        'client_id': Configuration.athentoClientId,
-        'client_secret': Configuration.athentoClientSecret,
-        'scope': 'write',
-      };
-
-
-      final parameters = Map<String, String>();
-
-      final headers = configProvider.getHttpHeaders({
-        'Content-Type': 'application/x-www-form-urlencoded'
-      });
-
-      headers.remove('Authorization');
-
-      final response = await SpWS.post(
-          configProvider.getEndpointUrl(AthentoEndpoint.getAuthToken),
-          parameters: parameters,
-          headers: headers,
-          body: requestBody
-      );
-
-      final jsonResponse = _jsonDecodeResponseUTF8(response);
-      return TokenInfo.fromJSON(jsonResponse);
-    }
-    on WebServiceException catch(e){
-      if (e.response != null) {
-        final response = e.response!;
-        if(response.statusCode == 400){
-          final jsonResponse = _jsonDecodeResponseUTF8(response);
-          if(jsonResponse['error_description'] != null
-              && jsonResponse['error_description'] == 'Invalid credentials given.'){
-            throw InvalidLoginException('Usuario o clave inválidos', cause: e);
-          }
-        }
-      }
-      throw e;
-    }
-    on Exception catch (e){
-      throw e;
-    }
-    on Error catch (e){
-      throw e;
-    }
-  }*/
 
   static Future<Map<String, dynamic>> createDocument({
     required ConfigProvider configProvider,

@@ -32,8 +32,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:navigation_app/config/cache.dart';
-import 'package:navigation_app/services/user_services.dart';
+import 'package:marieyayo/config/cache.dart';
+import 'package:marieyayo/services/user_services.dart';
+import 'package:marieyayo/ui/ui_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../app_state.dart';
@@ -215,11 +216,11 @@ class _LoginState extends State<Login> {
                                             await appState.login();
                                           }
                                           on InvalidLoginException catch (e) {
-                                            _showErrorSnackBar(e.message);
+                                            UIHelper.showErrorSnackBar(e.message, context);
                                           }
                                           on Exception {
-                                            _showErrorSnackBar(
-                                                'Ha ocurrido un error inesperado autenticando al usuario.');
+                                            UIHelper.showErrorSnackBar(
+                                                'Ha ocurrido un error inesperado autenticando al usuario.', context);
                                           }
                                         },
                                       ),
@@ -294,30 +295,18 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _showErrorSnackBar(String message) {
-    _showSnackBar(message, Colors.red);
-  }
-  void _showSuccessfulSnackBar(String message) {
-    _showSnackBar(message, Colors.green);
-  }
-  void _showSnackBar(String message, MaterialColor bgColor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: bgColor),
-    );
-  }
-
   Future<bool> updateLocalFiles() async {
     userTextController.text = (await Cache.getUserName()) ?? '';
     passwordTextController.text = (await Cache.getUserPassword()) ?? '';
 
     // Check and create (if necesary) local folders where the products and sales files will reside.
-    final localFolderPath = (await getApplicationDocumentsDirectory()).path;
+    //final localFolderPath = (await getApplicationDocumentsDirectory()).path;
 
-    final productsFolderPath = Directory('$localFolderPath/products');
+    //final productsFolderPath = Directory('$localFolderPath/products');
 
-    const filesFolderURL = 'https://socialpath.com.ar/bandeja/newsan';
+    //const filesFolderURL = 'https://socialpath.com.ar/bandeja/newsan';
     // Check if the product files folder exists in the local app folder. If not, create it
-    if (!productsFolderPath.existsSync()) {
+    /*if (!productsFolderPath.existsSync()) {
       await productsFolderPath.create();
     }
 
@@ -354,7 +343,7 @@ class _LoginState extends State<Login> {
         );
         await Cache.saveRulesFileLastModifiedDate(lastModifiedHeader!);
       }
-    }
+    }*/
 
     return true;
   }

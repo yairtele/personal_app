@@ -30,7 +30,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:navigation_app/config/configuration.dart';
+import 'package:marieyayo/config/configuration.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
