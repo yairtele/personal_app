@@ -67,6 +67,7 @@ Future<drive.FileList?> allFileList(context) async {
   }
 
   final folderId = await _getFolderId(driveApi, Configuration.photosFolderName);
+  //TODO: Order photos by name (name is the date so it would be ordered by date)
   final response = driveApi.files.list(
     spaces: 'drive',
     q: "'$folderId' in parents",

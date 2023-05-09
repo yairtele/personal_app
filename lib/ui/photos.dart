@@ -28,7 +28,8 @@ class Photos extends StatefulWidget{
 
 class _PhotosState extends State<Photos> {
 
-  late List<String> _photos;
+  late List<Image> _photos;
+  Image? _selectedPhoto = null;
   late Future<ScreenData<void, bool>> _localData;
   late String _userPhoto;
 
@@ -125,7 +126,66 @@ class _PhotosState extends State<Photos> {
                       ),
                     ],
                   ),
-                  body: SpUI.buildThumbnailsGridView(state: photosState, photos: _photos, context: context),
+                  body: SafeArea(
+                      child: Column(
+                          children: <Widget>[
+                            Container(
+                                height: MediaQuery.of(context).size.height * 0.45,
+                                width: MediaQuery.of(context).size.width,
+                                child: _selectedPhoto != null ?
+                                    GestureDetector(
+                                        child: _selectedPhoto,
+                                        onTap: () async {
+                                          FocusManager.instance.primaryFocus?.unfocus();
+                                          await showDialog(
+                                              context: context,
+                                              builder: (_) {
+                                                return Dialog(
+                                                  child: InteractiveViewer(
+                                                      clipBehavior: Clip.none,
+                                                      maxScale: 5,
+                                                      child: Container(
+                                                        child: _selectedPhoto,
+                                                        /*decoration: BoxDecoration(
+                                                          border: Border.all(color: Configuration.customerSecondaryColor),
+                                                        ),*/
+                                                      )
+                                                  ),
+                                                );
+                                              }
+                                          );
+                                        }
+                                    )
+                                    : Container(),
+                            ),
+                            const Divider(),
+                            _photos.length < 1?
+                              Container()
+                              : Container(
+                                  height: MediaQuery.of(context).size.height * 0.38,
+                                  child: GridView.builder(
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    crossAxisSpacing: 4,
+                                    mainAxisSpacing: 4),
+                                    itemBuilder: (_, i) {
+                                      final file = _photos[i];
+                                      return GestureDetector(
+                                        child: file,
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedPhoto = file;
+                                          });
+                                        },
+                                      );
+                                    },
+                                    itemCount: _photos.length
+                                  ),
+                                )
+                          ]
+                      )
+                  ),
+                  //SpUI.buildThumbnailsGridView(state: photosState, photos: _photos, context: context),
                   floatingActionButton: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -272,10 +332,13 @@ class _PhotosState extends State<Photos> {
         throw Exception();
       }
 
-      final photosIds = filesList.files!.map((f) => f.id!).toList();
+      final photos = filesList.files!.map((f){
+        final photoURL = Configuration.photosURL.replaceAll('<<photoId>>', f.id!);
+        return Image.network(photoURL);
+      }).toList();
 
       //TODO: ESTARIA BUENO DEVOLVER UN OBJETO CON NOMBRE DE LA FOTO Y BYTES PARA MOSTRAR
-      _photos = photosIds;
+      _photos = photos;
     }
 
     return true;

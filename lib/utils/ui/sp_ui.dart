@@ -12,7 +12,7 @@ import '../../config/configuration.dart';
 import '../sp_file_utils.dart';
 
 class SpUI{
-  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, /*required List<PhotoObject> photos**/required List<String> photos, required BuildContext context}) {
+  static Widget buildThumbnailsGridView<T extends StatefulWidget>({ required State<T> state, /*required List<PhotoObject> photos**/required List<Image> photos, required BuildContext context}) {
 
     final _mediaQuery = MediaQuery.of(context).size;
     final  desktopCrossAxisElements = _mediaQuery.width < 300? 1 : (_mediaQuery.width / 300).floor();
@@ -35,9 +35,9 @@ class SpUI{
     );
   }
 
-  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(/*String photoName,*/ String photoId, State<T> state, BuildContext context) {
+  static Widget _buildPhotoThumbnail<T extends StatefulWidget>(/*String photoName,*/ Image photo, State<T> state, BuildContext context) {
 
-    final photoURL = Configuration.photosURL.replaceAll('<<photoId>>', photoId);
+    //final photoURL = Configuration.photosURL.replaceAll('<<photoId>>', photoId);
 
     return Container(
         padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 4),
@@ -48,7 +48,7 @@ class SpUI{
           children: [
             Expanded(
               child: GestureDetector(
-                  child: Image.network(photoURL),
+                  child: photo,
                   onTap: () async {
                     FocusManager.instance.primaryFocus?.unfocus();
                     await showDialog(
@@ -59,7 +59,7 @@ class SpUI{
                                 clipBehavior: Clip.none,
                                 maxScale: 5,
                                 child: Container(
-                                  child:Image.network(photoURL),
+                                  child: photo,
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Configuration.customerSecondaryColor),
                                   ),
