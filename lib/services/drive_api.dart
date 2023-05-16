@@ -1,8 +1,12 @@
 import 'package:http/http.dart' as http;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 import '../config/configuration.dart';
 
@@ -15,7 +19,7 @@ bool getLoginStatus(){
 }
 
 final googleSignIn = GoogleSignIn.standard(scopes: [
-  drive.DriveApi.driveReadonlyScope
+  drive.DriveApi.driveScope//ReadonlyScope
 ]);
 
 Future<bool> signIn() async {
@@ -59,6 +63,68 @@ Future<void> signOut() async {
 
   return fileObject;
 }*/
+
+Future<bool> uploadTo(BuildContext context, XFile xfile) async {
+  try {
+    final driveApi = await _getDriveApi(context);
+    if (driveApi == null) {
+      return false;
+    }
+    // Not allow a user to do something else
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      transitionDuration: const Duration(seconds: 2),
+      barrierColor: Colors.black.withOpacity(0.5),
+      pageBuilder: (context, animation, secondaryAnimation) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    final folderId = await _getFolderId(driveApi, Configuration.photosFolderName);
+
+    // Create data here instead of loading a file
+    //const contents = 'Technical Feeder';
+    // Obtén el directorio temporal del dispositivo
+    final appDir = await getTemporaryDirectory();
+    final filePath = path.join(appDir.path, path.basename(xfile.path));
+
+    // Copia el archivo de XFile al directorio temporal
+    await xfile.saveTo(filePath);
+
+    // Lee el archivo desde el directorio temporal
+    final fileToUpload = File(filePath);
+
+    //final mediaStream = await xfile.readAsBytes();//Future.value(contents.codeUnits).asStream().asBroadcastStream();
+    //final mediaBytes = mediaStream.asStream().asBroadcastStream();
+    final media = drive.Media(fileToUpload.openRead(), fileToUpload.lengthSync());
+
+    // Set up File info
+    final driveFile = drive.File();
+    //final timestamp = DateFormat('yyyy-MM-dd-hhmmss').format(DateTime.now());
+    driveFile.name = xfile.path.split('/').last;//'technical-feeder-$timestamp.txt';
+    driveFile.modifiedTime = DateTime.now().toUtc();
+    driveFile.parents = [folderId!];
+
+    // Upload
+    final response = await driveApi.files.create(driveFile, uploadMedia: media);
+    print('response: $response');
+
+    //Delete temp file
+    fileToUpload.deleteSync();
+
+    // simulate a slow process
+    await Future.delayed(const Duration(seconds: 2));
+  } catch(_){
+    return false;
+  }finally {
+    // Remove a dialog
+    Navigator.pop(context);
+  }
+
+  return true;
+}
+
 
 Future<drive.FileList?> allFileList(context) async {
   final driveApi = await _getDriveApi(context);

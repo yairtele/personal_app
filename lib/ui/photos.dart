@@ -191,13 +191,20 @@ class _PhotosState extends State<Photos> {
                       children: [
                         FloatingActionButton(
                           onPressed: () async {
-                            final file = await getPhotoFromGallery();
-                            try {
-                              await saveImage(file!);
+                            final file = await getPhotoFromGallery(); //XFile
 
-                              UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
-                            } catch(e){
-                              UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
+                            try {
+                              final imageSaved = await saveImage(context, file!);
+
+                              setState((){
+                                if(imageSaved){
+                                  UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
+                                }else{
+                                  UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
+                                }
+                              });
+                            }catch(e){
+
                             }
                           },
                           backgroundColor: Configuration.customerPrimaryColor,
@@ -208,15 +215,16 @@ class _PhotosState extends State<Photos> {
                           onPressed: () async {
                             final file = await getPhotoFromCamera();
                             try {
-                              await saveImage(file!);
+                              final imageSaved = await saveImage(context, file!);
 
                               setState((){
-                                UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
+                                if(imageSaved){
+                                  UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
+                                }else{
+                                  UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
+                                }
                               });
                             } catch(e){
-                              setState((){
-                                UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
-                              });
                             }
                           },
                           backgroundColor: Configuration.customerPrimaryColor,

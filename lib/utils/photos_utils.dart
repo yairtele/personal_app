@@ -1,17 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<void> saveImage(XFile xfile) async {
+import '../services/drive_api.dart';
+
+Future<bool> saveImage(BuildContext context, XFile xfile) {
+
+  return uploadTo(context, xfile);
 
   //final image = await castXFile2File(xfile);
-
-  final directory = await getApplicationDocumentsDirectory(); //Directory
-  final filePath = directory.path + '/loadedPhotos/' + getTimestamp() + '.png';
-  final file = File(filePath); //File
-
-  await file.writeAsBytes(await xfile.readAsBytes());
 }
 
 Future<XFile?> getPhotoFromCamera() async {
