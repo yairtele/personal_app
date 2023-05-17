@@ -213,7 +213,7 @@ class _SongsState extends State<Songs> {
                                     crossAxisAlignment: CrossAxisAlignment.start,//x
                                     children:[
                                       Text(
-                                          songsToShow[index].title,
+                                        songsToShow[index].title,//.length > 35? songsToShow[index].title.substring(0,35) + '...' : songsToShow[index].title,
                                         style: const TextStyle(
                                           fontSize: 14.0,
                                           fontWeight: FontWeight.bold,
@@ -221,7 +221,7 @@ class _SongsState extends State<Songs> {
                                         )
                                       ),
                                       Text(
-                                        '${songsToShow[index].message}',
+                                        '${songsToShow[index].message}'.length > 87? '${songsToShow[index].message}'.substring(0,87) + '...' : '${songsToShow[index].message}',
                                         style: const TextStyle(
                                           fontSize: 12.0,
                                           color: Colors.grey

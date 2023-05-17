@@ -59,14 +59,6 @@ Future<void> signOut() async {
   //print("Sign out");
 }
 
-/*Future<Object> getFile(context, String fileId) async {
-  final driveApi = await _getDriveApi(context);//for this point, driveApi should not be null
-
-  final fileObject = (await driveApi!.files.get(fileId, downloadOptions: drive.DownloadOptions.fullMedia));
-
-  return fileObject;
-}*/
-
 Future<bool> uploadTo(BuildContext context, XFile xfile) async {
   try {
     final driveApi = await _getDriveApi(context);
@@ -91,7 +83,7 @@ Future<bool> uploadTo(BuildContext context, XFile xfile) async {
 
     //Set up file info
     final driveFile = drive.File();
-    driveFile.name = xfile.path.split('/').last;//'technical-feeder-$timestamp.txt';
+    driveFile.name = xfile.path.split('/').last.replaceAll('scaled_', '');//el replace es custom, hay varias que lo tienen
     driveFile.modifiedTime = DateTime.now().toUtc();
     driveFile.parents = [folderId!];
 
