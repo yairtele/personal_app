@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'dart:typed_data';
 
 import '../config/configuration.dart';
 
@@ -83,41 +86,25 @@ Future<bool> uploadTo(BuildContext context, XFile xfile) async {
 
     final folderId = await _getFolderId(driveApi, Configuration.photosFolderName);
 
-    // Create data here instead of loading a file
-    //const contents = 'Technical Feeder';
-    // Obtén el directorio temporal del dispositivo
-    final appDir = await getTemporaryDirectory();
-    final filePath = path.join(appDir.path, path.basename(xfile.path));
+    //Create media here
+    final media = drive.Media(castStream(xfile.openRead()), await xfile.length());
 
-    // Copia el archivo de XFile al directorio temporal
-    await xfile.saveTo(filePath);
-
-    // Lee el archivo desde el directorio temporal
-    final fileToUpload = File(filePath);
-
-    //final mediaStream = await xfile.readAsBytes();//Future.value(contents.codeUnits).asStream().asBroadcastStream();
-    //final mediaBytes = mediaStream.asStream().asBroadcastStream();
-    final media = drive.Media(fileToUpload.openRead(), fileToUpload.lengthSync());
-
-    // Set up File info
+    //Set up file info
     final driveFile = drive.File();
-    //final timestamp = DateFormat('yyyy-MM-dd-hhmmss').format(DateTime.now());
     driveFile.name = xfile.path.split('/').last;//'technical-feeder-$timestamp.txt';
     driveFile.modifiedTime = DateTime.now().toUtc();
     driveFile.parents = [folderId!];
 
-    // Upload
+    //Upload
+    //type 'Base64Encoder' is not a subtype of type 'StreamTransformer<Uint8List, String>' of 'streamTransformer'
     final response = await driveApi.files.create(driveFile, uploadMedia: media);
     print('response: $response');
 
-    //Delete temp file
-    fileToUpload.deleteSync();
-
-    // simulate a slow process
+    //simulate a slow process
     await Future.delayed(const Duration(seconds: 2));
   } catch(_){
     return false;
-  }finally {
+  } finally {
     // Remove a dialog
     Navigator.pop(context);
   }
@@ -125,6 +112,13 @@ Future<bool> uploadTo(BuildContext context, XFile xfile) async {
   return true;
 }
 
+Stream<List<int>> castStream(Stream<Uint8List> sourceStream) {
+  return sourceStream.transform(StreamTransformer<Uint8List, List<int>>.fromHandlers(
+    handleData: (Uint8List data, EventSink<List<int>> sink) {
+      sink.add(data.toList());
+    },
+  ));
+}
 
 Future<drive.FileList?> allFileList(context) async {
   final driveApi = await _getDriveApi(context);

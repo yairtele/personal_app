@@ -198,6 +198,7 @@ class _PhotosState extends State<Photos> {
 
                               setState((){
                                 if(imageSaved){
+                                  _localData = _getScreenData();
                                   UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
                                 }else{
                                   UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);
@@ -219,6 +220,7 @@ class _PhotosState extends State<Photos> {
 
                               setState((){
                                 if(imageSaved){
+                                  _localData = _getScreenData();
                                   UIHelper.showSuccessfulSnackBar('Imagen almacenada exitosamente', context);
                                 }else{
                                   UIHelper.showErrorSnackBar('La imagen no pudo ser almacenada', context);

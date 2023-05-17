@@ -7,10 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../services/drive_api.dart';
 
 Future<bool> saveImage(BuildContext context, XFile xfile) {
-
   return uploadTo(context, xfile);
-
-  //final image = await castXFile2File(xfile);
 }
 
 Future<XFile?> getPhotoFromCamera() async {
