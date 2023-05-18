@@ -130,6 +130,14 @@ class _PhotosState extends State<Photos> {
                       child: Column(
                           children: <Widget>[
                             Container(
+                                decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: AssetImage(
+                                      'assets/images/photos_bg.jpg',
+                                    ),
+                                  ),
+                                ),
                                 height: MediaQuery.of(context).size.height * 0.45,
                                 width: MediaQuery.of(context).size.width,
                                 child: _selectedPhoto != null ?
@@ -158,11 +166,19 @@ class _PhotosState extends State<Photos> {
                                     )
                                     : Container(),
                             ),
-                            const Divider(),
+                            //const Divider(),
                             _photos.length < 1?
                               Container()
                               : Container(
-                                  height: MediaQuery.of(context).size.height * 0.38,
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: AssetImage(
+                                        'assets/images/photos_down_bg.jpg',
+                                      ),
+                                    ),
+                                  ),
+                                  height: MediaQuery.of(context).size.height * 0.41,
                                   child: GridView.builder(
                                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 4,

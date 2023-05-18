@@ -134,55 +134,88 @@ class _PresentationState extends State<Presentation> {
               body: ListView(
                 children: [
                   Card(
-                    child: ListTile(
-                      leading: const Icon(FontAwesomeIcons.heart),
-                      title: const Text('Movie Part 1'),
-                      subtitle: const Text(
-                          'Primera parte de esta historia.'
-                      ),
-                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
-                      //isThreeLine: true,
-                      onTap: () => appState.waitCurrentAction<bool>(
-                          PageAction(state: PageState.addPage,
-                              pageConfig: MoviePart1PageConfig)
+                    child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                      fit: BoxFit.cover,
+                        image: AssetImage(
+                          'assets/images/mov1_bg.jpg',
+                        ),
+                        opacity: 0.5
                       ),
                     ),
+                    child: ListTile(
+                        leading: const Icon(FontAwesomeIcons.heart),
+                        title: const Text('Movie Part 1'),
+                        subtitle: const Text(
+                            'Primera parte de esta historia.'
+                        ),
+                        //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                        //isThreeLine: true,
+                        onTap: () => appState.waitCurrentAction<bool>(
+                            PageAction(state: PageState.addPage,
+                                pageConfig: MoviePart1PageConfig)
+                        ),
+                      ),
+                    )
                   ),
                   Card(
-                    child: ListTile(
-                      leading: const Icon(FontAwesomeIcons.heart),
-                      title: const Text('Movie Part 2'),
-                      subtitle: const Text(
-                          'Segunda parte de esta historia.'
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(
+                            'assets/images/mov2_bg.jpg',
+                          ),
+                          opacity: 0.5
+                        ),
                       ),
-                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
-                      //isThreeLine: true,
-                      onTap: () => appState.waitCurrentAction<bool>(
-                          PageAction(state: PageState.addPage,
-                              pageConfig: MoviePart2PageConfig)
+                      child: ListTile(
+                        leading: const Icon(FontAwesomeIcons.heart),
+                        title: const Text('Movie Part 2'),
+                        subtitle: const Text(
+                            'Segunda parte de esta historia.'
+                        ),
+                        //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                        //isThreeLine: true,
+                        onTap: () => appState.waitCurrentAction<bool>(
+                            PageAction(state: PageState.addPage,
+                                pageConfig: MoviePart2PageConfig)
+                        ),
                       ),
-                    ),
+                    )
                   ),
                   Card(
-                    child: ListTile(
-                      leading: const Icon(FontAwesomeIcons.photoVideo),
-                      title: const Text('Fotos'),
-                      subtitle: const Text(
-                          'Las mejores fotos de este viaje.'
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(
+                            'assets/images/photos_bg.jpg',
+                          ),
+                          opacity: 0.5
+                        ),
                       ),
-                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
-                      //isThreeLine: true,
-                      onTap: () {
-                        try {
-                          appState.waitCurrentAction<bool>(
-                              PageAction(state: PageState.addPage,
-                                  pageConfig: FotosPageConfig)
-                          );
-                        } on Exception catch (_) {
-                          UIHelper.showErrorSnackBar('No fue posible recuperar las fotos.', context);
+                      child: ListTile(
+                        leading: const Icon(FontAwesomeIcons.photoVideo),
+                        title: const Text('Fotos'),
+                        subtitle: const Text(
+                            'Las mejores fotos de este viaje.'
+                        ),
+                        //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                        //isThreeLine: true,
+                        onTap: () {
+                          try {
+                            appState.waitCurrentAction<bool>(
+                                PageAction(state: PageState.addPage,
+                                    pageConfig: FotosPageConfig)
+                            );
+                          } on Exception catch (_) {
+                            UIHelper.showErrorSnackBar('No fue posible recuperar las fotos.', context);
+                          }
                         }
-                      }
-                    ),
+                      ),
+                    )
                   ),
                   Card(
                     child: ListTile(
