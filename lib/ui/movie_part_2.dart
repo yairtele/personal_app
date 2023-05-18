@@ -104,9 +104,22 @@ class _MoviePart2State extends State<MoviePart2> {
                   ),
                 ],
               ),
-              body: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
-                  child: Text(textToShow)
+              body: SafeArea(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return Container(
+                        height: double.infinity,
+                        decoration: const BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage('assets/images/mov2_bg.jpg'),
+                                fit: BoxFit.cover
+                            )
+                        ),
+                        child: Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+                            child: Text(textToShow)
+                        )
+                    );
+                  })
               )
             );
           }
