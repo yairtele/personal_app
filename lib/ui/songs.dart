@@ -1,3 +1,4 @@
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:marieyayo/ui/screen_data.dart';
 import 'package:provider/provider.dart';
@@ -251,11 +252,20 @@ class _SongsState extends State<Songs> {
                 ),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () async {
-                    if(await canLaunchUrl(Uri.parse(Configuration.songsURL))) {
-                      await launchUrl(Uri.parse(Configuration.songsURL), mode: LaunchMode.externalApplication);
-                    }else{
-                      _showErrorSnackBar('URL can\'t be launched.', context);
-                    }
+                    /*try{
+                      const intent = AndroidIntent(
+                        action: 'action_view',
+                        data: 'package:com.smule.singandroid',
+                        //arguments: {'authAccount': currentUserEmail},
+                      );
+                      await intent.launch();
+                    }catch(_){*/
+                      if(await canLaunchUrl(Uri.parse(Configuration.songsURL))) {
+                        await launchUrl(Uri.parse(Configuration.songsURL), mode: LaunchMode.externalApplication);
+                      }else{
+                        _showErrorSnackBar('URL can\'t be launched.', context);
+                      }
+                    //}
                   },
                   backgroundColor: Configuration.customerSecondaryColor,
                   child: const Icon(Icons.add, color: Configuration.customerPrimaryColor),

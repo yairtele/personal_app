@@ -52,6 +52,7 @@ dependencies:
   firebase_core: ^2.10.0
   firebase_messaging: ^14.4.1
   firebase_core_platform_interface: ^4.6.0
+  android_intent_plus: ^4.0.0
 
 #  keycloak_flutter: ^0.0.3
   thumbnailer: ^2.0.1
