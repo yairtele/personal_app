@@ -73,9 +73,6 @@ class _PresentationState extends State<Presentation> {
           if (snapshot.connectionState == ConnectionState.done &&  snapshot.hasData) {
             final data = snapshot.data!;
             final userInfo = data.userInfo;
-            //final batches = data.data!;
-            //final draftBatches = batches.where((batch) => batch.state == BatchStates.Draft).toList();
-            //final auditedBatches = batches.where((batch) =>batch.state != BatchStates.Draft).toList();
             widget = Scaffold(
               appBar: AppBar(
                 elevation: 0,
@@ -218,19 +215,30 @@ class _PresentationState extends State<Presentation> {
                     )
                   ),
                   Card(
-                    child: ListTile(
-                      leading: const Icon(FontAwesomeIcons.music),
-                      title: const Text('Canciones'),
-                      subtitle: const Text(
-                          'Todos los éxitos de esta dupla.'
+                    child: Container(
+                      decoration: const BoxDecoration(
+                      image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage(
+                      'assets/images/songs_bg.jpg',
                       ),
-                      //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
-                      //isThreeLine: true,
-                      onTap: () => appState.waitCurrentAction<bool>(
-                          PageAction(state: PageState.addPage,
-                              pageConfig: SongsPageConfig)
+                      opacity: 0.5
                       ),
-                    ),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(FontAwesomeIcons.music),
+                        title: const Text('Canciones'),
+                        subtitle: const Text(
+                            'Todos los éxitos de esta dupla.'
+                        ),
+                        //trailing: const Icon(Icons.more_vert), //TODO: Agregar mas info o no?
+                        //isThreeLine: true,
+                        onTap: () => appState.waitCurrentAction<bool>(
+                            PageAction(state: PageState.addPage,
+                                pageConfig: SongsPageConfig)
+                        ),
+                      ),
+                    )
                   )
                 ],
               ));
