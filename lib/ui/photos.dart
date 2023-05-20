@@ -69,20 +69,6 @@ class _PhotosState extends State<Photos> {
                           color: Configuration.customerSecondaryColor),
                     ),
                     actions: [
-                      IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () =>
-                              appState.waitCurrentAction<bool>(
-                                  PageAction(state: PageState.addPage,
-                                      pageConfig: NewBatchPageConfig)
-                              ).then((shouldRefresh) {
-                                if (shouldRefresh!) {
-                                  setState(() {
-                                    _localData = _getScreenData();
-                                  });
-                                }
-                              })
-                      ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                             primary: Configuration.customerPrimaryColor
@@ -360,7 +346,8 @@ class _PhotosState extends State<Photos> {
 
       final photos = filesList.files!.map((f){
         final photoURL = Configuration.photosURL.replaceAll('<<photoId>>', f.id!);
-        return Image.network(photoURL);
+        final image = Image.network(photoURL);
+        return image;
       }).toList();
 
       //TODO: ESTARIA BUENO DEVOLVER UN OBJETO CON NOMBRE DE LA FOTO Y BYTES PARA MOSTRAR

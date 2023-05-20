@@ -5,6 +5,7 @@ class Configuration{
   static const Color customerPrimaryColor = Color(0xFF99cfe0);//TODO: Esto será personalizado por usuario
   static const Color customerSecondaryColor = Color(0xFFce5eb3);//TODO: Esto será personalizado por usuario
   static const String photosFolderName = 'personal_app_photos';
+  static const String photosFolderId = '1da75DOhostOiiYIBtXmR376TYQgJqa3j';
   static const String photosURL = 'https://drive.google.com/uc?export=view&id=<<photoId>>';
   static const String songsURL = 'https://www.smule.com';
   //TODO: PAPP - Pasar a archivo o db

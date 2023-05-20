@@ -105,21 +105,20 @@ class _MoviePart2State extends State<MoviePart2> {
                 ],
               ),
               body: SafeArea(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    return Container(
-                        height: double.infinity,
+                  child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Container(
                         decoration: const BoxDecoration(
                             image: DecorationImage(
-                                image: AssetImage('assets/images/mov2_bg.jpg'),
-                                fit: BoxFit.cover
+                              image: AssetImage('assets/images/mov2_bg.jpg'),
+                              fit: BoxFit.cover,
+                              opacity: 0.6
                             )
                         ),
-                        child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
-                            child: Text(textToShow)
-                        )
-                    );
-                  })
+                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
+                        child: Text(textToShow)
+                      )
+                  )
               )
             );
           }

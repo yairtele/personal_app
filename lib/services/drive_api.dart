@@ -129,7 +129,8 @@ Future<drive.FileList?> allFileList(context) async {
 }
 
 Future<String?> _getFolderId(drive.DriveApi driveApi, String folderName) async {
-  try {
+  return Configuration.photosFolderId;
+  /*try {
     final found = await driveApi.files.list(
       q: "mimeType = '$_folderType' and name = '$folderName'",
       $fields: 'files(id, name)',
@@ -145,7 +146,7 @@ Future<String?> _getFolderId(drive.DriveApi driveApi, String folderName) async {
   } catch (e) {
     print(e);
   }
-  return null;
+  return null;*/
 }
 
 Future<drive.DriveApi?> _getDriveApi(context) async {
