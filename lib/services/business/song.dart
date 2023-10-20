@@ -7,7 +7,7 @@ class Song {
   String key; //performance key (id)
   String title; //song title (name of song)
   String type; //performance type (audio or video)
-  String artist; //song artist
+  String? artist; //song artist
   String? message; //message of the song (description)
   String createdAt; //date of song creation
   String ensembleType; //ensemble type (DUET or SOLO or COLAB)
