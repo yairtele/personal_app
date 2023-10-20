@@ -6,7 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:marieyayo/services/athento/binary_file_info.dart';
 import 'package:marieyayo/services/business/batch_states.dart';
 import 'package:marieyayo/utils/ui/thumb_photo.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart';
+//import 'package:file_picker_cross/file_picker_cross.dart';
 
 import '../../config/configuration.dart';
 import '../sp_file_utils.dart';
@@ -87,29 +89,33 @@ class SpUI{
   }
 
   static Future<XFile?> _getPhotoFromDesktopLocalStorage() async {
-    final file_picked = await FilePickerCross.importFromStorage(
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowedExtensions: ['jpg', 'pdf', 'doc']
+    ); //FilePickerResult?
+
+    var file_picked;
+    if (result != null) {
+      file_picked = File(result.files.single.path!); //File
+    } else {
+      throw Error();
+    }
+    /*final file_picked = await FilePickerCross.importFromStorage(
         type: FileTypeCross.image,
         fileExtension: 'png, jpg, jpeg'
     ).onError((error, _) {
       throw Error();
-      /*
-      String _exceptionData = error.reason();
-      print('REASON: ${_exceptionData}');
-      if (_exceptionData == 'read_external_storage_denied') {
-        print('Permission was denied');
-      } else if (_exceptionData == 'selection_canceled') {
-        print('User canceled operation');
-      }
-    */
-    });
+    });*/
 
-    return _filePickerCross2XFile(file_picked);
+    return _file2XFile(file_picked);
   }
 
-  static XFile? _filePickerCross2XFile(FilePickerCross filePicked) {
-    final fileBytes = filePicked.toUint8List();
+  static XFile? _file2XFile(File filePicked) {
+    final fileBytes = filePicked.readAsBytesSync();
+    final filePath = filePicked.path;
 
-    return XFile.fromData(fileBytes, path: filePicked.path, mimeType: filePicked.fileExtension);
+    return XFile.fromData(fileBytes, path: filePath, mimeType: extension(filePath));
   }
 
   static Future<XFile?> _getPhoto(ImageSource source) async {
